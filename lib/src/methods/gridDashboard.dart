@@ -1,0 +1,188 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+
+class GridDashboard extends StatefulWidget {
+  final userId;
+  GridDashboard({this.userId});
+  @override
+  _GridDashboardState createState() => _GridDashboardState();
+}
+
+class _GridDashboardState extends State<GridDashboard> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Items item1 = new Items(
+      title: "Mis Pagos",
+      route: '/screen3',
+      icon: Icon(
+        Icons.show_chart_rounded,
+        size: 50,
+        color: Colors.lightGreen,
+      ));
+
+  Items item2 = new Items(
+      title: 'Proximamente',
+      //route: '/screen4',
+      icon: Icon(Icons.announcement_rounded, size: 50, color: Colors.grey));
+
+  Items item3 = new Items(
+      title: 'Proximamente',
+      //route: '/screen6',
+      icon: Icon(
+        Icons.book_rounded,
+        size: 50,
+        color: Colors.grey,
+      ));
+
+  Items item4 = new Items(
+      title: 'Amenidades',
+      route: '/screen7',
+      icon: Icon(
+        Icons.event,
+        size: 50,
+        color: Colors.deepPurpleAccent,
+      ));
+
+  Items item5 = new Items(
+      title: 'Reportes',
+      route: '/screen5',
+      icon: Icon(
+        Icons.report,
+        size: 50,
+        color: Colors.blue,
+      ));
+
+  Items item6 = new Items(
+      title: 'Coming Soon',
+      //route: '/screen8',
+      icon: Icon(
+        Icons.accessibility_new,
+        size: 50,
+        color: Colors.grey,
+      ));
+
+  Items item7 = new Items(
+      title: 'Coming Soon',
+      //route: '/screen9',
+      icon: Icon(
+        Icons.chat_rounded,
+        size: 50,
+        color: Colors.grey,
+      ));
+
+  Items item8 = new Items(
+      //route: '/screen10',
+      title: 'Coming Soon',
+      icon: Icon(Icons.assistant, size: 50, color: Colors.grey));
+  Items item9 = new Items(
+    route: '/screen11',
+    title: 'Directorio',
+    icon: Icon(
+      Icons.contacts,
+      size: 50,
+      color: Colors.greenAccent[700],
+    ),
+  );
+  List<Items> myList = [];
+  @override
+  Widget build(BuildContext context) {
+    switch (widget.userId) {
+      case 1:
+        myList = [
+          item1,
+          item5,
+          item4,
+          
+        ];
+
+        break;
+      case 2:
+        myList = [
+          item1,
+          item9,
+          item4,
+          item5,
+          item2,
+          item3,
+          item6,
+          item7,
+          item8,
+        ];
+
+        break;
+      case 3:
+        myList = [item8, item9];
+        break;
+    }
+    return Expanded(
+        child: AnimationLimiter(
+      child: GridView.count(
+          padding: EdgeInsets.only(left: 17, right: 17),
+          crossAxisCount: 2,
+          childAspectRatio: 1.1,
+          crossAxisSpacing: 15,
+          mainAxisSpacing: 15,
+          children: myList.map((data) {
+            return AnimationConfiguration.staggeredGrid(
+              columnCount: myList.length,
+              duration: Duration(milliseconds: 375),
+              position: 2,
+              child: ScaleAnimation(
+                scale: 0.5,
+                child: FadeInAnimation(
+                  child: InkWell(
+                    onTap: () {
+                      HapticFeedback.mediumImpact();
+                      Navigator.pushNamed(context, data.route!,
+                          arguments: GridDashboard());
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.grey,
+                                blurRadius: 10,
+                                offset: Offset(0, 5))
+                          ]),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          data.icon!,
+                          SizedBox(
+                            height: 14,
+                          ),
+                          Text(
+                            data.title!,
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }).toList()),
+    ));
+  }
+}
+
+class Items {
+  String? route;
+  String? title;
+  String? id;
+  String? subtitle;
+  //el evento puede ayudar a las notificaciones, checar despues
+  String? event;
+  Icon? icon;
+  Items({this.title, this.icon, this.subtitle, this.route, this.id});
+}

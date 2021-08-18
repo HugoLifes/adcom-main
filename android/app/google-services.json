@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "371215728163",
+    "project_id": "adcom-8e249",
+    "storage_bucket": "adcom-8e249.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:371215728163:android:73038fc169473254677b96",
+        "android_client_info": {
+          "package_name": "com.soluciones.adcom"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "371215728163-f2mucf32nl0g0pmvsgdcndrnbl3h6b8o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA8yz0BR-OPHLoowaywNfLPee6_FLx2ARY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "371215728163-f2mucf32nl0g0pmvsgdcndrnbl3h6b8o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

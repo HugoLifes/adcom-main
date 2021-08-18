@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config xmlns:tools="http://schemas.android.com/tools">
+    <base-config>
+        <domain tools:ignore="NetworkSecurityConfig">http://192.168.1.178/AdcomBackend/backend/web/index.php?r=adcom/get-directorio</domain>
+        <domain tools:ignore="NetworkSecurityConfig">http://187.197.53.8/AdcomBackend/backend/web/index.php?r=adcom/get-directorio</domain>
+        <trust-anchors>
+            <certificates src="system"/>
+        </trust-anchors>
+    </base-config>
+</network-security-config>
