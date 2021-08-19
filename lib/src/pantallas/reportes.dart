@@ -99,12 +99,12 @@ class _ReportesState extends State<Reportes> {
             decoration: BoxDecoration(color: Colors.blue),
           ),
           Container(
-            padding: size.width >= 880  ?EdgeInsets.only(top: 75) : EdgeInsets.only(top: 100, right: 25),
+            padding: EdgeInsets.only(top: size.height * .12, left: size.width * .12 ),
             alignment: Alignment.topRight,
             child: Icon(
               Icons.report,
               color: Colors.white,
-              size: 120,
+              size: size.height*.20 ,
             ),
           ),
           SafeArea(
@@ -138,7 +138,7 @@ class _ReportesState extends State<Reportes> {
                   width: size.width * .6,
                   child: Text(
                     'Reporta incidencias en tu comunidad para que todos estén al tanto de comportamientos inusuales o faltas a la comunidad.',
-                    style: TextStyle(color: Colors.white, fontSize: size.width >= 880  ? 19 : 18),
+                    style: TextStyle(color: Colors.white, fontSize: size.width /20),
                   ),
                 ),
                 SizedBox(

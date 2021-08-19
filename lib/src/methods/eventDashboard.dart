@@ -32,7 +32,7 @@ Future<Places?> amenidades() async {
   print('?$id');
 
   final Uri url = Uri.parse(
-      'http://187.189.53.8/AdcomBackend/backend/web/index.php?r=adcom/get-amenidades');
+      'http://187.189.53.8:8080/AdcomBackend/backend/web/index.php?r=adcom/get-amenidades');
   final response = await http.post(url, body: {
     "params": json.encode({"usuarioId": id})
   });
@@ -101,7 +101,7 @@ class _EventDashboardState extends State<EventDashboard> {
           )));
     }
     }catch(e){
-      myList.add(new Amenidad(error: 'No cuenta con estos servicios', icon: Icon(Icons.sms_failed, color: Colors.red,)));
+      myList.add(new Amenidad(error: 'No tiene amenidades', icon: Icon(Icons.sms_failed, color: Colors.red,)));
       setState(() {
         itsTrue = false;
       });    
@@ -118,99 +118,35 @@ class _EventDashboardState extends State<EventDashboard> {
   refresh() {
     setState(() {
       var size = MediaQuery.of(context).size.width;
-      viewAmenidades(size: size);
+      var size2 = MediaQuery.of(context).size.height;
+      viewAmenidades( width:size, heigth: size2);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size.width;
+    var size2 = MediaQuery.of(context).size.height;
     return myList.isEmpty
         ? Center(
             child: CircularProgressIndicator(
               backgroundColor: Colors.white,
             ),
           )
-        : viewAmenidades(size: size);
+        :  viewAmenidades(width: size, heigth: size2);
   }
 
-  viewAmenidades({size}) => size >= 880 ? Flexible(
-          child: GridView.builder(
-        padding: size >= 880 ?EdgeInsets.only(left: 15, right: 15, top: 17): EdgeInsets.only(left: 4, right: 4, top: 17) ,
-        itemCount: myList.length,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 1,
-          childAspectRatio: 3.5,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 14,
-        ),
-        itemBuilder: (context, int data) {
-          return InkWell(
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (_) => EventWeekly(id: myList[data].id)));
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.grey,
-                        blurRadius: 10,
-                        offset: Offset(0, 5))
-                  ]),
-              child: Container(
-                //margin: EdgeInsets.symmetric(vertical: 20),
-                padding: const EdgeInsets.all(18),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      height: 50,
-                      width: 50,
-                      child: myList[data].icon == null
-                          ? SizedBox()
-                          : myList[data].icon,
-                    ),
-                    SizedBox(
-                      width: 14,
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        myList[data].title == null
-                            ? Container()
-                            : Text(
-                                myList[data].title!,
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.w600),
-                              ),
-                        SizedBox(
-                          height: 12,
-                        ),
-                        myList[data].subtitle == null
-                            ? Container()
-                            : Text(myList[data].subtitle!, style: TextStyle(fontSize: 14),),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      )): Flexible(
+  viewAmenidades({width, heigth}){
+    
+    return Flexible(
           child: GridView.builder(
         padding: EdgeInsets.only(left: 10, right: 10, top: 15) ,
         itemCount: myList.length,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 1,
-          childAspectRatio: 3.8,
-          crossAxisSpacing: 14,
-          mainAxisSpacing: 14,
+          childAspectRatio: 3.3,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
         ),
         itemBuilder: (context, int data) {
           return InkWell(
@@ -247,7 +183,7 @@ class _EventDashboardState extends State<EventDashboard> {
                           : myList[data].icon,
                     ),
                     SizedBox(
-                      width: 14,
+                      width: 13,
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -262,7 +198,7 @@ class _EventDashboardState extends State<EventDashboard> {
                                     fontWeight: FontWeight.w600),
                               ),
                         SizedBox(
-                          height: 12,
+                          height: heigth/100,
                         ),
                         myList[data].subtitle == null
                             ? Container()
@@ -282,9 +218,9 @@ class _EventDashboardState extends State<EventDashboard> {
                                     fontWeight: FontWeight.w600),
                               ),
                         SizedBox(
-                          height: 12,
+                          height: width /40,
                         ),
-                        Text('Lo sentimos :(')
+                        itsTrue== false ? Text('Lo sentimos :('): Text(''),
                       ],
                     ),
                   ],
@@ -294,6 +230,9 @@ class _EventDashboardState extends State<EventDashboard> {
           );
         },
       ));
+  }
+
+  
 }
 
 class Amenidad {

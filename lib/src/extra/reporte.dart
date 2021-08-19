@@ -29,7 +29,7 @@ Future<GetReportes?> getReportes() async {
   prefs = await SharedPreferences.getInstance();
   var id = prefs!.getInt('id');
   Uri url = Uri.parse(
-      'http://187.189.53.8/AdcomBackend/backend/web/index.php?r=adcom/get-reportes');
+      'http://187.189.53.8:8080/AdcomBackend/backend/web/index.php?r=adcom/get-reportes');
 
   final response = await http.post(url, body: {"idResidente": id.toString()});
 

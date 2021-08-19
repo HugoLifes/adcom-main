@@ -38,7 +38,7 @@ Future<Accounts?> getAdeudos() async {
   var id = prefs!.getInt('idUser');
 
   final Uri url = Uri.parse(
-      'http://187.189.53.8/AdcomBackend/backend/web/index.php?r=adcom/get-adeudos');
+      'http://187.189.53.8:8080/AdcomBackend/backend/web/index.php?r=adcom/get-adeudos');
   final response = await http.post(url, body: {
     "params": json.encode({"usuarioId": id})
   });
@@ -103,7 +103,7 @@ class _FinanzasState extends State<Finanzas> {
             "pk_test_51JAjdHAoDnRH9C3fzuzLNpJaSlrcUVBJhDzN6ACKV8jocJSLvDCoBa1d1oBTX46CfOpC8wCLQ76H0aDOTZCo3xtO00a3pBNqw1",
         merchantId: "Test",
         androidPayMode: 'test'));
-    Future.delayed(Duration(milliseconds: 998), () => {refresh()});
+    Future.delayed(Duration(seconds : 1 ), () => {refresh()});
   }
 
   refresh() {
@@ -189,7 +189,9 @@ class _FinanzasState extends State<Finanzas> {
                               ? Center(
                                   child: CircularProgressIndicator(),
                                 )
-                              : mainView())
+                              : mainView()
+                              
+                              )
                     ],
                   ),
                 ),
@@ -202,7 +204,7 @@ class _FinanzasState extends State<Finanzas> {
                 decoration: BoxDecoration(color: Colors.lightGreen[700]),
               ),
               Container(
-                padding: EdgeInsets.only(top: 80),
+                padding: EdgeInsets.only(top: size.height * .10),
                 alignment: Alignment.topRight,
                 child: Icon(
                   Icons.show_chart_rounded,
@@ -213,48 +215,50 @@ class _FinanzasState extends State<Finanzas> {
               SafeArea(
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Text(
-                        'Mis Pagos',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 30,
-                            fontFamily: 'Roboto',
-                            fontWeight: FontWeight.w700),
-                      ),
-                      SizedBox(
-                        height: size.width >= 880 ? 25:23,
-                      ),
-                      Text(
-                        'Toma el control de tus gastos',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: 17),
-                      ),
-                      SizedBox(
-                        height: size.width >= 880? 35: 20,
-                      ),
-                      SizedBox(
-                        width: size.width * .6,
-                        child: Text(
-                          'Mantente actualizado revisando tus estados de cuenta y adeudos pendientes.',
-                          style: TextStyle(color: Colors.white, fontSize: 20),
+                  child: ListView(
+                    shrinkWrap: true,
+                    children:[
+                      Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Mis Pagos',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 30,
+                              fontFamily: 'Roboto',
+                              fontWeight: FontWeight.w700),
                         ),
-                      ),
-                      Container(
-                          padding: EdgeInsets.only(top: size.width >= 880 ? 45:10, left: size.width >=880?5:0, right: size.width >= 880? 5:0),
-                          child: localList.isEmpty
-                              ? Center(
-                                  child: CircularProgressIndicator(),
-                                )
-                              : mainView())
-                    ],
+                        SizedBox(
+                          height: size.width /19,
+                        ),
+                        Text(
+                          'Toma el control de tus gastos',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 17),
+                        ),
+                        SizedBox(
+                          height: size.width/20,
+                        ),
+                        SizedBox(
+                          width: size.width * .6,
+                          child: Text(
+                            'Mantente actualizado revisando tus estados de cuenta y adeudos pendientes.',
+                            style: TextStyle(color: Colors.white, fontSize: size.width / 20),
+                          ),
+                        ),
+                        Container(
+                            padding: EdgeInsets.only(top: size.width /10, left: size.width >=880?5:0, right: size.width >= 880? 5:0),
+                            child: localList.isEmpty
+                                ? Center(
+                                    child: CircularProgressIndicator(),
+                                  )
+                                : mainView()  )
+                      ],
+                    ),
+                    ] 
                   ),
                 ),
               ),
@@ -361,7 +365,7 @@ class _EstadoCuentaState extends State<EstadoCuenta> {
   void initState() {
     super.initState();
     data();
-    Future.delayed(Duration(milliseconds: 198), () {
+    Future.delayed(Duration(seconds: 1), () {
       setState(() {
         saldoDeudor();
         cuantoDebe();
@@ -371,8 +375,8 @@ class _EstadoCuentaState extends State<EstadoCuenta> {
 
   @override
   Widget build(BuildContext context) {
-    var size= MediaQuery.of(context).size.width;
-    return size >= 880 ? Container(
+    var size= MediaQuery.of(context).size;
+    return size.width >= 880 ? Container(
       width: MediaQuery.of(context).size.width,
       height: 180,
       decoration: BoxDecoration(boxShadow: [
@@ -405,7 +409,7 @@ class _EstadoCuentaState extends State<EstadoCuenta> {
                       children: [
                         Text('Información Actualizada:'),
                         SizedBox(
-                          width: size >= 880?100 : 50,
+                          width: size.width >= 880?100 : 50,
                         ),
                         Text(
                           '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
@@ -469,15 +473,15 @@ class _EstadoCuentaState extends State<EstadoCuenta> {
       ),
     ): Container(
       width: MediaQuery.of(context).size.width,
-      height: 120,
+      height: 170,
       decoration: BoxDecoration(boxShadow: [
         BoxShadow(color: Colors.grey, blurRadius: 6, offset: Offset(0, 1))
       ], color: Colors.white, borderRadius: BorderRadius.circular(10)),
       child: Padding(
         padding:
-            const EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 20),
+            const EdgeInsets.only(left: 11, right: 11, top: 10, bottom: 20),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -498,9 +502,9 @@ class _EstadoCuentaState extends State<EstadoCuenta> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Text('Información Actualizada:'),
+                        Text('Información Actualizada:', style: TextStyle(fontSize: size.width/28, fontWeight: FontWeight.bold),),
                         SizedBox(
-                          width: size >= 880?100 : 50,
+                          width: size.width * .13,
                         ),
                         Text(
                           '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
@@ -539,16 +543,16 @@ class _EstadoCuentaState extends State<EstadoCuenta> {
                 Expanded(
                   child: Center(
                     child: Text(
-                      '\$ ${saldoDeudor()} MXN',
+                      '\$${saldoDeudor()}MXN',
                       style: TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
-                          fontSize: 20),
+                          fontSize: size.width/ 17),
                     ),
                   ),
                 ),
                 SizedBox(
-                  width: 30,
+                  width: 20,
                 ),
                 Expanded(
                     child: Center(

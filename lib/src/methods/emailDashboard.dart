@@ -35,7 +35,7 @@ Future<Welcome?> getData() async {
   var id = prefs!.getInt('id');
 
   Uri uri = Uri.parse(
-      'http://187.189.53.8/AdcomBackend/backend/web/index.php?r=adcom/get-directorio');
+      'http://187.189.53.8:8080/AdcomBackend/backend/web/index.php?r=adcom/get-directorio');
   final response = await http.post(uri, body: {
     "params": json.encode({'usuarioId': id.toString()})
   });

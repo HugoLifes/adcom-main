@@ -118,10 +118,10 @@ class _GridDashboardState extends State<GridDashboard> {
         myList = [item8, item9];
         break;
     }
-    return Expanded(
+    return Flexible(
         child: AnimationLimiter(
       child: GridView.count(
-          padding: EdgeInsets.only(left: 17, right: 17),
+          padding: EdgeInsets.only(left: 16, right: 16, top: 10),
           crossAxisCount: 2,
           childAspectRatio: 1.1,
           crossAxisSpacing: 15,

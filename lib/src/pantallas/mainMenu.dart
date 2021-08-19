@@ -127,7 +127,7 @@ class _MainMenuState extends State<MainMenu> {
           ),
         ),
         Container(
-            padding: EdgeInsets.only(top: size.width * .45, right: size.width * .10),
+            padding: EdgeInsets.only(top: size.height * .18, right: size.width * .10),
             alignment: Alignment.topRight,
             child: Image.asset(
               'assets/images/AdCom3.png',
@@ -152,15 +152,21 @@ class _MainMenuState extends State<MainMenu> {
                         style: TextStyle(
                             color: Colors.black,
                             fontFamily: 'Roboto',
-                            fontSize: size.width * .11,
+                            fontSize: size.width /11,
                             fontWeight: FontWeight.w700),
                       ),
+                      //no mover
                       SizedBox(
-                        height: size.height /8,
+                        height: size.height >= 640 ?  size.height/6: size.height /10,
                       ),
                       
                     ],
                   ),
+                ),
+
+                //no mover
+                SizedBox(
+                  height: size.width <= 640 ? 0 : size.height/13,
                 ),
                 
                 GridDashboard(

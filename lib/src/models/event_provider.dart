@@ -87,7 +87,7 @@ class EventProvider extends ChangeNotifier {
 
         dataOff5(userId);
 
-        //Navigator.pushReplacementNamed(ctx, '/');
+        Navigator.pushReplacementNamed(ctx, '/');
       }
     });
 

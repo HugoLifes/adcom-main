@@ -24,7 +24,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
     super.initState();
     _showPersBottomSheetCallBack = _showPersBottomSheetCallBack;
     data();
-    Future.delayed(Duration(milliseconds: 198), () {
+    Future.delayed(Duration(seconds: 1), () {
       setState(() {
         ultimaDeuda();
         estadodepago();
@@ -40,6 +40,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+    var size2 = MediaQuery.of(context).size.width;
     return mylist.isEmpty
         ? SizedBox()
         : size.width >= 880 ? Container(
@@ -252,7 +253,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
 
                       OutlinedButton(
                         onPressed: () {
-                          _showAlertDialog();
+                          _showAlertDialog(size: size2);
                         },
                         child: Text('Detalles',
                             textAlign: TextAlign.center,
@@ -355,7 +356,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
         });
   }
 
-  _showAlertDialog() async {
+  _showAlertDialog({size}) async {
     Widget okButton = TextButton(
         onPressed: () {
           Navigator.of(context)..pop();
@@ -368,7 +369,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
         style: TextStyle(fontSize: 25),
       ),
       content: Container(
-        width: 140,
+        width: size/20,
         height: 150,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -378,7 +379,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
               children: [
                 Text('Mantenimiento',
                     style: TextStyle(
-                      fontSize: 19,
+                      fontSize: size /20,
                       fontWeight: FontWeight.w400,
                       textBaseline: TextBaseline.alphabetic,
                     )),

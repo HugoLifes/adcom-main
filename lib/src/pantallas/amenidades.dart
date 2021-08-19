@@ -33,7 +33,7 @@ Future<Places?> idso() async {
   var id = prefs!.getInt('idCom');
 
   final Uri url = Uri.parse(
-      'http://187.189.53.8/AdcomBackend/backend/web/index.php?r=adcom/get-amenidades');
+      'http://187.189.53.8:8080/AdcomBackend/backend/web/index.php?r=adcom/get-amenidades');
   final response = await http.post(url, body: {
     "params": json.encode({"usuarioId": id})
   });
@@ -153,7 +153,7 @@ class _AmenidadesState extends State<Amenidades> {
               child: Icon(
                 Icons.event,
                 color: Colors.white,
-                size: 150,
+                size: size.width /3,
               ),
             ),
             SafeArea(
@@ -190,7 +190,7 @@ class _AmenidadesState extends State<Amenidades> {
                     width: size.width * .5,
                     child: Text(
                       'Enterate de la disponibilidad de tus areas recreativas o aparta con tiempo para tus eventos',
-                      style: TextStyle(color: Colors.white, fontSize: size.width >=880?19:19),
+                      style: TextStyle(color: Colors.white, fontSize: size.width / 20),
                     ),
                   ),
                   SizedBox(

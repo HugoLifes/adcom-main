@@ -101,7 +101,7 @@ class _AvisosDashboardState extends State<AvisosDashboard> {
         child: GridView.count(
             padding: EdgeInsets.only(left: 10, right: 10, top: 10),
             crossAxisCount: 1,
-            childAspectRatio: 3.5,
+            childAspectRatio: 3.4,
             crossAxisSpacing: 14,
             mainAxisSpacing: 14,
             children: myList.map((data) {
@@ -139,13 +139,13 @@ class _AvisosDashboardState extends State<AvisosDashboard> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             SizedBox(
-                              height: 18,
+                              height: 15,
                             ),
                             Text(
                               data.title!,
                               style: TextStyle(
                                   color: Colors.black,
-                                  fontSize: 15,
+                                  fontSize: size.width / 25,
                                   fontWeight: FontWeight.w600),
                             ),
                           ],
