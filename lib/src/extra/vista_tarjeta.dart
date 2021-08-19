@@ -481,7 +481,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
             DateTime.now().year <= mylist[i].fechaLimite!.year) {
           return debe = monto;
         } else {
-          if (mylist[i].pagoTardio == 0) {
+          if (mylist[i].pagoTardio == 0 || mylist[i].pagoTardio == null ) {
             return debe = monto;
           } else {
             total = int.parse(mylist[i].montoTardio!);

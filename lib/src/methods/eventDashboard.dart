@@ -48,6 +48,7 @@ Future<Places?> amenidades() async {
 class _EventDashboardState extends State<EventDashboard> {
   List<Amenidad> myList = [];
   late Places places;
+  bool itsTrue = true;
 
   Amenidad item1 = new Amenidad(
       route: '/screen12',
@@ -101,6 +102,9 @@ class _EventDashboardState extends State<EventDashboard> {
     }
     }catch(e){
       myList.add(new Amenidad(error: 'No cuenta con estos servicios', icon: Icon(Icons.sms_failed, color: Colors.red,)));
+      setState(() {
+        itsTrue = false;
+      });    
     }
   }
 
@@ -211,8 +215,13 @@ class _EventDashboardState extends State<EventDashboard> {
         itemBuilder: (context, int data) {
           return InkWell(
             onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
+
+              if(itsTrue == false){
+              
+              }else{
+                Navigator.of(context).push(MaterialPageRoute(
                   builder: (_) => EventWeekly(id: myList[data].id)));
+              }
             },
             child: Container(
               decoration: BoxDecoration(

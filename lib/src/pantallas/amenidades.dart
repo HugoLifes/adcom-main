@@ -13,6 +13,7 @@ SharedPreferences? prefs;
 
 class Amenidades extends StatefulWidget {
   final id;
+  
   Amenidades({Key? key, this.id}) : super(key: key);
   static init() async {
     prefs = await SharedPreferences.getInstance();

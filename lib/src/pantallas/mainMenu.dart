@@ -112,15 +112,26 @@ class _MainMenuState extends State<MainMenu> {
     ): Stack(
       children: [
         Container(
-          height: size.height * .40,
-          decoration: BoxDecoration(color: Colors.red),
+          height: size.height * .34,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(20),
+              bottomRight: Radius.circular(20)
+            ),
+            boxShadow:[
+              BoxShadow(
+                color: Colors.grey, blurRadius: 10, offset: Offset(1,0))
+              
+            ], 
+          ),
         ),
         Container(
-            padding: EdgeInsets.only(top: size.width >=880? 150: 120, right: 30),
+            padding: EdgeInsets.only(top: size.width * .45, right: size.width * .10),
             alignment: Alignment.topRight,
             child: Image.asset(
-              'assets/images/AdCom.png',
-              width: 160,
+              'assets/images/AdCom3.png',
+              width: size.width * .38,
             )),
         SafeArea(
           child: Padding(
@@ -128,9 +139,7 @@ class _MainMenuState extends State<MainMenu> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  height: size.width>=880? 34:24,
-                ),
+              
                 Padding(
                   padding: const EdgeInsets.only(
                     left: 12,
@@ -141,26 +150,19 @@ class _MainMenuState extends State<MainMenu> {
                       Text(
                         '¡${greeting()}! \n${user == null ? '' : user}',
                         style: TextStyle(
-                            color: Colors.white,
+                            color: Colors.black,
                             fontFamily: 'Roboto',
-                            fontSize: 30,
+                            fontSize: size.width * .11,
                             fontWeight: FontWeight.w700),
                       ),
                       SizedBox(
-                        height: 15,
+                        height: size.height /8,
                       ),
-                      Container(
-                          alignment: Alignment.centerLeft,
-                          height: 30,
-                          width: 150,
-                          margin: size.width >= 880? EdgeInsets.all(25): EdgeInsets.only(left: 10, top: 10),
-                          child:SizedBox())
+                      
                     ],
                   ),
                 ),
-                SizedBox(
-                  height: size.width >= 880 ?35:90,
-                ),
+                
                 GridDashboard(
                   userId: userType,
                 )
