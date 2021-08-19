@@ -169,7 +169,7 @@ class _MainMenuState extends State<MainMenu> {
                                 //no mover
                                 SizedBox(
                                   height: size.height >= 640
-                                      ? size.height / 6
+                                      ? size.height / 7
                                       : size.height / 10,
                                 ),
                               ],
@@ -178,7 +178,7 @@ class _MainMenuState extends State<MainMenu> {
 
                           //no mover
                           SizedBox(
-                            height: size.width <= 640 ? 5 : size.height / 13,
+                            height: size.width <= 640 ? 0 : size.height / 13,
                           ),
 
                           GridDashboard(
