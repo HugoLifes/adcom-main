@@ -204,6 +204,7 @@ class _LoginPageState extends State<LoginPage> {
                           } catch (e) {
                             HapticFeedback.heavyImpact();
                             showAlertDialog();
+                            Navigator.popAndPushNamed(context, '/');
                           }
                         } else {
                           HapticFeedback.heavyImpact();
