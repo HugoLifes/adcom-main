@@ -166,7 +166,7 @@ class _MainMenuState extends State<MainMenu> {
 
                 //no mover
                 SizedBox(
-                  height: size.width <= 640 ? 0 : size.height/13,
+                  height: size.width <= 640 ? 4 : size.height/13,
                 ),
                 
                 GridDashboard(
