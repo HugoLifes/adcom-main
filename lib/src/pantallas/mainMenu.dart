@@ -49,135 +49,147 @@ class _MainMenuState extends State<MainMenu> {
     //final args = ModalRoute.of(context)!.settings.arguments as LoginPage;
     var size = MediaQuery.of(context).size;
     return Scaffold(
-        body: size.width >= 880? Stack(
-      children: [
-        Container(
-          height: size.height * .40,
-          decoration: BoxDecoration(color: Colors.red),
-        ),
-        Container(
-            padding: EdgeInsets.only(top: size.width >=880? 150: 190, right: 21),
-            alignment: Alignment.topRight,
-            child: Image.asset(
-              'assets/images/AdCom.png',
-              width: 192,
-            )),
-        SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: size.width>=880? 34:24,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: 12,
+        body: size.width >= 880
+            ? Stack(
+                children: [
+                  Container(
+                    height: size.height * .40,
+                    decoration: BoxDecoration(color: Colors.red),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '¡${greeting()}! \n${user == null ? '' : user}',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontFamily: 'Roboto',
-                            fontSize: 35,
-                            fontWeight: FontWeight.w700),
+                  Container(
+                      padding: EdgeInsets.only(
+                          top: size.width >= 880 ? 150 : 190, right: 21),
+                      alignment: Alignment.topRight,
+                      child: Image.asset(
+                        'assets/images/AdCom.png',
+                        width: 192,
+                      )),
+                  SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: size.width >= 880 ? 34 : 24,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              left: 12,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  height: size.width / 10,
+                                ),
+                                Text(
+                                  '¡${greeting()}! \n${user == null ? '' : user}',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: 'Roboto',
+                                      fontSize: 35,
+                                      fontWeight: FontWeight.w700),
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Container(
+                                    alignment: Alignment.centerLeft,
+                                    height: 50,
+                                    width: 150,
+                                    margin: size.width >= 880
+                                        ? EdgeInsets.all(25)
+                                        : EdgeInsets.only(left: 10, top: 46),
+                                    child: SizedBox())
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            height: size.width >= 880 ? 35 : 10,
+                          ),
+                          GridDashboard(
+                            userId: userType,
+                          )
+                        ],
                       ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Container(
-                          alignment: Alignment.centerLeft,
-                          height: 50,
-                          width: 150,
-                          margin: size.width >= 880? EdgeInsets.all(25): EdgeInsets.only(left: 10, top: 46),
-                          child:SizedBox())
-                    ],
+                    ),
+                  )
+                ],
+              )
+            : Stack(
+                children: [
+                  Container(
+                    height: size.height * .34,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(20),
+                          bottomRight: Radius.circular(20)),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.grey,
+                            blurRadius: 10,
+                            offset: Offset(1, 0))
+                      ],
+                    ),
                   ),
-                ),
-                SizedBox(
-                  height: size.width >= 880 ?35:10,
-                ),
-                GridDashboard(
-                  userId: userType,
-                )
-              ],
-            ),
-          ),
-        )
-      ],
-    ): Stack(
-      children: [
-        Container(
-          height: size.height * .34,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(20),
-              bottomRight: Radius.circular(20)
-            ),
-            boxShadow:[
-              BoxShadow(
-                color: Colors.grey, blurRadius: 10, offset: Offset(1,0))
-              
-            ], 
-          ),
-        ),
-        Container(
-            padding: EdgeInsets.only(top: size.height * .18, right: size.width * .10),
-            alignment: Alignment.topRight,
-            child: Image.asset(
-              'assets/images/AdCom3.png',
-              width: size.width * .38,
-            )),
-        SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-              
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: 12,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '¡${greeting()}! \n${user == null ? '' : user}',
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontFamily: 'Roboto',
-                            fontSize: size.width /11,
-                            fontWeight: FontWeight.w700),
-                      ),
-                      //no mover
-                      SizedBox(
-                        height: size.height >= 640 ?  size.height/6: size.height /10,
-                      ),
-                      
-                    ],
-                  ),
-                ),
+                  Container(
+                      padding: EdgeInsets.only(
+                          top: size.height * .18, right: size.width * .10),
+                      alignment: Alignment.topRight,
+                      child: Image.asset(
+                        'assets/images/AdCom3.png',
+                        width: size.width * .38,
+                      )),
+                  SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              left: 12,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  height: size.width / 19,
+                                ),
+                                Text(
+                                  '¡${greeting()}! \n${user == null ? '' : user}',
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontFamily: 'Roboto',
+                                      fontSize: size.width / 11,
+                                      fontWeight: FontWeight.w700),
+                                ),
+                                //no mover
+                                SizedBox(
+                                  height: size.height >= 640
+                                      ? size.height / 6
+                                      : size.height / 10,
+                                ),
+                              ],
+                            ),
+                          ),
 
-                //no mover
-                SizedBox(
-                  height: size.width <= 640 ? 4 : size.height/13,
-                ),
-                
-                GridDashboard(
-                  userId: userType,
-                )
-              ],
-            ),
-          ),
-        )
-      ],
-    ));
+                          //no mover
+                          SizedBox(
+                            height: size.width <= 640 ? 5 : size.height / 13,
+                          ),
+
+                          GridDashboard(
+                            userId: userType,
+                          )
+                        ],
+                      ),
+                    ),
+                  )
+                ],
+              ));
   }
 
   String greeting() {
