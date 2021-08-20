@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:adcom/json/jsonFinanzas.dart';
-import 'package:adcom/main.dart';
 import 'package:adcom/src/extra/referencia_view.dart';
 import 'package:adcom/src/extra/vista_tarjeta.dart';
 import 'package:adcom/src/models/event_provider.dart';
