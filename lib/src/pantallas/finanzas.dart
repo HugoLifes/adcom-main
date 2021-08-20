@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:adcom/json/jsonFinanzas.dart';
 import 'package:adcom/main.dart';
+import 'package:adcom/src/extra/opciones_edoCuenta.dart';
 import 'package:adcom/src/extra/referencia_view.dart';
 import 'package:adcom/src/extra/vista_tarjeta.dart';
 import 'package:adcom/src/models/event_provider.dart';
@@ -287,11 +288,11 @@ class _FinanzasState extends State<Finanzas> {
           height: 15,
         ),
         InkWell(
-            /* onTap: () {
-                                    HapticFeedback.mediumImpact();
-                                    Navigator.of(context).push(MaterialPageRoute(
-                                        builder: (_) => OpcionesEdoCuenta()));
-                                  }, */
+            onTap: () {
+              HapticFeedback.mediumImpact();
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (_) => OpcionesEdoCuenta()));
+            },
             child: EstadoCuenta()),
       ],
     );
