@@ -63,32 +63,33 @@ class _FinanzasState extends State<Finanzas> {
       RefreshController(initialRefresh: false);
 
   data() async {
-    cuentas = await getAdeudos();
-    final provider = Provider.of<EventProvider>(context, listen: false);
-    for (int i = 0; i < cuentas!.data!.length; i++) {
-      provider.addDeudas(new DatosCuenta(
-          idComu: cuentas!.data![i].idComu,
-          idResidente: cuentas!.data![i].idComu,
-          montoCuota: cuentas!.data![i].montoCuota!,
-          fechaGenerada: cuentas!.data![i].fechaGeneracion!,
-          fechaLimite: cuentas!.data![i].fechaLimite!,
-          fechaPago: cuentas!.data![i].fechaPago,
-          referencia: cuentas!.data![i].referencia,
-          pago: cuentas!.data![i].pago!,
-          totalApagar: cuentas!.data![i].totalApagar,
-          pagoTardio: cuentas!.data![i].pagoTardio,
-          montoTardio: cuentas!.data![i].montoPagoTardio));
+    cuentas =
+        await getAdeudos().onError((error, stackTrace) => errorLoSiento());
 
-      localList.add(new DatosCuenta(
-          idComu: cuentas!.data![i].idComu,
-          montoCuota: cuentas!.data![i].montoCuota,
-          fechaGenerada: cuentas!.data![i].fechaGeneracion!,
-          fechaLimite: cuentas!.data![i].fechaLimite!,
-          fechaPago: cuentas!.data![i].fechaPago,
-          pago: cuentas!.data![i].pago));
+    if (cuentas!.value == 1) {
+      for (int i = 0; i < cuentas!.data!.length; i++) {
+        localList.add(new DatosCuenta(
+            idComu: cuentas!.data![i].idComu,
+            montoCuota: cuentas!.data![i].montoCuota,
+            fechaGenerada: cuentas!.data![i].fechaGeneracion!,
+            fechaLimite: cuentas!.data![i].fechaLimite!,
+            fechaPago: cuentas!.data![i].fechaPago,
+            pago: cuentas!.data![i].pago));
+      }
+      estado.add(EstadoCuenta());
+      estado.add(VistaTarjeta());
     }
-    estado.add(EstadoCuenta());
-    estado.add(VistaTarjeta());
+  }
+
+  errorLoSiento() {
+    Container(
+        padding: EdgeInsets.only(top: 0),
+        child: Center(
+          child: Image.asset(
+            'assets/images/error.png',
+            width: 192,
+          ),
+        ));
   }
 
   @override
