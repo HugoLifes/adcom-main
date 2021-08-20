@@ -98,11 +98,7 @@ class _FinanzasState extends State<Finanzas> {
     super.initState();
     _showPersBottomSheetCallBack = _showPersBottomSheetCallBack;
     data();
-    StripePayment.setOptions(StripeOptions(
-        publishableKey:
-            "pk_test_51JAjdHAoDnRH9C3fzuzLNpJaSlrcUVBJhDzN6ACKV8jocJSLvDCoBa1d1oBTX46CfOpC8wCLQ76H0aDOTZCo3xtO00a3pBNqw1",
-        merchantId: "Test",
-        androidPayMode: 'test'));
+
     Future.delayed(Duration(seconds: 1), () => {refresh()});
   }
 
