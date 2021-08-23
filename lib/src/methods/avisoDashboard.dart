@@ -104,9 +104,9 @@ class _AvisosDashboardState extends State<AvisosDashboard> {
             child: GridView.count(
                 padding: EdgeInsets.only(left: 10, right: 10, top: 10),
                 crossAxisCount: 1,
-                childAspectRatio: 3.7,
-                crossAxisSpacing: 15,
-                mainAxisSpacing: 15,
+                childAspectRatio: 3.3,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
                 children: myList.map((data) {
                   return InkWell(
                     onTap: () {

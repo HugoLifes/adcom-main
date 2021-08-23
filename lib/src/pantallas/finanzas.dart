@@ -207,7 +207,7 @@ class _FinanzasState extends State<Finanzas> {
                       decoration: BoxDecoration(color: Colors.lightGreen[700]),
                     ),
                     Container(
-                      padding: EdgeInsets.only(top: size.height / 12),
+                      padding: EdgeInsets.only(top: size.height / 10),
                       alignment: Alignment.topRight,
                       child: Icon(
                         Icons.show_chart_rounded,
@@ -223,7 +223,7 @@ class _FinanzasState extends State<Finanzas> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               SizedBox(
-                                height: size.width / 20,
+                                height: size.width / 26,
                               ),
                               Text(
                                 'Mis Pagos',
@@ -257,9 +257,9 @@ class _FinanzasState extends State<Finanzas> {
                               ),
                               Container(
                                   padding: EdgeInsets.only(
-                                      top: size.width / 10,
-                                      left: size.width >= 880 ? 5 : 0,
-                                      right: size.width >= 880 ? 5 : 0),
+                                      top: size.width/14,
+                                      left: size.width/300,
+                                      right: size.width/300),
                                   child: localList.isEmpty
                                       ? Center(
                                           child: CircularProgressIndicator(),
@@ -415,7 +415,7 @@ class _EstadoCuentaState extends State<EstadoCuenta> {
                             children: [
                               Text('Información Actualizada:'),
                               SizedBox(
-                                width: size.width >= 880 ? 100 : 50,
+                                width: size.width >= 880 ? 70 : 50,
                               ),
                               Text(
                                 '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
@@ -481,7 +481,7 @@ class _EstadoCuentaState extends State<EstadoCuenta> {
           )
         : Container(
             width: MediaQuery.of(context).size.width,
-            height: 170,
+            height:MediaQuery.of(context).size.height /4,
             decoration: BoxDecoration(boxShadow: [
               BoxShadow(color: Colors.grey, blurRadius: 6, offset: Offset(0, 1))
             ], color: Colors.white, borderRadius: BorderRadius.circular(10)),
@@ -517,7 +517,7 @@ class _EstadoCuentaState extends State<EstadoCuenta> {
                                     fontWeight: FontWeight.bold),
                               ),
                               SizedBox(
-                                width: size.width * .13,
+                                width: size.width * .12,
                               ),
                               Text(
                                 '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',

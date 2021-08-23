@@ -148,7 +148,7 @@ class _EventDashboardState extends State<EventDashboard> {
       itemCount: myList.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 1,
-        childAspectRatio: 3.9,
+        childAspectRatio: 3.0,
         crossAxisSpacing: 15,
         mainAxisSpacing: 15,
       ),
@@ -221,7 +221,7 @@ class _EventDashboardState extends State<EventDashboard> {
                                   fontWeight: FontWeight.w600),
                             ),
                       SizedBox(
-                        height: width / 40,
+                        height: width / 50,
                       ),
                       itsTrue == false ? Text('Lo sentimos :(') : Text(''),
                     ],
