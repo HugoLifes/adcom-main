@@ -28,7 +28,7 @@ dataOff2(id2, perfil) async {
 
 Future<Places?> amenidades() async {
   prefs = await SharedPreferences.getInstance();
-  var id = prefs!.getInt('idCom');
+  var id = prefs!.getInt('idPrimario');
   print('?$id');
 
   final Uri url = Uri.parse(
@@ -72,41 +72,43 @@ class _EventDashboardState extends State<EventDashboard> {
       places = (await amenidades())!;
       var userType = prefs!.getInt('UserType');
 
-      switch (userType) {
-        case 1:
-          myList.add(
-            item2,
-          );
-          break;
-        case 2:
-          myList.add(
-            item1,
-          );
-          break;
-        default:
-      }
+      if (places.data!.isNotEmpty) {
+        switch (userType) {
+          case 1:
+            myList.add(
+              item2,
+            );
+            break;
+          case 2:
+            myList.add(
+              item1,
+            );
+            break;
+          default:
+        }
 
-      for (int i = 0; i < places.data!.length; i++) {
-        myList.add(new Amenidad(
-            //route: '/screen12',
-            id: places.data![i].id,
-            idComu: places.data![i].idCom,
-            title: places.data![i].amenidadDesc,
-            route: '/screen12',
-            subtitle: 'Only residentes',
-            icon: Icon(
-              Icons.pool,
-              size: 30,
-              color: Colors.deepPurple,
-            )));
+        for (int i = 0; i < places.data!.length; i++) {
+          myList.add(new Amenidad(
+              //route: '/screen12',
+              id: places.data![i].id,
+              idComu: places.data![i].idCom,
+              title: places.data![i].amenidadDesc,
+              route: '/screen12',
+              subtitle: 'Only residentes',
+              icon: Icon(
+                Icons.pool,
+                size: 30,
+                color: Colors.deepPurple,
+              )));
+        }
+      } else {
+        setState(() {
+          if (mounted) {
+            itsTrue = false;
+          }
+        });
       }
     } catch (e) {
-      myList.add(new Amenidad(
-          error: 'No tiene amenidades',
-          icon: Icon(
-            Icons.sms_failed,
-            color: Colors.red,
-          )));
       setState(() {
         itsTrue = false;
       });
@@ -117,14 +119,19 @@ class _EventDashboardState extends State<EventDashboard> {
   void initState() {
     super.initState();
     gtData();
-    Future.delayed(Duration(milliseconds: 988), () => {refresh()});
+    if (itsTrue == false) {
+    } else {
+      Future.delayed(Duration(milliseconds: 988), () => {refresh()});
+    }
   }
 
   refresh() {
     setState(() {
-      var size = MediaQuery.of(context).size.width;
-      var size2 = MediaQuery.of(context).size.height;
-      viewAmenidades(width: size, heigth: size2);
+      if (mounted) {
+        var size = MediaQuery.of(context).size.width;
+        var size2 = MediaQuery.of(context).size.height;
+        viewAmenidades(width: size, heigth: size2);
+      }
     });
   }
 
@@ -134,9 +141,30 @@ class _EventDashboardState extends State<EventDashboard> {
     var size2 = MediaQuery.of(context).size.height;
     return myList.isEmpty
         ? Center(
-            child: CircularProgressIndicator(
-              backgroundColor: Colors.white,
-            ),
+            child: itsTrue == false
+                ? Container(
+                    padding: const EdgeInsets.only(top: 90),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/images/zzz.png',
+                          width: size / 1,
+                          height: 200,
+                        ),
+                        Text(
+                          'Lo sentimos por el momento no dispone amenidades',
+                          style: TextStyle(
+                            fontSize: size / 20,
+                            color: Colors.deepPurple,
+                          ),
+                          textAlign: TextAlign.justify,
+                        )
+                      ],
+                    ))
+                : CircularProgressIndicator(
+                    backgroundColor: Colors.white,
+                  ),
           )
         : viewAmenidades(width: size, heigth: size2);
   }

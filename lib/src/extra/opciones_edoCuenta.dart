@@ -54,7 +54,6 @@ class _OpcionesEdoCuentaState extends State<OpcionesEdoCuenta> {
               children: <Widget>[
                 Text(item, style: TextStyle(fontSize: 16.0)),
                 InkWell(
-                  
                   child: Icon(
                     Icons.picture_as_pdf_rounded,
                     size: 30,
@@ -95,24 +94,6 @@ class _OpcionesEdoCuentaState extends State<OpcionesEdoCuenta> {
               fontWeight: pw.FontWeight.bold,
               color: PdfColors.black)),
       padding: pw.EdgeInsets.all(4),
-    );
-  }
-}
-
-class PdfVista extends StatefulWidget {
-  PdfVista({Key? key}) : super(key: key);
-
-  @override
-  _PdfVistaState createState() => _PdfVistaState();
-}
-
-class _PdfVistaState extends State<PdfVista> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        child: SfPdfViewer.network(''),
-      ),
     );
   }
 }

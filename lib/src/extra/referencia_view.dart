@@ -1,10 +1,12 @@
 import 'package:adcom/src/models/event_provider.dart';
+import 'package:adcom/src/pantallas/finanzas.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class RefView extends StatefulWidget {
-  RefView({Key? key}) : super(key: key);
+  late List<DatosCuenta>? list = [];
+  RefView({Key? key, this.list}) : super(key: key);
 
   @override
   _RefViewState createState() => _RefViewState();
@@ -95,15 +97,13 @@ class _RefViewState extends State<RefView> {
   }
 
   referenciaApagar() {
-    final deudas = Provider.of<EventProvider>(context, listen: false).deudas;
-
     String? ref;
-    for (int i = 0; i < deudas.length; i++) {
-      if (deudas[i].pago == 1 && deudas[i].pagoTardio == 0) {
+    for (int i = 0; i < widget.list!.length; i++) {
+      if (widget.list![i].pago == 1 && widget.list![i].pagoTardio == 0) {
         print('no debe');
       } else {
         setState(() {
-          ref = deudas[i].referencia!;
+          ref = widget.list![i].referencia!;
         });
         return ref == null ? " " : ref;
       }

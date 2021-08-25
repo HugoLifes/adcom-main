@@ -62,7 +62,6 @@ class EventProvider extends ChangeNotifier {
 
   var userd;
   void login(user, pass, ctx) async {
-   
     _loading = false;
     notifyListeners();
 
@@ -71,6 +70,7 @@ class EventProvider extends ChangeNotifier {
       var userId;
       var post = value;
       if (post!.value == 1) {
+        var idPrimario = post.id;
         userId = post.idResidente;
         var comId = post.idCom;
         userd = post.nombreResidente;
@@ -78,8 +78,8 @@ class EventProvider extends ChangeNotifier {
         somData(userd, userType);
         obtainId(userType);
         accesData(comId, userId);
-        dataOff2(comId, userType);
-        dataOff4(comId);
+        dataOff2(idPrimario, userType);
+        dataOff4(idPrimario);
         someData(comId, userId);
         //Adeudos
         dataOff3(userId);
@@ -100,7 +100,6 @@ class EventProvider extends ChangeNotifier {
       _islogged = false;
       notifyListeners();
     }
-    
   }
 
   void loginState() async {

@@ -57,16 +57,13 @@ class _FinanzasState extends State<Finanzas> {
   int? idComu;
   var montoCuota;
   Timer? timer;
-  List<Widget> estado = [];
   VoidCallback? _showPersBottomSheetCallBack;
-  RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
+  bool itsTrue = true;
 
   data() async {
-    cuentas =
-        await getAdeudos().onError((error, stackTrace) => errorLoSiento());
+    cuentas = await getAdeudos();
 
-    if (cuentas!.value == 1) {
+    if (cuentas!.data!.isNotEmpty) {
       for (int i = 0; i < cuentas!.data!.length; i++) {
         localList.add(new DatosCuenta(
             idComu: cuentas!.data![i].idComu,
@@ -76,8 +73,12 @@ class _FinanzasState extends State<Finanzas> {
             fechaPago: cuentas!.data![i].fechaPago,
             pago: cuentas!.data![i].pago));
       }
-      estado.add(EstadoCuenta());
-      estado.add(VistaTarjeta());
+    } else {
+      setState(() {
+        if (mounted) {
+          itsTrue = false;
+        }
+      });
     }
   }
 
@@ -97,17 +98,17 @@ class _FinanzasState extends State<Finanzas> {
     super.initState();
     _showPersBottomSheetCallBack = _showPersBottomSheetCallBack;
     data();
-    StripePayment.setOptions(StripeOptions(
-        publishableKey:
-            "pk_test_51JAjdHAoDnRH9C3fzuzLNpJaSlrcUVBJhDzN6ACKV8jocJSLvDCoBa1d1oBTX46CfOpC8wCLQ76H0aDOTZCo3xtO00a3pBNqw1",
-        merchantId: "Test",
-        androidPayMode: 'test'));
-    Future.delayed(Duration(seconds: 1), () => {refresh()});
+    if (itsTrue == false) {
+    } else {
+      Future.delayed(Duration(seconds: 1), () => {refresh()});
+    }
   }
 
   refresh() {
     setState(() {
-      mainView();
+      if (mounted) {
+        mainView();
+      }
     });
   }
 
@@ -120,158 +121,99 @@ class _FinanzasState extends State<Finanzas> {
           backgroundColor: Colors.lightGreen[700],
         ),
         resizeToAvoidBottomInset: false,
-        body: SmartRefresher(
-          controller: _refreshController,
-          enablePullDown: true,
-          header: WaterDropHeader(),
-          onRefresh: _onRefresh,
-          onLoading: _onLoading,
-          footer: ClassicFooter(
-            loadStyle: LoadStyle.ShowWhenLoading,
-            completeDuration: Duration(milliseconds: 500),
-          ),
-          child: size.width >= 880
-              ? Stack(
-                  children: [
-                    Container(
-                      height: size.height * .35,
-                      decoration: BoxDecoration(color: Colors.lightGreen[700]),
-                    ),
-                    Container(
-                      padding: EdgeInsets.only(top: 80),
-                      alignment: Alignment.topRight,
-                      child: Icon(
-                        Icons.show_chart_rounded,
-                        size: 190,
-                        color: Colors.white,
+        body: Stack(
+          children: [
+            Container(
+              height: size.height * .35,
+              decoration: BoxDecoration(color: Colors.lightGreen[700]),
+            ),
+            Container(
+              padding: EdgeInsets.only(top: size.height / 10),
+              alignment: Alignment.topRight,
+              child: Icon(
+                Icons.show_chart_rounded,
+                size: size.width / 2,
+                color: Colors.white,
+              ),
+            ),
+            SafeArea(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: ListView(shrinkWrap: true, children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: size.width / 26,
                       ),
-                    ),
-                    SafeArea(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              height: 12,
-                            ),
-                            Text(
-                              'Mis Pagos',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 40,
-                                  fontFamily: 'Roboto',
-                                  fontWeight: FontWeight.w700),
-                            ),
-                            SizedBox(
-                              height: size.width >= 880 ? 25 : 20,
-                            ),
-                            Text(
-                              'Toma el control de tus gastos',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  fontSize: 16),
-                            ),
-                            SizedBox(
-                              height: size.width >= 880 ? 35 : 23,
-                            ),
-                            SizedBox(
-                              width: size.width * .6,
-                              child: Text(
-                                'Mantente actualizado revisando tus estados de cuenta y adeudos pendientes.',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 19),
-                              ),
-                            ),
-                            Container(
-                                padding: EdgeInsets.only(
-                                    top: size.width >= 880 ? 45 : 25,
-                                    left: size.width >= 880 ? 5 : 0,
-                                    right: size.width >= 880 ? 5 : 0),
-                                child: localList.isEmpty
-                                    ? Center(
-                                        child: CircularProgressIndicator(),
-                                      )
-                                    : mainView())
-                          ],
+                      Text(
+                        'Mis Pagos',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 30,
+                            fontFamily: 'Roboto',
+                            fontWeight: FontWeight.w700),
+                      ),
+                      SizedBox(
+                        height: size.width / 19,
+                      ),
+                      Text(
+                        'Toma el control de tus gastos',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: 17),
+                      ),
+                      SizedBox(
+                        height: size.width / 20,
+                      ),
+                      SizedBox(
+                        width: size.width * .6,
+                        child: Text(
+                          'Mantente actualizado revisando tus estados de cuenta y adeudos pendientes.',
+                          style: TextStyle(
+                              color: Colors.white, fontSize: size.width / 21),
                         ),
                       ),
-                    ),
-                  ],
-                )
-              : Stack(
-                  children: [
-                    Container(
-                      height: size.height * .35,
-                      decoration: BoxDecoration(color: Colors.lightGreen[700]),
-                    ),
-                    Container(
-                      padding: EdgeInsets.only(top: size.height / 10),
-                      alignment: Alignment.topRight,
-                      child: Icon(
-                        Icons.show_chart_rounded,
-                        size: size.width / 2,
-                        color: Colors.white,
-                      ),
-                    ),
-                    SafeArea(
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20),
-                        child: ListView(shrinkWrap: true, children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(
-                                height: size.width / 26,
-                              ),
-                              Text(
-                                'Mis Pagos',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 30,
-                                    fontFamily: 'Roboto',
-                                    fontWeight: FontWeight.w700),
-                              ),
-                              SizedBox(
-                                height: size.width / 19,
-                              ),
-                              Text(
-                                'Toma el control de tus gastos',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                    fontSize: 17),
-                              ),
-                              SizedBox(
-                                height: size.width / 20,
-                              ),
-                              SizedBox(
-                                width: size.width * .6,
-                                child: Text(
-                                  'Mantente actualizado revisando tus estados de cuenta y adeudos pendientes.',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: size.width / 21),
-                                ),
-                              ),
-                              Container(
-                                  padding: EdgeInsets.only(
-                                      top: size.width/14,
-                                      left: size.width/300,
-                                      right: size.width/300),
-                                  child: localList.isEmpty
-                                      ? Center(
-                                          child: CircularProgressIndicator(),
-                                        )
-                                      : mainView())
-                            ],
-                          ),
-                        ]),
-                      ),
-                    ),
-                  ],
-                ),
+                      Container(
+                          padding: EdgeInsets.only(
+                              top: size.width / 8,
+                              left: size.width / 300,
+                              right: size.width / 300),
+                          child: localList.isEmpty
+                              ? Center(
+                                  child: itsTrue == false
+                                      ? Container(
+                                          padding:
+                                              const EdgeInsets.only(top: 90),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Image.asset(
+                                                'assets/images/magic.png',
+                                                width: size.width / 1,
+                                                height: 200,
+                                              ),
+                                              Text(
+                                                'Lo sentimos nuestra magia no funciona en este lugar',
+                                                style: TextStyle(
+                                                  fontSize: size.width / 20,
+                                                  color: Colors.lightGreen[700],
+                                                ),
+                                                textAlign: TextAlign.justify,
+                                              )
+                                            ],
+                                          ))
+                                      : CircularProgressIndicator(),
+                                )
+                              : mainView())
+                    ],
+                  ),
+                ]),
+              ),
+            ),
+          ],
         ));
   }
 
@@ -282,57 +224,10 @@ class _FinanzasState extends State<Finanzas> {
         InkWell(
             onTap: () {
               HapticFeedback.mediumImpact();
-              Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (_) => RefView()));
             },
             child: VistaTarjeta()),
-        SizedBox(
-          height: 15,
-        ),
-        InkWell(
-            /* onTap: () {
-                                    HapticFeedback.mediumImpact();
-                                    Navigator.of(context).push(MaterialPageRoute(
-                                        builder: (_) => OpcionesEdoCuenta()));
-                                  }, */
-            child: EstadoCuenta()),
       ],
     );
-  }
-
-  void _onRefresh() async {
-    // monitor network fetch
-    await Future.delayed(Duration(milliseconds: 1000), () {});
-    // if failed,use refreshFailed()
-    //getAdeudos();
-    _refreshController.refreshCompleted();
-  }
-
-  void _onLoading() async {
-    // monitor network fetch
-    await Future.delayed(Duration(milliseconds: 1000), () => {});
-    // if failed,use loadFailed(),if no data return,use LoadNodata()
-    Finanzas();
-    if (mounted) setState(() {});
-
-    _refreshController.loadComplete();
-  }
-
-  referenciaApagar() {
-    final deudas = Provider.of<EventProvider>(context, listen: false).deudas;
-
-    String? ref;
-    for (int i = 0; i < deudas.length; i++) {
-      if (deudas[i].pago == 1) {
-        //no debe
-      } else {
-        //si debe
-        setState(() {
-          ref = deudas[i].referencia!;
-        });
-      }
-    }
-    return ref;
   }
 }
 
@@ -355,13 +250,18 @@ class _EstadoCuentaState extends State<EstadoCuenta> {
   data() async {
     cuentas = await getAdeudos();
 
+    final provider = Provider.of<EventProvider>(context, listen: false);
     for (int i = 0; i < cuentas!.data!.length; i++) {
+      provider.addDeudas(DatosCuenta(
+        referencia: cuentas!.data![i].referencia,
+      ));
       mylist.add(new DatosCuenta(
           idComu: cuentas!.data![i].idComu,
           montoCuota: cuentas!.data![i].montoCuota,
           fechaGenerada: cuentas!.data![i].fechaGeneracion!,
           fechaLimite: cuentas!.data![i].fechaLimite!,
           fechaPago: cuentas!.data![i].fechaPago,
+          referencia: cuentas!.data![i].referencia,
           pago: cuentas!.data![i].pago!));
     }
   }
@@ -381,206 +281,168 @@ class _EstadoCuentaState extends State<EstadoCuenta> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    return size.width >= 880
-        ? Container(
-            width: MediaQuery.of(context).size.width,
-            height: 180,
-            decoration: BoxDecoration(boxShadow: [
-              BoxShadow(color: Colors.grey, blurRadius: 6, offset: Offset(0, 1))
-            ], color: Colors.white, borderRadius: BorderRadius.circular(10)),
-            child: Padding(
-              padding: const EdgeInsets.only(
-                  left: 20, right: 20, top: 20, bottom: 30),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Estado de cuenta',
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Text('Información Actualizada:'),
-                              SizedBox(
-                                width: size.width >= 880 ? 70 : 50,
-                              ),
-                              Text(
-                                '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              )
-                            ],
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                          child: InkWell(
-                        child: Text(
-                          '¿Cuánto debo?',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.black),
-                        ),
-                      )),
-                      Text('|', style: TextStyle(color: Colors.black)),
-                      Expanded(
-                          child: InkWell(
-                        onTap: () {
-                          HapticFeedback.mediumImpact();
-                        },
-                        child: Text('Cuotas de atraso',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.black)),
-                      ))
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Center(
-                          child: Text(
-                            '\$ ${saldoDeudor()} MXN',
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 30,
-                      ),
-                      Expanded(
-                          child: Center(
-                        child: Text(
-                          '${cuantoDebe()}',
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height / 4,
+      decoration: BoxDecoration(boxShadow: [
+        BoxShadow(color: Colors.grey, blurRadius: 6, offset: Offset(0, 1))
+      ], color: Colors.white, borderRadius: BorderRadius.circular(10)),
+      child: Padding(
+        padding:
+            const EdgeInsets.only(left: 11, right: 11, top: 10, bottom: 20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Estado de cuenta',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13),
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Text(
+                          'Información Actualizada:',
                           style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
+                              fontSize: size.width / 28,
+                              fontWeight: FontWeight.bold),
                         ),
-                      ))
-                    ],
-                  ),
-                ],
-              ),
+                        SizedBox(
+                          width: size.width * .12,
+                        ),
+                        Text(
+                          '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        )
+                      ],
+                    )
+                  ],
+                ),
+              ],
             ),
-          )
-        : Container(
-            width: MediaQuery.of(context).size.width,
-            height:MediaQuery.of(context).size.height /4,
-            decoration: BoxDecoration(boxShadow: [
-              BoxShadow(color: Colors.grey, blurRadius: 6, offset: Offset(0, 1))
-            ], color: Colors.white, borderRadius: BorderRadius.circular(10)),
-            child: Padding(
-              padding: const EdgeInsets.only(
-                  left: 11, right: 11, top: 10, bottom: 20),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Estado de cuenta',
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13),
-                          ),
-                          SizedBox(
-                            height: 5,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Text(
-                                'Información Actualizada:',
-                                style: TextStyle(
-                                    fontSize: size.width / 28,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(
-                                width: size.width * .12,
-                              ),
-                              Text(
-                                '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              )
-                            ],
-                          )
-                        ],
-                      ),
-                    ],
+            Row(
+              children: [
+                Expanded(
+                    child: InkWell(
+                  child: Text(
+                    '¿Cuánto debo?',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.black),
                   ),
-                  Row(
-                    children: [
-                      Expanded(
-                          child: InkWell(
-                        child: Text(
-                          '¿Cuánto debo?',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.black),
-                        ),
-                      )),
-                      Text('|', style: TextStyle(color: Colors.black)),
-                      Expanded(
-                          child: InkWell(
-                        onTap: () {
-                          HapticFeedback.mediumImpact();
-                        },
-                        child: Text('Cuotas de atraso',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.black)),
-                      ))
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Center(
-                          child: Text(
-                            '\$${saldoDeudor()}MXN',
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: size.width / 17),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 20,
-                      ),
-                      Expanded(
-                          child: Center(
-                        child: Text(
-                          '${cuantoDebe()}',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                      ))
-                    ],
-                  ),
-                ],
-              ),
+                )),
+                Text('|', style: TextStyle(color: Colors.black)),
+                Expanded(
+                    child: InkWell(
+                  onTap: () {
+                    HapticFeedback.mediumImpact();
+                  },
+                  child: Text('Cuotas de atraso',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.black)),
+                ))
+              ],
             ),
-          );
+            Row(
+              children: [
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      '\$${saldoDeudor()}MXN',
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: size.width / 17),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 20,
+                ),
+                Expanded(
+                    child: Center(
+                  child: Text(
+                    '${cuantoDebe()}',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ))
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  fechadepago() {
+    int? dia;
+    int? mes;
+    int? year;
+    for (int i = 0; i < mylist.length; i++) {
+      if (mylist[i].pago == 1) {
+        print('no debe');
+      } else {
+        setState(() {
+          dia = mylist[i].fechaLimite!.day;
+          mes = mylist[i].fechaLimite!.month;
+          year = mylist[i].fechaLimite!.year;
+        });
+        return dia == null ? '' : '$dia/$mes/$year';
+      }
+    }
+
+    return dia == null ? '' : '$dia/$mes/$year';
+  }
+
+  ultimaDeuda() {
+    double debe = 0.0;
+    double? monto;
+    int? total;
+    for (int i = 0; i < mylist.length; i++) {
+      monto = double.parse(mylist[i].montoCuota!);
+      if (mylist[i].pago == 1 && mylist[i].pagoTardio == 0) {
+      } else {
+        if (DateTime.now().day <= mylist[i].fechaLimite!.day &&
+            DateTime.now().month <= mylist[i].fechaLimite!.month &&
+            DateTime.now().year <= mylist[i].fechaLimite!.year) {
+          return debe = monto;
+        } else {
+          if (mylist[i].pagoTardio == 0 || mylist[i].pagoTardio == null) {
+            return debe = monto;
+          } else {
+            total = int.parse(mylist[i].montoTardio!);
+            print('${total}');
+            return debe = monto + total;
+          }
+        }
+      }
+    }
+    return debe == 0.0 ? '0.0' : debe;
+  }
+
+  referenciaApagar() {
+    String? ref;
+    for (int i = 0; i < mylist.length; i++) {
+      if (mylist[i].pago == 1 && mylist[i].pagoTardio == 0) {
+        print('no debe');
+      } else {
+        setState(() {
+          ref = mylist[i].referencia!;
+        });
+        return ref == null ? " " : ref;
+      }
+    }
+    return ref == null ? " " : ref;
   }
 
   //te dice cuanto dinero debe

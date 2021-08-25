@@ -37,7 +37,7 @@ Future<Welcome?> getData() async {
   Uri uri = Uri.parse(
       'http://187.189.53.8:8080/AdcomBackend/backend/web/index.php?r=adcom/get-directorio');
   final response = await http.post(uri, body: {
-    "params": json.encode({'usuarioId': id})
+    "params": json.encode({"usuarioId": id})
   });
 
   if (response.statusCode == 200) {
