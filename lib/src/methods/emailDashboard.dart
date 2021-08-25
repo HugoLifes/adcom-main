@@ -34,10 +34,12 @@ Future<Welcome?> getData() async {
   prefs = await SharedPreferences.getInstance();
   var id = prefs!.getInt('id');
 
+  print(id.toString());
+
   Uri uri = Uri.parse(
-      'http://187.189.53.8:8080/AdcomBackend/backend/web/index.php?r=adcom/get-directorio');
+      'http://192.168.1.178:8080/AdcomBackend/backend/web/index.php?r=adcom/get-directorio');
   final response = await http.post(uri, body: {
-    "params": json.encode({'usuarioId': id})
+    "params": json.encode({"usuarioId": id})
   });
 
   if (response.statusCode == 200) {

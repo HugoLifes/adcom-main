@@ -62,45 +62,63 @@ class EventProvider extends ChangeNotifier {
 
   var userd;
   void login(user, pass, ctx) async {
-   
     _loading = false;
     notifyListeners();
 
-    _loading = true;
-    await loginAcces(user, pass).then((value) {
-      var userId;
-      var post = value;
-      if (post!.value == 1) {
-        userId = post.idResidente;
-        var comId = post.idCom;
-        userd = post.nombreResidente;
-        var userType = post.idPerfil;
-        somData(userd, userType);
-        obtainId(userType);
-        accesData(comId, userId);
-        dataOff2(comId, userType);
-        dataOff4(comId);
-        someData(comId, userId);
-        //Adeudos
-        dataOff3(userId);
-        //amenidades
+    try {
+      _loading = true;
+      await loginAcces(user, pass).then((value) {
+        var userId;
+        var post = value;
+        if (post!.value == 1) {
+          var idPrimario = post.id;
+          userId = post.idResidente;
+          var comId = post.idCom;
+          userd = post.nombreResidente;
+          var userType = post.idPerfil;
+          somData(userd, userType);
+          obtainId(userType);
+          accesData(comId, userId);
+          dataOff2(idPrimario, userType);
+          dataOff4(idPrimario);
+          someData(comId, userId);
+          //Adeudos
+          dataOff3(userId);
+          //amenidades
 
-        dataOff5(userId);
+          dataOff5(userId);
 
-        Navigator.pushReplacementNamed(ctx, '/');
+          Navigator.pushReplacementNamed(ctx, '/');
+        }
+      });
+
+      _loading = true;
+      if (userd != null) {
+        _islogged = true;
+        pref.setBool('isLoggedIn', true);
+        notifyListeners();
+      } else {
+        _islogged = false;
+        notifyListeners();
       }
-    });
+    } catch (e) {
+      {
+        HapticFeedback.lightImpact();
+        Widget okButton = TextButton(
+            onPressed: () {
+              Navigator.of(ctx)..pop();
+            },
+            child: Text('OK'));
 
-    _loading = true;
-    if (userd != null) {
-      _islogged = true;
-      pref.setBool('isLoggedIn', true);
-      notifyListeners();
-    } else {
-      _islogged = false;
-      notifyListeners();
+        AlertDialog alert = AlertDialog(
+          title: Text('Atencion!'),
+          content: Text('Sus datos son incorrectos, vuelva a introducirlos'),
+          actions: [okButton],
+        );
+
+        showDialog(context: ctx, builder: (_) => alert);
+      }
     }
-    
   }
 
   void loginState() async {

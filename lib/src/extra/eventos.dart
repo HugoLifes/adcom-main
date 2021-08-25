@@ -63,7 +63,7 @@ class _CalendarioState extends State<Calendario> {
     prefs = await SharedPreferences.getInstance();
 
     Uri uri = Uri.parse(
-        'http://187.189.53.8:8080/AdcomBackend/backend/web/index.php?r=adcom/get-amenidad-reserva');
+        'http://192.168.1.178:8080/AdcomBackend/backend/web/index.php?r=adcom/get-amenidad-reserva');
 
     final response =
         await http.post(uri, body: {"idAmenidad": "${widget.idA}"});

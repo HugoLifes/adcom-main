@@ -25,7 +25,7 @@ class LoginPage extends StatefulWidget {
 
 Future<Posting?> loginAcces(String user, String pass) async {
   final Uri uri = Uri.parse(
-      'http://187.189.53.8:8080/AdcomBackend/backend/web/index.php?r=adcom/login');
+      'http://192.168.1.178:8080/AdcomBackend/backend/web/index.php?r=adcom/login');
   final response = await http.post(uri, body: {
     "params": jsonEncode({'username': user, 'password': pass}),
   });

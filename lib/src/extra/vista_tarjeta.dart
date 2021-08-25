@@ -1,10 +1,13 @@
 import 'package:adcom/json/jsonFinanzas.dart';
+import 'package:adcom/src/extra/detalles_pago.dart';
 import 'package:adcom/src/extra/more_view_cuota.dart';
+import 'package:adcom/src/extra/referencia_view.dart';
 
 import 'package:adcom/src/models/event_provider.dart';
 import 'package:adcom/src/pantallas/finanzas.dart';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import 'package:provider/provider.dart';
 
@@ -19,11 +22,14 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
   VoidCallback? _showPersBottomSheetCallBack;
   Accounts? cuentas;
   List<DatosCuenta> mylist = [];
+  List<String> mesFormat = [];
+
   @override
   void initState() {
     super.initState();
     _showPersBottomSheetCallBack = _showPersBottomSheetCallBack;
     data();
+
     Future.delayed(Duration(seconds: 1), () {
       setState(() {
         ultimaDeuda();
@@ -41,247 +47,125 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     var size2 = MediaQuery.of(context).size.width;
+
     return mylist.isEmpty
         ? SizedBox()
-        : size.width >= 880
-            ? Container(
-                width: MediaQuery.of(context).size.width,
-                height: 225,
-                decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.grey,
-                          blurRadius: 6,
-                          offset: Offset(0, 1))
-                    ],
-                    color: estadodepagoColor(),
-                    borderRadius: BorderRadius.circular(10)),
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                      left: 20, right: 20, top: 20, bottom: 30),
-                  child: Column(
+        : Container(
+            width: MediaQuery.of(context).size.width,
+            height: 220,
+            decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.grey, blurRadius: 6, offset: Offset(0, 1))
+                ],
+                color: estadodepagoColor(),
+                borderRadius: BorderRadius.circular(10)),
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  left: 13, right: 13, top: 13, bottom: 20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Monto de cuota',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 17),
-                              ),
-                              SizedBox(
-                                height: 5.0,
-                              ),
-                              Text(
-                                '${estadodepago()}',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                ),
-                              )
-                            ],
-                          ),
-                          Container(
-                            height: 40,
-                            child: OutlinedButton(
-                              onPressed: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (_) => MoreViewCuota()));
-                              },
-                              child: Icon(Icons.add,
-                                  size: 25, color: Colors.white),
-                              style: OutlinedButton.styleFrom(
-                                  side: BorderSide(
-                                      width: 1.0, color: Colors.transparent)),
-                            ),
-                          )
-                        ],
-                      ),
                       Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '\$ ${ultimaDeuda()}',
+                            'Monto de cuota',
                             style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 28),
+                                fontSize: 15),
                           ),
                           SizedBox(
-                            height: 10,
+                            height: 2.0,
                           ),
                           Text(
-                            mylist.isEmpty
-                                ? 'Pagar antes del día: '
-                                : 'Pagar antes del día: ${fechadepago()}',
+                            '${estadodepago()}',
                             style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          OutlinedButton(
-                            onPressed: () {
-                              _showModalSheet();
-                            },
-                            child: Text(
-                              'Pagar Ahora',
-                              textAlign: TextAlign.center,
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 15),
+                              color: Colors.black,
+                              fontSize: 14,
                             ),
-                            style: OutlinedButton.styleFrom(
-                                side: BorderSide(
-                                    width: 1.0, color: Colors.white)),
-                          ),
-                          //Text('|', style: TextStyle(color: Colors.white, fontSize: 15)),
-
-                          OutlinedButton(
-                            onPressed: () {
-                              _showAlertDialog();
-                            },
-                            child: Text('Detalles',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 15)),
-                            style: OutlinedButton.styleFrom(
-                                side: BorderSide(
-                                    width: 1.0, color: Colors.white)),
                           )
                         ],
+                      ),
+                      Container(
+                        height: 30,
+                        child: OutlinedButton(
+                          onPressed: () {
+                            Navigator.of(context).push(
+                                MaterialPageRoute(builder: (_) => RefView()));
+                          },
+                          child: Icon(Icons.add, size: 25, color: Colors.white),
+                          style: OutlinedButton.styleFrom(
+                              side: BorderSide(
+                                  width: 1.0, color: Colors.transparent)),
+                        ),
                       )
                     ],
                   ),
-                ),
-              )
-            : Container(
-                width: MediaQuery.of(context).size.width,
-                height: 190,
-                decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.grey,
-                          blurRadius: 6,
-                          offset: Offset(0, 1))
-                    ],
-                    color: estadodepagoColor(),
-                    borderRadius: BorderRadius.circular(10)),
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                      left: 10, right: 10, top: 10, bottom: 20),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  Column(
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Monto de cuota',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15),
-                              ),
-                              SizedBox(
-                                height: 2.0,
-                              ),
-                              Text(
-                                '${estadodepago()}',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 14,
-                                ),
-                              )
-                            ],
-                          ),
-                          Container(
-                            height: 30,
-                            child: OutlinedButton(
-                              onPressed: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (_) => MoreViewCuota()));
-                              },
-                              child: Icon(Icons.add,
-                                  size: 25, color: Colors.white),
-                              style: OutlinedButton.styleFrom(
-                                  side: BorderSide(
-                                      width: 1.0, color: Colors.transparent)),
-                            ),
-                          )
-                        ],
+                      Text(
+                        '\$ ${saldoDeudor()}',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 28),
                       ),
-                      Column(
-                        children: [
-                          Text(
-                            '\$ ${ultimaDeuda()}',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 28),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Text(
-                            mylist.isEmpty
-                                ? 'Pagar antes del día: '
-                                : 'Pagar antes del día: ${fechadepago()}',
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14),
-                          ),
-                        ],
+                      SizedBox(
+                        height: 10,
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          OutlinedButton(
-                            onPressed: () {
-                              _showModalSheet();
-                            },
-                            child: Text(
-                              'Pagar Ahora',
-                              textAlign: TextAlign.center,
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 14),
-                            ),
-                            style: OutlinedButton.styleFrom(
-                                side: BorderSide(
-                                    width: 1.0, color: Colors.white)),
-                          ),
-                          //Text('|', style: TextStyle(color: Colors.white, fontSize: 15)),
-
-                          OutlinedButton(
-                            onPressed: () {
-                              _showAlertDialog(size: size2);
-                            },
-                            child: Text('Detalles',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 15)),
-                            style: OutlinedButton.styleFrom(
-                                side: BorderSide(
-                                    width: 1.0, color: Colors.white)),
-                          )
-                        ],
-                      )
+                      Text(
+                        mylist.isEmpty
+                            ? 'Pagar antes del día: '
+                            : 'Pagar antes del día: ${fechadepago()}',
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w400,
+                            fontSize: 14),
+                      ),
                     ],
                   ),
-                ),
-              );
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      OutlinedButton(
+                        onPressed: () {
+                          _showModalSheet();
+                        },
+                        child: Text(
+                          'Pagar Ahora',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white, fontSize: 14),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                            side: BorderSide(width: 1.0, color: Colors.white)),
+                      ),
+                      //Text('|', style: TextStyle(color: Colors.white, fontSize: 15)),
+
+                      OutlinedButton(
+                        onPressed: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (_) => DetallesPago(
+                                    list: mylist,
+                                  )));
+                        },
+                        child: Text('Detalles',
+                            textAlign: TextAlign.center,
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 15)),
+                        style: OutlinedButton.styleFrom(
+                            side: BorderSide(width: 1.0, color: Colors.white)),
+                      )
+                    ],
+                  )
+                ],
+              ),
+            ),
+          );
   }
 
   void _showModalSheet() {
@@ -385,55 +269,37 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
       content: Container(
         width: size / 20,
         height: 150,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Column(
               children: [
-                Text('Mantenimiento',
+                Text('Cuota',
                     style: TextStyle(
                       fontSize: size / 20,
                       fontWeight: FontWeight.w400,
                       textBaseline: TextBaseline.alphabetic,
                     )),
-                Text('\$${ultimaDeuda2()}',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      textBaseline: TextBaseline.alphabetic,
-                    ))
               ],
             ),
             SizedBox(
               height: 12,
             ),
-            Row(
+            /*  Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Atraso',
-                  style: TextStyle(
-                      fontSize: 19,
-                      fontWeight: FontWeight.w400,
-                      textBaseline: TextBaseline.alphabetic),
-                ),
-                Text('\$${atraso()}',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      textBaseline: TextBaseline.alphabetic,
-                    ))
+                Column(
+                  children: [Text('${mesesDeAtraso()}')],
+                )
               ],
-            ),
+            ), */
             SizedBox(
               height: 15,
               child: Divider(
                 color: Colors.black,
               ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Column(
               children: [
                 Text(
                   'Total',
@@ -442,7 +308,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
                       fontWeight: FontWeight.w400,
                       textBaseline: TextBaseline.alphabetic),
                 ),
-                totalApagars() == null
+                saldoDeudor() == null
                     ? Text('\$0.0',
                         style: TextStyle(
                           fontSize: 20,
@@ -481,6 +347,24 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
           pagoTardio: cuentas!.data![i].pagoTardio,
           montoTardio: cuentas!.data![i].montoPagoTardio));
     }
+  }
+
+  mesesDeAtraso() {
+    DateTime? mesesAtrazo;
+
+    for (int i = 0; i < mylist.length; i++) {
+      if (mylist[i].pago == 1) {
+      } else {
+        setState(() {
+          mesesAtrazo = mylist[i].fechaGenerada;
+          mesFormat
+              .add((DateFormat('MMM').format(DateTime(0, mesesAtrazo!.month))));
+        });
+
+        print(DateFormat('MMM').format(DateTime(0, mesesAtrazo!.month)));
+      }
+    }
+    return DateFormat('MMM').format(DateTime(0, mesesAtrazo!.month));
   }
 
   ultimaDeuda() {
@@ -550,6 +434,28 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
     }
 
     return dia == null ? '' : '$dia/$mes/$year';
+  }
+
+  saldoDeudor() {
+    double contador = 0.0;
+    double deuda;
+    double tardio;
+    for (int i = 0; i < mylist.length; i++) {
+      deuda = double.parse(mylist[i].montoCuota!);
+      tardio = double.parse(mylist[i].montoTardio!);
+      if (mylist[i].pago == 1 && mylist[i].pagoTardio == 0) {
+      } else {
+        if (DateTime.now().day <= mylist[i].fechaLimite!.day &&
+            DateTime.now().month <= mylist[i].fechaLimite!.month &&
+            DateTime.now().year <= mylist[i].fechaLimite!.year) {
+        } else {
+          setState(() {
+            contador += deuda + tardio;
+          });
+        }
+      }
+    }
+    return contador;
   }
 
   estadodepago() {

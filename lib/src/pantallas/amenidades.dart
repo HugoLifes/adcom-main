@@ -13,7 +13,7 @@ SharedPreferences? prefs;
 
 class Amenidades extends StatefulWidget {
   final id;
-  
+
   Amenidades({Key? key, this.id}) : super(key: key);
   static init() async {
     prefs = await SharedPreferences.getInstance();
@@ -25,15 +25,15 @@ class Amenidades extends StatefulWidget {
 
 dataOff4(id) async {
   await Amenidades.init();
-  prefs!.setInt('id', id);
+  prefs!.setInt('idPrimario', id);
 }
 
 Future<Places?> idso() async {
   prefs = await SharedPreferences.getInstance();
-  var id = prefs!.getInt('idCom');
+  var id = prefs!.getInt('idPrimario');
 
   final Uri url = Uri.parse(
-      'http://187.189.53.8:8080/AdcomBackend/backend/web/index.php?r=adcom/get-amenidades');
+      'http://192.168.1.178:8080/AdcomBackend/backend/web/index.php?r=adcom/get-amenidades');
   final response = await http.post(url, body: {
     "params": json.encode({"usuarioId": id})
   });
@@ -49,17 +49,17 @@ Future<Places?> idso() async {
 
 class _AmenidadesState extends State<Amenidades> {
   gtData() async {
+    try {
+      var places = (await idso())!;
 
-    try{
-    var places = (await idso())!;
-
-    final provider = Provider.of<EventProvider>(context, listen: false);
-    for (int i = 0; i < places.data!.length; i++) {
-      provider.addAmenidad(new Amenidad(id: places.data![i].id));
-    }
-    }catch(e){
       final provider = Provider.of<EventProvider>(context, listen: false);
-      provider.addAmenidad(new Amenidad(error: 'Su comunidad no tiene este servicio'));
+      for (int i = 0; i < places.data!.length; i++) {
+        provider.addAmenidad(new Amenidad(id: places.data![i].id));
+      }
+    } catch (e) {
+      final provider = Provider.of<EventProvider>(context, listen: false);
+      provider.addAmenidad(
+          new Amenidad(error: 'Su comunidad no tiene este servicio'));
     }
   }
 
@@ -72,7 +72,7 @@ class _AmenidadesState extends State<Amenidades> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    
+
     return ChangeNotifierProvider(
       create: (_) => EventProvider(),
       child: Scaffold(
@@ -81,127 +81,132 @@ class _AmenidadesState extends State<Amenidades> {
           elevation: 6,
           backgroundColor: Colors.deepPurpleAccent,
         ),
-        body: size.width >= 880 ? Stack(
-          children: [
-            Container(
-              height: size.height * .40,
-              decoration: BoxDecoration(color: Colors.deepPurpleAccent),
-            ),
-            Container(
-              padding: EdgeInsets.only(top: 95),
-              alignment: Alignment.topRight,
-              child: Icon(
-                Icons.event,
-                color: Colors.white,
-                size: 170,
-              ),
-            ),
-            SafeArea(
-                child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        body: size.width >= 880
+            ? Stack(
                 children: [
-                  SizedBox(
-                    height: 10,
+                  Container(
+                    height: size.height * .40,
+                    decoration: BoxDecoration(color: Colors.deepPurpleAccent),
                   ),
-                  Text(
-                    "Amenidades",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 40,
-                        fontFamily: 'Roboto',
-                        fontWeight: FontWeight.w700),
-                  ),
-                  SizedBox(
-                    height: 25,
-                  ),
-                  Text(
-                    'Disfruta las ventajas de tu comunidad',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: 15),
-                  ),
-                  SizedBox(
-                    height: 35,
-                  ),
-                  SizedBox(
-                    width: size.width * .5,
-                    child: Text(
-                      'Enterate de la disponibilidad de tus areas recreativas o aparta con tiempo para tus eventos',
-                      style: TextStyle(color: Colors.white, fontSize: size.width >=880?19:17),
+                  Container(
+                    padding: EdgeInsets.only(top: 95),
+                    alignment: Alignment.topRight,
+                    child: Icon(
+                      Icons.event,
+                      color: Colors.white,
+                      size: 170,
                     ),
                   ),
-                  SizedBox(
-                    height:20,
-                  ),
-                  EventDashboard()
+                  SafeArea(
+                      child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          "Amenidades",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 40,
+                              fontFamily: 'Roboto',
+                              fontWeight: FontWeight.w700),
+                        ),
+                        SizedBox(
+                          height: 25,
+                        ),
+                        Text(
+                          'Disfruta las ventajas de tu comunidad',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 15),
+                        ),
+                        SizedBox(
+                          height: 35,
+                        ),
+                        SizedBox(
+                          width: size.width * .5,
+                          child: Text(
+                            'Enterate de la disponibilidad de tus areas recreativas o aparta con tiempo para tus eventos',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: size.width >= 880 ? 19 : 17),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        EventDashboard()
+                      ],
+                    ),
+                  ))
                 ],
-              ),
-            ))
-          ],
-        ): Stack(
-          children: [
-            Container(
-              height: size.height * .40,
-              decoration: BoxDecoration(color: Colors.deepPurpleAccent),
-            ),
-            Container(
-              padding: EdgeInsets.only(top: 95),
-              alignment: Alignment.topRight,
-              child: Icon(
-                Icons.event,
-                color: Colors.white,
-                size: size.width /3,
-              ),
-            ),
-            SafeArea(
-                child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              )
+            : Stack(
                 children: [
-                  SizedBox(
-                    height: 5,
+                  Container(
+                    height: size.height * .40,
+                    decoration: BoxDecoration(color: Colors.deepPurpleAccent),
                   ),
-                  Text(
-                    "Amenidades",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 40,
-                        fontFamily: 'Roboto',
-                        fontWeight: FontWeight.w700),
-                  ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  Text(
-                    'Disfruta las ventajas de tu comunidad',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: 15),
-                  ),
-                  SizedBox(
-                    height: 18,
-                  ),
-                  SizedBox(
-                    width: size.width * .5,
-                    child: Text(
-                      'Enterate de la disponibilidad de tus areas recreativas o aparta con tiempo para tus eventos',
-                      style: TextStyle(color: Colors.white, fontSize: size.width / 20),
+                  Container(
+                    padding: EdgeInsets.only(top: 95),
+                    alignment: Alignment.topRight,
+                    child: Icon(
+                      Icons.event,
+                      color: Colors.white,
+                      size: size.width / 3,
                     ),
                   ),
-                  SizedBox(
-                    height:20,
-                  ),
-                  EventDashboard()
+                  SafeArea(
+                      child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Text(
+                          "Amenidades",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 40,
+                              fontFamily: 'Roboto',
+                              fontWeight: FontWeight.w700),
+                        ),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        Text(
+                          'Disfruta las ventajas de tu comunidad',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 15),
+                        ),
+                        SizedBox(
+                          height: 18,
+                        ),
+                        SizedBox(
+                          width: size.width * .5,
+                          child: Text(
+                            'Enterate de la disponibilidad de tus areas recreativas o aparta con tiempo para tus eventos',
+                            style: TextStyle(
+                                color: Colors.white, fontSize: size.width / 20),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        EventDashboard()
+                      ],
+                    ),
+                  ))
                 ],
               ),
-            ))
-          ],
-        ),
       ),
     );
   }

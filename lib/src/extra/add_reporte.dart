@@ -355,7 +355,7 @@ class _AddReorteState extends State<AddReorte> {
       });
 
       Response response = await dio.post(
-          'http://187.189.53.8:8080/AdcomBackend/backend/web/index.php?r=adcom/reportes',
+          'http://192.168.1.178:8080/AdcomBackend/backend/web/index.php?r=adcom/reportes',
           data: formdata2, onSendProgress: (received, total) {
         if (total != 1) {
           print((received / total * 100).toStringAsFixed(0) + '%');

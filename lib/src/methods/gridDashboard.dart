@@ -1,6 +1,11 @@
+import 'package:adcom/json/jsonAmenidades.dart';
+import 'package:adcom/src/methods/eventDashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+SharedPreferences? prefs;
 
 class GridDashboard extends StatefulWidget {
   final userId;
@@ -25,12 +30,13 @@ class _GridDashboardState extends State<GridDashboard> {
       ));
 
   Items item2 = new Items(
-      title: 'Proximamente',
-      //route: '/screen4',
-      icon: Icon(Icons.announcement_rounded, size: 50, color: Colors.grey));
+      title: 'Avisos',
+      route: '/screen4',
+      icon: Icon(Icons.announcement_rounded,
+          size: 50, color: Colors.blueGrey[700]));
 
   Items item3 = new Items(
-      title: 'Proximamente',
+      title: 'Votaciones',
       //route: '/screen6',
       icon: Icon(
         Icons.book_rounded,
@@ -92,17 +98,11 @@ class _GridDashboardState extends State<GridDashboard> {
   Widget build(BuildContext context) {
     switch (widget.userId) {
       case 1:
-        myList = [
-          item1,
-          item5,
-          item4,
-          
-        ];
+        myList = [item1, item5, item4, item2];
 
         break;
       case 2:
         myList = [
-          item1,
           item9,
           item4,
           item5,

@@ -1,3 +1,5 @@
+import 'package:adcom/json/jsonAmenidades.dart';
+import 'package:adcom/src/methods/eventDashboard.dart';
 import 'package:adcom/src/methods/gridDashboard.dart';
 import 'package:adcom/src/models/event_provider.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +31,8 @@ somData(user, userType) async {
 class _MainMenuState extends State<MainMenu> {
   var user;
   int? userType;
+  bool entrada = true;
+  Places? acceso;
 
   userName() async {
     prefs = await SharedPreferences.getInstance();
@@ -169,7 +173,7 @@ class _MainMenuState extends State<MainMenu> {
                                 //no mover
                                 SizedBox(
                                   height: size.height >= 640
-                                      ? size.height / 6
+                                      ? size.height / 6.5
                                       : size.height / 10,
                                 ),
                               ],

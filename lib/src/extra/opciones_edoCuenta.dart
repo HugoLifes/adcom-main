@@ -65,18 +65,8 @@ class _OpcionesEdoCuentaState extends State<OpcionesEdoCuenta> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Text(item, style: TextStyle(fontSize: 16.0)),
-                InkWell(
-                  onTap: () async {
-                    Printing.layoutPdf(onLayout: (PdfPageFormat format) {
-                      return buildPdf(format);
-                    });
-                  },
-                  child: Icon(
-                    Icons.picture_as_pdf_rounded,
-                    size: 30,
-                  ),
-                )
+                Text('Cuota', style: TextStyle(fontSize: 16.0)),
+                Text('')
               ],
             ),
             SizedBox(
