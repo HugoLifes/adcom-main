@@ -29,7 +29,7 @@ Future<GetReportes?> getReportes() async {
   prefs = await SharedPreferences.getInstance();
   var id = prefs!.getInt('id');
   Uri url = Uri.parse(
-      'http://192.168.1.178:8080/AdcomBackend/backend/web/index.php?r=adcom/get-reportes');
+      'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-reportes');
 
   final response = await http.post(url, body: {"idResidente": id.toString()});
 
@@ -45,16 +45,35 @@ Future<GetReportes?> getReportes() async {
 
 class _LevantarReporteState extends State<LevantarReporte> {
   List<DataReporte> myList = [];
-
+  List<Progreso> listProgreso = [];
+  var contador;
   GetReportes? cuentas;
+
   data() async {
     cuentas = await getReportes();
     for (int i = 0; i < cuentas!.data!.length; i++) {
       myList.add(new DataReporte(
+          id: cuentas!.data![i].idReporte,
           descripCorta: cuentas!.data![i].descCorta,
           desperfecto: cuentas!.data![i].descDesperfecto,
           fechaRep: cuentas!.data![i].fechaRep,
           uri: cuentas!.data![i].evidencia!.toList()));
+
+      for (int j = 0; j < cuentas!.data![i].progreso!.length; j++) {
+        /*  print("conta $contador");
+        print("len: ${cuentas!.data![i].progreso!.length}"); */
+        /*  if (contador == cuentas!.data![i].progreso!.length) {
+            print('here');
+            break;
+          } else { */
+        listProgreso.add(new Progreso(
+            id: cuentas!.data![i].progreso![j].idProgreso,
+            time: cuentas!.data![i].progreso![j].fechaSeg,
+            comentario: cuentas!.data![i].progreso![j].comentario,
+            progreso: cuentas!.data![i].progreso![j].progreso));
+      }
+      //}
+
     }
   }
 
@@ -122,7 +141,8 @@ class _LevantarReporteState extends State<LevantarReporte> {
             child: ListTile(
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) => ReportEditPage(report: myList[index])));
+                    builder: (_) => ReportEditPage(
+                        report: myList[index], progreso: listProgreso)));
               },
               title: Text(
                 '${myList[index].descripCorta}',
@@ -154,11 +174,32 @@ class _LevantarReporteState extends State<LevantarReporte> {
   }
 }
 
+class Progreso {
+  int? id;
+  DateTime? time;
+  String? comentario;
+  String? progreso;
+
+  Progreso({this.time, this.comentario, this.progreso, this.id});
+  /* @override
+  String toString() {
+    return "($id, $time, $comentario, $progreso)";
+  } */
+}
+
 class DataReporte {
+  int? id;
   String? descripCorta;
   String? desperfecto;
   DateTime? fechaRep;
   List<String>? uri = [];
+  List<dynamic>? progreso = [];
 
-  DataReporte({this.descripCorta, this.desperfecto, this.fechaRep, this.uri});
+  DataReporte(
+      {this.id,
+      this.descripCorta,
+      this.desperfecto,
+      this.fechaRep,
+      this.uri,
+      this.progreso});
 }

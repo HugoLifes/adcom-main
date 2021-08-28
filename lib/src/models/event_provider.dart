@@ -106,7 +106,8 @@ class EventProvider extends ChangeNotifier {
         HapticFeedback.lightImpact();
         Widget okButton = TextButton(
             onPressed: () {
-              Navigator.of(ctx)..pop();
+              Navigator.of(ctx).popAndPushNamed('/');
+              ;
             },
             child: Text('OK'));
 

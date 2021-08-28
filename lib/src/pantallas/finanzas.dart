@@ -38,7 +38,7 @@ Future<Accounts?> getAdeudos() async {
   var id = prefs!.getInt('idUser');
 
   final Uri url = Uri.parse(
-      'http://192.168.1.178:8080/AdcomBackend/backend/web/index.php?r=adcom/get-adeudos');
+      'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-adeudos');
   final response = await http.post(url, body: {
     "params": json.encode({"usuarioId": id})
   });
@@ -60,18 +60,13 @@ class _FinanzasState extends State<Finanzas> {
   var montoCuota;
   Timer? timer;
   VoidCallback? _showPersBottomSheetCallBack;
-  RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
+  bool itsTrue = true;
 
   data() async {
     cuentas = await getAdeudos();
-    final provider = Provider.of<EventProvider>(context, listen: false);
-    if (cuentas!.value == 1) {
-      for (int i = 0; i < cuentas!.data!.length; i++) {
-        provider.addDeudas(DatosCuenta(
-          referencia: cuentas!.data![i].referencia,
-        ));
 
+    if (cuentas!.data!.isNotEmpty) {
+      for (int i = 0; i < cuentas!.data!.length; i++) {
         localList.add(new DatosCuenta(
             idComu: cuentas!.data![i].idComu,
             montoCuota: cuentas!.data![i].montoCuota,
@@ -82,19 +77,12 @@ class _FinanzasState extends State<Finanzas> {
             pago: cuentas!.data![i].pago));
       }
     } else {
-      errorLoSiento();
+      setState(() {
+        if (mounted) {
+          itsTrue = false;
+        }
+      });
     }
-  }
-
-  errorLoSiento() {
-    Container(
-        padding: EdgeInsets.only(top: 0),
-        child: Center(
-          child: Image.asset(
-            'assets/images/error.png',
-            width: 192,
-          ),
-        ));
   }
 
   @override
@@ -102,13 +90,17 @@ class _FinanzasState extends State<Finanzas> {
     super.initState();
     _showPersBottomSheetCallBack = _showPersBottomSheetCallBack;
     data();
-
-    Future.delayed(Duration(seconds: 1), () => {refresh()});
+    if (itsTrue == false) {
+    } else {
+      Future.delayed(Duration(seconds: 1), () => {refresh()});
+    }
   }
 
   refresh() {
     setState(() {
-      mainView();
+      if (mounted) {
+        mainView();
+      }
     });
   }
 
@@ -121,148 +113,100 @@ class _FinanzasState extends State<Finanzas> {
           backgroundColor: Colors.lightGreen[700],
         ),
         resizeToAvoidBottomInset: false,
-        body: size.width >= 880
-            ? Stack(
-                children: [
-                  Container(
-                    height: size.height * .35,
-                    decoration: BoxDecoration(color: Colors.lightGreen[700]),
-                  ),
-                  Container(
-                    padding: EdgeInsets.only(top: 80),
-                    alignment: Alignment.topRight,
-                    child: Icon(
-                      Icons.show_chart_rounded,
-                      size: 190,
-                      color: Colors.white,
-                    ),
-                  ),
-                  SafeArea(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            height: 12,
-                          ),
-                          Text(
-                            'Mis Pagos',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 40,
-                                fontFamily: 'Roboto',
-                                fontWeight: FontWeight.w700),
-                          ),
-                          SizedBox(
-                            height: size.width >= 880 ? 25 : 20,
-                          ),
-                          Text(
-                            'Toma el control de tus gastos',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                fontSize: 16),
-                          ),
-                          SizedBox(
-                            height: size.width >= 880 ? 35 : 23,
-                          ),
-                          SizedBox(
-                            width: size.width * .6,
-                            child: Text(
-                              'Mantente actualizado revisando tus estados de cuenta y adeudos pendientes.',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 19),
-                            ),
-                          ),
-                          Container(
-                              padding: EdgeInsets.only(
-                                  top: size.width >= 880 ? 45 : 25,
-                                  left: size.width >= 880 ? 5 : 0,
-                                  right: size.width >= 880 ? 5 : 0),
-                              child: localList.isEmpty
-                                  ? Center(
-                                      child: CircularProgressIndicator(),
-                                    )
-                                  : mainView())
-                        ],
+        body: Stack(
+          children: [
+            Container(
+              height: size.height * .30,
+              decoration: BoxDecoration(color: Colors.lightGreen[700]),
+            ),
+            Container(
+              padding: EdgeInsets.only(top: size.height / 12),
+              alignment: Alignment.topRight,
+              child: Icon(
+                Icons.show_chart_rounded,
+                size: size.width / 2,
+                color: Colors.white,
+              ),
+            ),
+            SafeArea(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: ListView(shrinkWrap: true, children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: size.width / 20,
                       ),
-                    ),
-                  ),
-                ],
-              )
-            : Stack(
-                children: [
-                  Container(
-                    height: size.height * .35,
-                    decoration: BoxDecoration(color: Colors.lightGreen[700]),
-                  ),
-                  Container(
-                    padding: EdgeInsets.only(top: size.height / 12),
-                    alignment: Alignment.topRight,
-                    child: Icon(
-                      Icons.show_chart_rounded,
-                      size: size.width / 2,
-                      color: Colors.white,
-                    ),
-                  ),
-                  SafeArea(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: ListView(shrinkWrap: true, children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              height: size.width / 20,
-                            ),
-                            Text(
-                              'Mis Pagos',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 30,
-                                  fontFamily: 'Roboto',
-                                  fontWeight: FontWeight.w700),
-                            ),
-                            SizedBox(
-                              height: size.width / 19,
-                            ),
-                            Text(
-                              'Toma el control de tus gastos',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  fontSize: 17),
-                            ),
-                            SizedBox(
-                              height: size.width / 20,
-                            ),
-                            SizedBox(
-                              width: size.width * .6,
-                              child: Text(
-                                'Mantente actualizado revisando tus estados de cuenta y adeudos pendientes.',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: size.width / 21),
-                              ),
-                            ),
-                            Container(
-                                padding: EdgeInsets.only(
-                                    top: size.width / 10,
-                                    left: size.width >= 880 ? 5 : 0,
-                                    right: size.width >= 880 ? 5 : 0),
-                                child: localList.isEmpty
-                                    ? Center(
-                                        child: CircularProgressIndicator(),
-                                      )
-                                    : mainView())
-                          ],
+                      Text(
+                        'Mis Pagos',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 30,
+                            fontFamily: 'Roboto',
+                            fontWeight: FontWeight.w700),
+                      ),
+                      SizedBox(
+                        height: size.width / 19,
+                      ),
+                      Text(
+                        'Toma el control de tus gastos',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: 17),
+                      ),
+                      SizedBox(
+                        height: size.width / 20,
+                      ),
+                      SizedBox(
+                        width: size.width * .6,
+                        child: Text(
+                          'Mantente actualizado revisando tus estados de cuenta y adeudos pendientes.',
+                          style: TextStyle(
+                              color: Colors.white, fontSize: size.width / 21),
                         ),
-                      ]),
-                    ),
+                      ),
+                      Container(
+                          padding: EdgeInsets.only(
+                              top: size.width / 7,
+                              left: size.width >= 880 ? 5 : 0,
+                              right: size.width >= 880 ? 5 : 0),
+                          child: localList.isEmpty
+                              ? Center(
+                                  child: itsTrue == false
+                                      ? Container(
+                                          padding:
+                                              const EdgeInsets.only(top: 90),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Image.asset(
+                                                'assets/images/magic.png',
+                                                width: size.width / 1,
+                                                height: 200,
+                                              ),
+                                              Text(
+                                                'Lo sentimos nuestra magia no funciona en este lugar',
+                                                style: TextStyle(
+                                                  fontSize: size.width / 20,
+                                                  color: Colors.lightGreen[700],
+                                                ),
+                                                textAlign: TextAlign.justify,
+                                              )
+                                            ],
+                                          ))
+                                      : CircularProgressIndicator(),
+                                )
+                              : mainView())
+                    ],
                   ),
-                ],
-              ));
+                ]),
+              ),
+            ),
+          ],
+        ));
   }
 
   mainView() {

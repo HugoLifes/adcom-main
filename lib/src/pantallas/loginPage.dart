@@ -24,8 +24,8 @@ class LoginPage extends StatefulWidget {
 }
 
 Future<Posting?> loginAcces(String user, String pass) async {
-  final Uri uri = Uri.parse(
-      'http://192.168.1.178:8080/AdcomBackend/backend/web/index.php?r=adcom/login');
+  final Uri uri =
+      Uri.parse('http://187.189.53.8:8081/backend/web/index.php?r=adcom/login');
   final response = await http.post(uri, body: {
     "params": jsonEncode({'username': user, 'password': pass}),
   });
@@ -204,7 +204,6 @@ class _LoginPageState extends State<LoginPage> {
                           } catch (e) {
                             HapticFeedback.heavyImpact();
                             showAlertDialog();
-                            Navigator.popAndPushNamed(context, '/');
                           }
                         } else {
                           HapticFeedback.heavyImpact();
@@ -280,7 +279,7 @@ class _LoginPageState extends State<LoginPage> {
   showAlertDialog() {
     Widget okButton = TextButton(
         onPressed: () {
-          Navigator.of(context)..pop();
+          Navigator.of(context).popAndPushNamed('/');
         },
         child: Text('OK'));
 

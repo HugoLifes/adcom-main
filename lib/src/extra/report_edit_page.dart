@@ -4,17 +4,24 @@ import 'package:adcom/src/extra/reporte.dart';
 import 'package:flutter/material.dart';
 import 'package:im_stepper/stepper.dart';
 
+// ignore: must_be_immutable
 class ReportEditPage extends StatefulWidget {
   final DataReporte report;
+  final List<Progreso> progreso;
 
-  const ReportEditPage({Key? key, required this.report}) : super(key: key);
+  ReportEditPage({Key? key, required this.report, required this.progreso})
+      : super(key: key);
 
   @override
   _ReportEditPageState createState() => _ReportEditPageState();
 }
 
 class _ReportEditPageState extends State<ReportEditPage> {
-  int _activeStep = 0;
+  var activestep = 0;
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,10 +42,12 @@ class _ReportEditPageState extends State<ReportEditPage> {
                   Icon(Icons.access_alarm),
                   Icon(Icons.check)
                 ],
-                activeStep: _activeStep,
+                activeStep: widget.progreso.last.id!,
                 onStepReached: (index) {
                   setState(() {
-                    _activeStep = index;
+                    for (int i = 0; i < widget.progreso.length; i++) {
+                      widget.progreso[i].id = index;
+                    }
                   });
                 },
               ),
@@ -59,7 +68,7 @@ class _ReportEditPageState extends State<ReportEditPage> {
   Widget header() {
     return Container(
       decoration: BoxDecoration(
-          color: stepColor()!, borderRadius: BorderRadius.circular(5)),
+          color: Colors.grey, borderRadius: BorderRadius.circular(5)),
       child: Row(
         children: [
           Padding(
@@ -76,7 +85,7 @@ class _ReportEditPageState extends State<ReportEditPage> {
   }
 
   Widget plainText() {
-    switch (_activeStep) {
+    switch (widget.progreso.last.id!) {
       case 1:
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -156,26 +165,13 @@ class _ReportEditPageState extends State<ReportEditPage> {
     }
   }
 
-  Color? stepColor() {
-    switch (_activeStep) {
-      case 1:
-        return Colors.lightGreen[200];
-      case 2:
-        return Colors.lightGreen[300];
-      case 3:
-        return Colors.lightGreen;
-      default:
-        return Colors.yellow;
-    }
-  }
-
   String? headerText() {
-    switch (_activeStep) {
+    switch (widget.progreso.last.id!) {
       case 1:
-        return 'Revisión';
+        return 'Revision';
       case 2:
         return 'Respuesta';
-      case 3:
+      case 4:
         return 'Finalizado';
 
       default:

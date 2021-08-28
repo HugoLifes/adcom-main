@@ -1,3 +1,5 @@
+import 'package:adcom/src/extra/dashboard_Avisos.dart';
+import 'package:adcom/src/extra/nuevo_post.dart';
 import 'package:adcom/src/methods/searchBar.dart';
 import 'package:flutter/material.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
@@ -59,7 +61,7 @@ class _AvisosState extends State<Avisos> {
     var size = MediaQuery.of(context).size;
     return Scaffold(
         appBar: AppBar(
-          elevation: 3.0,
+          elevation: 4.0,
           backgroundColor: Colors.blueGrey[700],
         ),
         resizeToAvoidBottomInset: false,
@@ -113,33 +115,26 @@ class _AvisosState extends State<Avisos> {
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
+                  SizedBox(
+                    height: size.width / 8,
+                  ),
+                  AvisosDashboard()
                 ],
               ),
             ))
           ],
         ),
-        bottomNavigationBar: BottomNavigationBar(
-          items: <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.announcement_rounded),
-              label: 'Avisos',
-              backgroundColor: Colors.red,
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.file_present),
-              label: 'Archivos',
-              backgroundColor: Colors.green,
-            ),
-          ],
-          elevation: 5,
-          currentIndex: _selectedIndex,
-          selectedItemColor: Colors.blueGrey[700],
-          onTap: _onItemTapped,
+        bottomNavigationBar: BottomAppBar(
+          shape: const CircularNotchedRectangle(),
+          child: Container(height: 50.0),
         ),
         floatingActionButton: FloatingActionButton(
           elevation: 5,
           backgroundColor: Colors.blueGrey[700],
-          onPressed: () {},
+          onPressed: () {
+            Navigator.of(context)
+                .push(MaterialPageRoute(builder: (_) => MakeNewPost()));
+          },
           tooltip: 'add post',
           child: const Icon(
             Icons.add,

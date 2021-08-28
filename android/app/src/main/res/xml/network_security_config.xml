@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config xmlns:tools="http://schemas.android.com/tools">
     <base-config cleartextTrafficPermitted="false">
-        <domain includeSubdomains="true">http://187.189.53.8:8080</domain>
+        <domain includeSubdomains="true">http://187.189.53.8:8081</domain>
         <domain tools:ignore="NetworkSecurityConfig">http://192.168.1.178/AdcomBackend/backend/web/index.php?r=adcom/get-directorio</domain>
         <domain tools:ignore="NetworkSecurityConfig">http://187.197.53.8/AdcomBackend/backend/web/index.php?r=adcom/get-directorio</domain>
         <trust-anchors>

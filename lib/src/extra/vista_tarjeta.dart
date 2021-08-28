@@ -95,8 +95,10 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
                         height: 30,
                         child: OutlinedButton(
                           onPressed: () {
-                            Navigator.of(context).push(
-                                MaterialPageRoute(builder: (_) => RefView()));
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (_) => RefView(
+                                      list: mylist,
+                                    )));
                           },
                           child: Icon(Icons.add, size: 25, color: Colors.white),
                           style: OutlinedButton.styleFrom(
@@ -185,7 +187,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(
-                    'Seleccione su método de pago',
+                    'Seleccioné su método de pago',
                     style: TextStyle(fontSize: 21),
                   ),
                   SizedBox(
@@ -344,6 +346,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
           fechaPago: cuentas!.data![i].fechaPago,
           pago: cuentas!.data![i].pago!,
           totalApagar: cuentas!.data![i].totalApagar,
+          referencia: cuentas!.data![i].referencia,
           pagoTardio: cuentas!.data![i].pagoTardio,
           montoTardio: cuentas!.data![i].montoPagoTardio));
     }
@@ -443,11 +446,21 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
     for (int i = 0; i < mylist.length; i++) {
       deuda = double.parse(mylist[i].montoCuota!);
       tardio = double.parse(mylist[i].montoTardio!);
-      if (mylist[i].pago == 1 && mylist[i].pagoTardio == 0) {
+      if (mylist[i].pago == 1) {
+        contador;
       } else {
-        if (DateTime.now().day <= mylist[i].fechaLimite!.day &&
-            DateTime.now().month <= mylist[i].fechaLimite!.month &&
-            DateTime.now().year <= mylist[i].fechaLimite!.year) {
+        if (mylist[i].pagoTardio == 0) {
+          if (DateTime.now().day <= mylist[i].fechaLimite!.day &&
+              DateTime.now().month <= mylist[i].fechaLimite!.month &&
+              DateTime.now().year <= mylist[i].fechaLimite!.year) {
+            setState(() {
+              contador += deuda;
+            });
+          } else {
+            setState(() {
+              contador += deuda + tardio;
+            });
+          }
         } else {
           setState(() {
             contador += deuda + tardio;

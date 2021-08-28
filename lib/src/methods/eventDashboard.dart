@@ -33,7 +33,7 @@ Future<Places?> amenidades() async {
   print('?$id');
 
   final Uri url = Uri.parse(
-      'http://192.168.1.178:8080/AdcomBackend/backend/web/index.php?r=adcom/get-amenidades');
+      'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-amenidades');
   final response = await http.post(url, body: {
     "params": json.encode({"usuarioId": id})
   });
@@ -152,13 +152,13 @@ class _EventDashboardState extends State<EventDashboard> {
                       children: [
                         Image.asset(
                           'assets/images/zzz.png',
-                          width: 280,
+                          width: size / 1,
                           height: 200,
                         ),
                         Text(
                           'Lo sentimos por el momento no dispone amenidades',
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: size / 20,
                             color: Colors.deepPurple,
                           ),
                           textAlign: TextAlign.justify,
@@ -254,7 +254,6 @@ class _EventDashboardState extends State<EventDashboard> {
                       SizedBox(
                         height: width / 40,
                       ),
-                      itsTrue == false ? Text('Lo sentimos :(') : Text(''),
                     ],
                   ),
                 ],

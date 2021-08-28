@@ -31,7 +31,7 @@ class _GridDashboardState extends State<GridDashboard> {
 
   Items item2 = new Items(
       title: 'Avisos',
-      route: '/screen4',
+      /* route: '/screen4' */
       icon: Icon(Icons.announcement_rounded,
           size: 50, color: Colors.blueGrey[700]));
 
@@ -98,7 +98,7 @@ class _GridDashboardState extends State<GridDashboard> {
   Widget build(BuildContext context) {
     switch (widget.userId) {
       case 1:
-        myList = [item1, item5, item4, item2];
+        myList = [item1, item5, item4];
 
         break;
       case 2:
