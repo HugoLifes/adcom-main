@@ -32,7 +32,7 @@ Future<Places?> amenidades() async {
   print('?$id');
 
   final Uri url = Uri.parse(
-      'http://187.189.53.8:8080/AdcomBackend/backend/web/index.php?r=adcom/get-amenidades');
+      'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-amenidades');
   final response = await http.post(url, body: {
     "params": json.encode({"usuarioId": id})
   });
@@ -143,7 +143,7 @@ class _EventDashboardState extends State<EventDashboard> {
         ? Center(
             child: itsTrue == false
                 ? Container(
-                    padding: const EdgeInsets.only(top: 90),
+                    padding: EdgeInsets.only(top: size / 100),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -153,7 +153,7 @@ class _EventDashboardState extends State<EventDashboard> {
                           height: 200,
                         ),
                         Text(
-                          'Lo sentimos por el momento no dispone amenidades',
+                          'Lo sentimos, por el momento no dispone amenidades',
                           style: TextStyle(
                             fontSize: size / 20,
                             color: Colors.deepPurple,
@@ -176,7 +176,7 @@ class _EventDashboardState extends State<EventDashboard> {
       itemCount: myList.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 1,
-        childAspectRatio: 3.0,
+        childAspectRatio: 3.5,
         crossAxisSpacing: 15,
         mainAxisSpacing: 15,
       ),
@@ -251,7 +251,7 @@ class _EventDashboardState extends State<EventDashboard> {
                       SizedBox(
                         height: width / 50,
                       ),
-                      itsTrue == false ? Text('Lo sentimos :(') : Text(''),
+                      
                     ],
                   ),
                 ],

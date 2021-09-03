@@ -63,7 +63,7 @@ class _CalendarioState extends State<Calendario> {
     prefs = await SharedPreferences.getInstance();
 
     Uri uri = Uri.parse(
-        'http://187.189.53.8:8080/AdcomBackend/backend/web/index.php?r=adcom/get-amenidad-reserva');
+        'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-amenidad-reserva');
 
     final response =
         await http.post(uri, body: {"idAmenidad": "${widget.idA}"});
@@ -115,7 +115,7 @@ class _CalendarioState extends State<Calendario> {
         ? Center(
             child: CircularProgressIndicator(),
           )
-        : calendart(context, events);
+        : calendart(context, event2);
   }
 
   SfCalendar calendart(BuildContext context, List<Event> event) {

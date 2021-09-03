@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+// ignore: must_be_immutable
 class RefView extends StatefulWidget {
   late List<DatosCuenta>? list = [];
   RefView({Key? key, this.list}) : super(key: key);

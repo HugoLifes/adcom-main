@@ -36,7 +36,7 @@ Future<Accounts?> getAdeudos() async {
   var id = prefs!.getInt('idUser');
 
   final Uri url = Uri.parse(
-      'http://187.189.53.8:8080/AdcomBackend/backend/web/index.php?r=adcom/get-adeudos');
+      'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-adeudos');
   final response = await http.post(url, body: {
     "params": json.encode({"usuarioId": id})
   });
@@ -82,16 +82,7 @@ class _FinanzasState extends State<Finanzas> {
     }
   }
 
-  errorLoSiento() {
-    Container(
-        padding: EdgeInsets.only(top: 0),
-        child: Center(
-          child: Image.asset(
-            'assets/images/error.png',
-            width: 192,
-          ),
-        ));
-  }
+
 
   @override
   void initState() {
@@ -185,7 +176,7 @@ class _FinanzasState extends State<Finanzas> {
                                   child: itsTrue == false
                                       ? Container(
                                           padding:
-                                              const EdgeInsets.only(top: 90),
+                                               EdgeInsets.only(top: size.width/ 90),
                                           child: Column(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.center,

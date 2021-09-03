@@ -168,9 +168,7 @@ class _MainMenuState extends State<MainMenu> {
                                 ),
                                 //no mover
                                 SizedBox(
-                                  height: size.height >= 640
-                                      ? size.height / 5.5
-                                      : size.height / 10,
+                                  height: size.height / 5.5
                                 ),
                               ],
                             ),

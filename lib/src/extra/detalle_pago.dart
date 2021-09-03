@@ -51,7 +51,7 @@ class _DetallesPagoState extends State<DetallesPago> {
             Row(
               children: [
                 Container(
-                  padding: EdgeInsets.only(left: 180, top: 10),
+                  padding: EdgeInsets.only(left: size.width/ 4, top: 10),
                   child: Row(
                     children: [
                       Text(

@@ -230,7 +230,7 @@ class _EventEditingPageState extends State<EventEditingPage> {
       });
 
       Response response = await dio.post(
-          'http://187.189.53.8:8080/AdcomBackend/backend/web/index.php?r=adcom/reserva-amenidad',
+          'http://187.189.53.8:8081/backend/web/index.php?r=adcom/reserva-amenidad',
           data: formData, onSendProgress: (received, total) {
         if (total != -1) {
           print((received / total * 100).toStringAsFixed(0) + '%');

@@ -169,7 +169,7 @@ class _ContactosState extends State<Contactos> {
           padding: EdgeInsets.only(left: 4, right: 4, top: 17),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 1,
-            childAspectRatio: 3.1,
+            childAspectRatio: 2.9,
             crossAxisSpacing: 15,
             mainAxisSpacing: 15,
           ),

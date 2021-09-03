@@ -33,7 +33,7 @@ Future<Places?> idso() async {
   var id = prefs!.getInt('idPrimario');
 
   final Uri url = Uri.parse(
-      'http://187.189.53.8:8080/AdcomBackend/backend/web/index.php?r=adcom/get-amenidades');
+      'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-amenidades');
   final response = await http.post(url, body: {
     "params": json.encode({"usuarioId": id})
   });
@@ -84,7 +84,7 @@ class _AmenidadesState extends State<Amenidades> {
         body: Stack(
           children: [
             Container(
-              height: size.height * .40,
+              height: size.height * .35,
               decoration: BoxDecoration(color: Colors.deepPurpleAccent),
             ),
             Container(
@@ -134,9 +134,7 @@ class _AmenidadesState extends State<Amenidades> {
                           color: Colors.white, fontSize: size.width / 20),
                     ),
                   ),
-                  SizedBox(
-                    height: 20,
-                  ),
+                  
                   EventDashboard()
                 ],
               ),

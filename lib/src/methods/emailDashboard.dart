@@ -35,7 +35,7 @@ Future<Welcome?> getData() async {
   var id = prefs!.getInt('id');
 
   Uri uri = Uri.parse(
-      'http://187.189.53.8:8080/AdcomBackend/backend/web/index.php?r=adcom/get-directorio');
+      'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-directorio');
   final response = await http.post(uri, body: {
     "params": json.encode({"usuarioId": id})
   });
@@ -106,27 +106,29 @@ class _ContactDashboardState extends State<ContactDashboard> {
 
   refresh() {
     setState(() {
-      vistaContactos();
+      var size = MediaQuery.of(context).size.width;
+      vistaContactos(size: size);
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size.width;
     return myList.isEmpty
         ? Center(
             child: CircularProgressIndicator(),
           )
-        : vistaContactos();
+        : vistaContactos(size: size);
   }
 
-  vistaContactos() => Flexible(
+  vistaContactos({size}) => Flexible(
         child: GridView.builder(
           shrinkWrap: false,
-          padding: EdgeInsets.only(left: 4, right: 4, top: 17),
+          padding: EdgeInsets.only(left: 3, right: 3, top: 17),
           itemCount: myList.length,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 1,
-            childAspectRatio: 3.15,
+            childAspectRatio: 3.1,
             crossAxisSpacing: 16,
             mainAxisSpacing: 16,
           ),
@@ -162,20 +164,23 @@ class _ContactDashboardState extends State<ContactDashboard> {
                             : myList[index].icon,
                       ),
                       SizedBox(
-                        width: 15,
+                        width: 12,
                       ),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           myList[index].title == null
                               ? Container()
-                              : Text(
-                                  myList[index].title!.toUpperCase(),
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 14.5,
-                                      fontWeight: FontWeight.w600),
-                                ),
+                              : SizedBox(
+                                width: size *.40,
+                                child: Text(
+                                    myList[index].title!.toUpperCase(),
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 14.5,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                              ),
                           SizedBox(
                             height: 10,
                           ),
@@ -185,7 +190,7 @@ class _ContactDashboardState extends State<ContactDashboard> {
                                 'Comu:',
                                 style: TextStyle(
                                     color: Colors.black,
-                                    fontSize: 15,
+                                    fontSize: 16,
                                     fontWeight: FontWeight.bold),
                               ),
                               SizedBox(
@@ -196,17 +201,17 @@ class _ContactDashboardState extends State<ContactDashboard> {
                                   : Text("${myList[index].comNombre}",
                                       style: TextStyle(
                                         color: Colors.black,
-                                        fontSize: 15,
+                                        fontSize: 16,
                                       )),
                             ],
                           ),
                           SizedBox(
                             height: 10,
                           ),
-                          Row(
+                         /*  Row(
                             children: [
                               Text(
-                                'Celular:',
+                                'Email:',
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 15,
@@ -215,15 +220,18 @@ class _ContactDashboardState extends State<ContactDashboard> {
                               SizedBox(
                                 width: 3,
                               ),
-                              myList[index].telCel == null
-                                  ? Container()
-                                  : Text(myList[index].telCel!,
+                              myList[index].email == null
+                                  ? Text('No tiene disponible', style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 15,
+                                      ))
+                                  : Text(myList[index].email!,
                                       style: TextStyle(
                                         color: Colors.black,
                                         fontSize: 15,
                                       )),
                             ],
-                          ),
+                          ), */
                         ],
                       ),
                     ],
