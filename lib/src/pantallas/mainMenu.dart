@@ -21,16 +21,20 @@ class MainMenu extends StatefulWidget {
   _MainMenuState createState() => _MainMenuState();
 }
 
-somData(user, userType) async {
+somData(user, userType, idCom, idPrimario, userId) async {
   await MainMenu.init();
 
   prefs!.setString('user', user);
   prefs!.setInt('userType', userType);
+  prefs!.setInt('idCom', idCom);
+  prefs!.setInt('idPrimario', idPrimario);
+  prefs!.setInt('userId', userId);
 }
 
 class _MainMenuState extends State<MainMenu> {
   var user;
   int? userType;
+  int? idCom;
   bool entrada = true;
   Places? acceso;
 

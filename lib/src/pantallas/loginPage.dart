@@ -33,8 +33,6 @@ Future<Posting?> loginAcces(String user, String pass) async {
     var data = response.body;
 
     return postingFromJson(data);
-  } else {
-    return null;
   }
 }
 

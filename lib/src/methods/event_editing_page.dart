@@ -24,12 +24,6 @@ class EventEditingPage extends StatefulWidget {
   _EventEditingPageState createState() => _EventEditingPageState();
 }
 
-accesData(comId, userId) async {
-  await EventEditingPage.init();
-  prefs!.setInt('idCom', comId);
-  prefs!.setInt('idUser', userId);
-}
-
 //intentar llamar id Amenidad de otra manera
 
 class _EventEditingPageState extends State<EventEditingPage> {
@@ -45,7 +39,7 @@ class _EventEditingPageState extends State<EventEditingPage> {
     prefs = await SharedPreferences.getInstance();
     setState(() {
       idCom = prefs!.getInt('idCom');
-      idUser = prefs!.getInt('idUser');
+      idUser = prefs!.getInt('userId');
     });
   }
 

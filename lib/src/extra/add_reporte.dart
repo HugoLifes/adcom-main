@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:camera/camera.dart';
 import 'package:dio/dio.dart';
 import 'dart:io';
 import 'package:adcom/src/methods/slide.dart';
@@ -10,20 +11,21 @@ import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 SharedPreferences? prefs;
+var cameras;
+var firstCamera;
 
 class AddReorte extends StatefulWidget {
   final Report? report;
 
   static init() async {
-    prefs = await SharedPreferences.getInstance();
+    cameras = await availableCameras();
+    firstCamera = cameras.first;
   }
 
-  AddReorte({
-    Key? key,
-    this.report,
-  }) : super(key: key);
+  AddReorte({Key? key, this.report}) : super(key: key);
 
   @override
   _AddReorteState createState() => _AddReorteState();
@@ -49,12 +51,21 @@ class _AddReorteState extends State<AddReorte> {
   int _currentStep = 0;
   int? idCom;
   int? idUser;
+  late CameraController _controller;
+  late Future<void> _initializeControllerFuture;
+
+  getCameras() async {
+    await Permission.camera.request();
+    await Permission.storage.request();
+    await Permission.manageExternalStorage.request();
+    await Permission.mediaLibrary.request();
+  }
 
   addata() async {
     prefs = await SharedPreferences.getInstance();
     setState(() {
       idCom = prefs!.getInt('idCom');
-      idUser = prefs!.getInt('idUser');
+      idUser = prefs!.getInt('userId');
     });
   }
 
@@ -62,6 +73,7 @@ class _AddReorteState extends State<AddReorte> {
   void initState() {
     super.initState();
     addata();
+    getCameras();
   }
 
   @override
@@ -242,7 +254,8 @@ class _AddReorteState extends State<AddReorte> {
 
   //funcion que abre la camara y muestra
   void openCamera() async {
-    var image = await _picker.pickImage(source: ImageSource.camera);
+    var image =
+        await _picker.pickImage(source: ImageSource.camera, imageQuality: 85);
 
     setState(() {
       if (image != null) {
@@ -338,6 +351,7 @@ class _AddReorteState extends State<AddReorte> {
 
       for (var item in file) {
         filesArr.add(item.path.split('/').last);
+        print(filesArr[0]);
       }
 
       var formdata2 = FormData.fromMap({
@@ -350,7 +364,7 @@ class _AddReorteState extends State<AddReorte> {
         'img[]': [
           for (int i = 0; i < file.length; i++)
             MultipartFile.fromFileSync(file[i].path,
-                filename: filesArr[i], contentType: MediaType('image', '*'))
+                filename: filesArr[i], contentType: MediaType('*', '*'))
         ]
       });
 
@@ -442,6 +456,7 @@ class _AddReorteState extends State<AddReorte> {
           style: TextStyle(fontSize: 19),
         )));
       });
+
       return response;
     }
   }

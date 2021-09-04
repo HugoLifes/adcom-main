@@ -1,8 +1,16 @@
+import 'dart:convert';
+
+import 'package:adcom/json/json-getComunidades.dart';
+import 'package:adcom/json/obtenerAvisos.dart';
 import 'package:adcom/src/extra/dashboard_Avisos.dart';
 import 'package:adcom/src/extra/nuevo_post.dart';
 import 'package:adcom/src/methods/searchBar.dart';
 import 'package:flutter/material.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+SharedPreferences? prefs;
 
 class Avisos extends StatefulWidget {
   final id;
@@ -15,44 +23,99 @@ class Avisos extends StatefulWidget {
 class _AvisosState extends State<Avisos> {
   bool _requierConsent = true;
   int _selectedIndex = 0;
+  List<AvisosCall> comunities = [];
+  List<String> idComName = [];
+
+  List<AvisosUsuario> avisos = [];
+  List? links;
+  List? name;
+
+  List<String> hLinks = [];
+  var nombres = <dynamic, dynamic>{};
+  var Link = <dynamic, Map>{};
+  List<Map<dynamic, Map>> superMap2 = [];
+  var typeUser;
+  var idComu;
+  //funcion que checa el usuario y llama a las funciones si es el usuario maestro
+  Future userCheck() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      typeUser = prefs!.getInt('userType');
+      idComu = prefs!.getInt('idCom');
+    });
+
+    print('$typeUser');
+    print('here $idComu');
+
+    if (typeUser == 2) {
+      AvisosCall().getComunidades().then((value) => {
+            for (int i = 0; i < value!.data!.length; i++)
+              {
+                idComName.add(value.data![i].nombreComu!),
+                comunities.add(AvisosCall(
+                    id: value.data![i].idCom,
+                    nombreComu: value.data![i].nombreComu,
+                    ubicacion: value.data![i].ubicacion,
+                    cp: value.data![i].cp,
+                    idAdmin: value.data![i].idAdministrador == null
+                        ? 0
+                        : value.data![i].idAdministrador,
+                    idComite: value.data![i].idComite == null
+                        ? 0
+                        : value.data![i].idComite,
+                    idTipoComu: value.data![i].idTipoComu,
+                    banco: value.data![i].banco,
+                    cuentaBanco: value.data![i].cuentaBanco,
+                    cuentaClabe: value.data![i].cuentaClabe,
+                    RFC: value.data![i].rfc)),
+              }
+          });
+    } else {
+      print('usario no aceptado');
+    }
+
+    AvisosUsuario()
+        .getAvisos(idComu)
+        .then((value) => {
+              for (int i = 0; i < value!.data!.length; i++)
+                {
+                  avisos.add(new AvisosUsuario(
+                    avisos: value.data![i].aviso,
+                    tipoAviso: value.data![i].tipoAviso,
+                    fecha: value.data![i].fechaAviso,
+                  )),
+                },
+              links = List.generate(
+                  value.data!.length,
+                  (index2) => List.generate(
+                      value.data![index2].archivos!.length,
+                      (index) => value
+                          .data![index2].archivos![index].direccionArchivo),
+                  growable: true),
+              name = List.generate(
+                  value.data!.length,
+                  (index2) => List.generate(
+                      value.data![index2].archivos!.length,
+                      (index) =>
+                          value.data![index2].archivos![index].nombreArchivo),
+                  growable: true),
+            })
+        .whenComplete(() => refresh());
+  }
+
   @override
   void initState() {
+    userCheck();
     super.initState();
   }
 
-  static const List<Widget> _widgetOptions = [
-    Text('Avisos'),
-    Text('Archivos'),
-  ];
-
-  void _onItemTapped(int index) {
+  refresh() {
     setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  Future<void>? initStatePlatform() async {
-    if (!mounted) return;
-
-    OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
-
-    OneSignal.shared.setRequiresUserPrivacyConsent(_requierConsent);
-
-    OneSignal.shared.setNotificationOpenedHandler((result) {
-      print('Notification ha sido abierta $result');
-      this.setState(() {});
-    });
-
-    OneSignal.shared.setInAppMessageClickedHandler((action) {
-      this.setState(() {});
-    });
-
-    OneSignal.shared.setSubscriptionObserver((changes) {
-      print('La subscripcion ha cambiado ${changes.jsonRepresentation()}');
-    });
-
-    OneSignal.shared.setPermissionObserver((changes) {
-      print('El permiso ha cambiado ${changes.jsonRepresentation()}');
+      if (mounted) {
+        AvisosDashboard(
+          avisos: avisos,
+        );
+      }
     });
   }
 
@@ -116,31 +179,138 @@ class _AvisosState extends State<Avisos> {
                     ),
                   ),
                   SizedBox(
-                    height: size.width / 8,
+                    height: size.width / 12,
                   ),
-                  AvisosDashboard()
+                  avisos.isEmpty
+                      ? Center(
+                          child: Container(
+                              padding: EdgeInsets.only(top: 25),
+                              child: CircularProgressIndicator()))
+                      : AvisosDashboard(
+                          links: links,
+                          name: name,
+                          avisos: avisos,
+                        )
                 ],
               ),
             ))
           ],
         ),
-        bottomNavigationBar: BottomAppBar(
-          shape: const CircularNotchedRectangle(),
-          child: Container(height: 50.0),
-        ),
-        floatingActionButton: FloatingActionButton(
-          elevation: 5,
-          backgroundColor: Colors.blueGrey[700],
-          onPressed: () {
-            Navigator.of(context)
-                .push(MaterialPageRoute(builder: (_) => MakeNewPost()));
-          },
-          tooltip: 'add post',
-          child: const Icon(
-            Icons.add,
-          ),
-        ),
+        bottomNavigationBar: typeUser == 2
+            ? BottomAppBar(
+                shape: const CircularNotchedRectangle(),
+                child: Container(height: 50.0),
+              )
+            : null,
+        floatingActionButton: typeUser == 2
+            ? FloatingActionButton(
+                elevation: 5,
+                backgroundColor: Colors.blueGrey[700],
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (_) => MakeNewPost(
+                            idComu: idComName,
+                            comunities: comunities,
+                          )));
+                },
+                tooltip: 'add post',
+                child: const Icon(
+                  Icons.add,
+                ),
+              )
+            : null,
         floatingActionButtonLocation:
-            FloatingActionButtonLocation.centerDocked);
+            typeUser == 2 ? FloatingActionButtonLocation.centerDocked : null);
+  }
+
+  Future<void>? initStatePlatform() async {
+    if (!mounted) return;
+
+    OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
+
+    OneSignal.shared.setRequiresUserPrivacyConsent(_requierConsent);
+
+    OneSignal.shared.setNotificationOpenedHandler((result) {
+      print('Notification ha sido abierta $result');
+      this.setState(() {});
+    });
+
+    OneSignal.shared.setInAppMessageClickedHandler((action) {
+      this.setState(() {});
+    });
+
+    OneSignal.shared.setSubscriptionObserver((changes) {
+      print('La subscripcion ha cambiado ${changes.jsonRepresentation()}');
+    });
+
+    OneSignal.shared.setPermissionObserver((changes) {
+      print('El permiso ha cambiado ${changes.jsonRepresentation()}');
+    });
+  }
+}
+
+class AvisosCall {
+  int? id;
+  String? nombreComu;
+  String? ubicacion;
+  int? cp;
+  int? idAdmin;
+  int? idComite;
+  String? idTipoComu;
+  String? banco;
+  String? cuentaBanco;
+  String? cuentaClabe;
+  String? RFC;
+
+  AvisosCall(
+      {this.id,
+      this.nombreComu,
+      this.RFC,
+      this.banco,
+      this.cp,
+      this.idTipoComu,
+      this.cuentaBanco,
+      this.cuentaClabe,
+      this.idAdmin,
+      this.idComite,
+      this.ubicacion});
+
+  Future<Comunities?> getComunidades() async {
+    Uri url = Uri.parse(
+        "http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-comunities");
+
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      var data = response.body;
+
+      return comunitiesFromJson(data);
+    }
+  }
+}
+
+class AvisosUsuario {
+  int? id;
+  String? avisos;
+  int? tipoAviso;
+  DateTime? fecha;
+
+  AvisosUsuario({
+    this.avisos,
+    this.fecha,
+    this.tipoAviso,
+    this.id,
+  });
+
+  Future<GetAvisos?> getAvisos(int id) async {
+    Uri url = Uri.parse(
+        "http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-avisos-by-residente");
+    final response = await http.post(url, body: {'idCom': id.toString()});
+
+    if (response.statusCode == 200) {
+      var data = response.body;
+
+      return getAvisosFromJson(data);
+    }
   }
 }

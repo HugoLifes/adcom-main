@@ -2,6 +2,7 @@ import 'package:adcom/src/methods/slide.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_onboard/flutter_onboard.dart';
 import 'package:gradient_widgets/gradient_widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OnBoardReportes extends StatefulWidget {
   OnBoardReportes({Key? key}) : super(key: key);
@@ -10,16 +11,22 @@ class OnBoardReportes extends StatefulWidget {
   _OnBoardReportesState createState() => _OnBoardReportesState();
 }
 
+SharedPreferences? prefs;
+
 class _OnBoardReportesState extends State<OnBoardReportes> {
   int? pages = 0;
   List<Slide>? _slides = [];
   PageController? _pageController = PageController();
 
+  getPref() async {
+    prefs = await SharedPreferences.getInstance();
+  }
+
   @override
   void initState() {
     super.initState();
     pages = 0;
-
+    getPref();
     _pageController = PageController(initialPage: pages!);
   }
 
@@ -94,10 +101,15 @@ class _OnBoardReportesState extends State<OnBoardReportes> {
           onBoardData: onBoardData,
           pageController: _pageController!,
           onSkip: () {
-            Navigator.of(context).popAndPushNamed('/screen18');
+            prefs!.setBool('UnaVez', true);
+            Navigator.of(context)
+                .popAndPushNamed('/screen18')
+                .then((value) => prefs!.setBool('UnaVez', true));
           },
           onDone: () {
-            Navigator.of(context).popAndPushNamed('/screen18');
+            Navigator.of(context)
+                .popAndPushNamed('/screen18')
+                .then((value) => {prefs!.setBool('UnaVez', true)});
           },
           titleStyles: TextStyle(
             color: Colors.black,

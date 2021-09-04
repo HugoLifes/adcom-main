@@ -3,13 +3,25 @@ import 'package:adcom/src/extra/add_reporte.dart';
 import 'package:adcom/src/extra/reporte.dart';
 import 'package:flutter/material.dart';
 import 'package:im_stepper/stepper.dart';
+import 'dart:convert';
 
 // ignore: must_be_immutable
 class ReportEditPage extends StatefulWidget {
+  final int? id;
   final DataReporte report;
-  final List<Progreso> progreso;
+  final List<Progreso> data;
 
-  ReportEditPage({Key? key, required this.report, required this.progreso})
+  Map<dynamic, Map>? progreso;
+  Map<dynamic, Map>? datos;
+  Map? superMap = <dynamic, Map>{};
+
+  ReportEditPage(
+      {Key? key,
+      required this.report,
+      required this.data,
+      this.datos,
+      this.progreso,
+      this.id})
       : super(key: key);
 
   @override
@@ -18,13 +30,64 @@ class ReportEditPage extends StatefulWidget {
 
 class _ReportEditPageState extends State<ReportEditPage> {
   var activestep = 0;
+  List<dynamic> progreso = [];
+  var data;
+  List<ProgressIndicator> progres = [];
+  List<DatosProgreso> datosp = [];
+
+  List<int> progresFromJson(String str) =>
+      List<int>.from(json.decode(str).map((x) => x));
+
+  String progresToJson(List<dynamic> data) =>
+      json.encode(List<dynamic>.from(data.map((x) => x)));
+  estatus() {
+    widget.progreso!.forEach((key, value) {
+      if (widget.id == key) {
+        value.forEach((key, value) {
+          if (key == 'Progreso') {
+            setState(() {
+              for (int i = 0; i < value.length; i++) {
+                progres.add(new ProgressIndicator(id: value[i]));
+              }
+            });
+          }
+        });
+      } else {
+        return;
+      }
+    });
+  }
+
+  datos() {
+    widget.datos!.forEach((key, value) {
+      if (widget.id == key) {
+        value.forEach((key, value) {
+          if (key == 'Datos') {
+            setState(() {
+              for (int i = 0; i < value.length; i++) {
+                datosp.add(new DatosProgreso(coment: value[i]));
+              }
+            });
+          }
+        });
+      } else {
+        return;
+      }
+    });
+  }
+
   @override
   void initState() {
+    estatus();
+    datos();
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size.width;
+    var size2 = MediaQuery.of(context).size.width;
     return Scaffold(
         appBar: AppBar(
           title: Text('Seguimiento de reporte'),
@@ -38,15 +101,18 @@ class _ReportEditPageState extends State<ReportEditPage> {
               IconStepper(
                 icons: [
                   Icon(Icons.supervised_user_circle),
+                  Icon(Icons.check),
                   Icon(Icons.flag),
                   Icon(Icons.access_alarm),
                   Icon(Icons.check)
                 ],
-                activeStep: widget.progreso.last.id!,
+                activeStep: progres.isEmpty ? 0 : progres.last.id,
                 onStepReached: (index) {
                   setState(() {
-                    for (int i = 0; i < widget.progreso.length; i++) {
-                      widget.progreso[i].id = index;
+                    if (progres.isEmpty) {
+                      activestep = index;
+                    } else {
+                      progres.last.id = index;
                     }
                   });
                 },
@@ -59,7 +125,7 @@ class _ReportEditPageState extends State<ReportEditPage> {
               SizedBox(
                 height: 20,
               ),
-              plainText()
+              plainText(size)
             ],
           ),
         ));
@@ -68,7 +134,7 @@ class _ReportEditPageState extends State<ReportEditPage> {
   Widget header() {
     return Container(
       decoration: BoxDecoration(
-          color: Colors.grey, borderRadius: BorderRadius.circular(5)),
+          color: stepColor(), borderRadius: BorderRadius.circular(5)),
       child: Row(
         children: [
           Padding(
@@ -84,9 +150,33 @@ class _ReportEditPageState extends State<ReportEditPage> {
     );
   }
 
-  Widget plainText() {
-    switch (widget.progreso.last.id!) {
+  Widget plainText(size) {
+    switch (progres.isEmpty ? 0 : progres.last.id) {
       case 1:
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Atencion:',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Text(
+              'Se ha enviado su reporte',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w300),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Text(
+              'Se le notificara el cambio de estado del reporte',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w300),
+            )
+          ],
+        );
+      case 2:
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -110,7 +200,7 @@ class _ReportEditPageState extends State<ReportEditPage> {
             )
           ],
         );
-      case 2:
+      case 3:
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -129,9 +219,22 @@ class _ReportEditPageState extends State<ReportEditPage> {
             SizedBox(
               height: 10,
             ),
-            Text(
-              'Comentarios:',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            Row(
+              children: [
+                Text(
+                  'Comentarios:',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                ),
+                SizedBox(
+                  width: size / 20,
+                ),
+                SizedBox(
+                  width: size / 2,
+                  child: Text('${datosp[2].coment}',
+                      style:
+                          TextStyle(fontWeight: FontWeight.w400, fontSize: 18)),
+                )
+              ],
             ),
             SizedBox(
               height: 10,
@@ -142,7 +245,7 @@ class _ReportEditPageState extends State<ReportEditPage> {
             )
           ],
         );
-      case 3:
+      case 4:
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -165,17 +268,34 @@ class _ReportEditPageState extends State<ReportEditPage> {
     }
   }
 
-  String? headerText() {
-    switch (widget.progreso.last.id!) {
+  Color? stepColor() {
+    switch (progres.isEmpty ? 0 : progres.last.id) {
       case 1:
-        return 'Revision';
+        return Colors.yellow;
       case 2:
+        return Colors.lightGreen[200];
+      case 3:
+        return Colors.lightGreen[300];
+      case 4:
+        return Colors.lightGreen;
+
+      default:
+        return Colors.grey;
+    }
+  }
+
+  String? headerText() {
+    switch (progres.isEmpty ? 0 : progres.last.id) {
+      case 1:
+        return 'En proceso';
+      case 2:
+        return 'Revision';
+      case 3:
         return 'Respuesta';
       case 4:
         return 'Finalizado';
-
       default:
-        return 'En proceso';
+        return 'Enviado';
     }
   }
 
@@ -228,4 +348,16 @@ class _ReportEditPageState extends State<ReportEditPage> {
       ],
     );
   }
+}
+
+class ProgressIndicator {
+  var id;
+
+  ProgressIndicator({this.id});
+}
+
+class DatosProgreso {
+  var coment;
+
+  DatosProgreso({this.coment});
 }
