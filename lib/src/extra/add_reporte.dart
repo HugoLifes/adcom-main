@@ -54,7 +54,7 @@ class _AddReorteState extends State<AddReorte> {
     prefs = await SharedPreferences.getInstance();
     setState(() {
       idCom = prefs!.getInt('idCom');
-      idUser = prefs!.getInt('idUser');
+      idUser = prefs!.getInt('userId');
     });
   }
 

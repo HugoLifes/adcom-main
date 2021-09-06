@@ -75,8 +75,8 @@ class EventProvider extends ChangeNotifier {
         var comId = post.idCom;
         userd = post.nombreResidente;
         var userType = post.idPerfil;
-        somData(userd, userType);
-        obtainId(userType);
+        somData(userd, userType, comId, idPrimario, userId );
+       /*  obtainId(userType);
         accesData(comId, userId);
         dataOff2(idPrimario, userType);
         dataOff4(idPrimario);
@@ -86,7 +86,7 @@ class EventProvider extends ChangeNotifier {
         //amenidades
 
         dataOff5(userId);
-
+ */
         Navigator.pushReplacementNamed(ctx, '/');
       }
     });

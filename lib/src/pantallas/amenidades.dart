@@ -68,6 +68,11 @@ class _AmenidadesState extends State<Amenidades> {
     super.initState();
     gtData();
   }
+  @override
+  void dispose() {
+    
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

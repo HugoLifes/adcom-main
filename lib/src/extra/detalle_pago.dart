@@ -141,7 +141,7 @@ class _DetallesPagoState extends State<DetallesPago> {
     }
   }
 
-  totalApagars() {
+   totalApagars() {
     late double total;
     double deuda;
 
@@ -149,16 +149,21 @@ class _DetallesPagoState extends State<DetallesPago> {
       total = double.parse(widget.list![i].montoCuota!);
       deuda = double.parse(widget.list![i].montoTardio!);
 
-      if (widget.list![i].pago == 1 && widget.list![i].pagoTardio == 0) {
+      if (widget.list![i].pago == 1) {
       } else {
         //si sigue en fecha
-        if (DateTime.now().day <= widget.list![i].fechaLimite!.day &&
-            DateTime.now().month <= widget.list![i].fechaLimite!.month &&
-            DateTime.now().year <= widget.list![i].fechaLimite!.year) {
-          //solo monto cuota
-          debt.add(total);
+        if (widget.list![i].pagoTardio == 0) {
+          if (DateTime.now().day <= widget.list![i].fechaLimite!.day &&
+              DateTime.now().month <= widget.list![i].fechaLimite!.month &&
+              DateTime.now().year <= widget.list![i].fechaLimite!.year) {
+            //solo monto cuota
+            debt.add(total);
+          } else {
+            //si no esta en fecha añadir deuda extra
+            total = total + deuda;
+            debt.add(total);
+          }
         } else {
-          //si no esta en fecha añadir deuda extra
           total = total + deuda;
           debt.add(total);
         }
@@ -166,18 +171,28 @@ class _DetallesPagoState extends State<DetallesPago> {
     }
   }
 
-  saldoDeudor() {
+   saldoDeudor() {
     double contador = 0.0;
     double deuda;
     double tardio;
     for (int i = 0; i < widget.list!.length; i++) {
       deuda = double.parse(widget.list![i].montoCuota!);
       tardio = double.parse(widget.list![i].montoTardio!);
-      if (widget.list![i].pago == 1 && widget.list![i].pagoTardio == 0) {
+      if (widget.list![i].pago == 1) {
+        contador;
       } else {
-        if (DateTime.now().day <= widget.list![i].fechaLimite!.day &&
-            DateTime.now().month <= widget.list![i].fechaLimite!.month &&
-            DateTime.now().year <= widget.list![i].fechaLimite!.year) {
+        if (widget.list![i].pagoTardio == 0) {
+          if (DateTime.now().day <= widget.list![i].fechaLimite!.day &&
+              DateTime.now().month <= widget.list![i].fechaLimite!.month &&
+              DateTime.now().year <= widget.list![i].fechaLimite!.year) {
+            setState(() {
+              contador += deuda;
+            });
+          } else {
+            setState(() {
+              contador += deuda + tardio;
+            });
+          }
         } else {
           setState(() {
             contador += deuda + tardio;

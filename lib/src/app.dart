@@ -19,6 +19,7 @@ import 'package:adcom/src/pantallas/visitantes.dart';
 import 'package:adcom/src/pantallas/votaciones.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyApp extends StatefulWidget {
   final user;
@@ -28,15 +29,21 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => _MyAppState();
 }
 
+SharedPreferences ? prefs;
 class _MyAppState extends State<MyApp> {
   final heroController = HeroController();
   GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   var id = 'icono';
   bool _loggedIn = false;
 
+  init()async{
+    prefs = await SharedPreferences.getInstance();
+  }
+
   @override
   void initState() {
     super.initState();
+    init();
   }
 
   @override
@@ -76,7 +83,14 @@ class _MyAppState extends State<MyApp> {
           '/screen14': (BuildContext context) => LevantarReporte(),
           '/screen15': (BuildContext context) => ChatPage(),
           '/screen16': (BuildContext context) => Seguimiento(),
-          '/screen17': (BuildContext context) => OnBoardReportes(),
+          '/screen17': (BuildContext context) {
+            var tru = prefs!.containsKey('UnaVez');
+            if(tru == true){
+              return AddReorte();
+            }else{
+              return OnBoardReportes();
+            }
+          },
           '/screen18': (BuildContext context) => AddReorte()
         },
       ),

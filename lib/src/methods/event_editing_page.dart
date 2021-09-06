@@ -45,7 +45,7 @@ class _EventEditingPageState extends State<EventEditingPage> {
     prefs = await SharedPreferences.getInstance();
     setState(() {
       idCom = prefs!.getInt('idCom');
-      idUser = prefs!.getInt('idUser');
+      idUser = prefs!.getInt('userId');
     });
   }
 

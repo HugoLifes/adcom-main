@@ -25,9 +25,9 @@ class _GridDashboardState extends State<GridDashboard> {
       ));
 
   Items item2 = new Items(
-      title: 'Proximamente',
-      //route: '/screen4',
-      icon: Icon(Icons.announcement_rounded, size: 50, color: Colors.grey));
+      title: 'Avisos',
+      route: '/screen4',
+      icon: Icon(Icons.announcement_rounded, size: 50, color: Colors.blueGrey[700]));
 
   Items item3 = new Items(
       title: 'Proximamente',
@@ -96,7 +96,7 @@ class _GridDashboardState extends State<GridDashboard> {
           item1,
           item5,
           item4,
-          
+          item2
         ];
 
         break;

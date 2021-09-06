@@ -33,12 +33,13 @@ dataOff3(id) async {
 
 Future<Accounts?> getAdeudos() async {
   prefs = await SharedPreferences.getInstance();
-  var id = prefs!.getInt('idUser');
+  var id = prefs!.getInt('userId');
+  print('$id');
 
   final Uri url = Uri.parse(
       'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-adeudos');
   final response = await http.post(url, body: {
-    "params": json.encode({"usuarioId": id})
+    "params": json.encode({"usuarioId": id.toString()})
   });
 
   if (response.statusCode == 200) {
@@ -69,7 +70,7 @@ class _FinanzasState extends State<Finanzas> {
             idComu: cuentas!.data![i].idComu,
             montoCuota: cuentas!.data![i].montoCuota,
             fechaGenerada: cuentas!.data![i].fechaGeneracion!,
-            fechaLimite: cuentas!.data![i].fechaLimite!,
+            fechaLimite: cuentas!.data![i].fechaLimite,
             fechaPago: cuentas!.data![i].fechaPago,
             pago: cuentas!.data![i].pago));
       }
@@ -81,8 +82,6 @@ class _FinanzasState extends State<Finanzas> {
       });
     }
   }
-
-
 
   @override
   void initState() {
@@ -115,7 +114,7 @@ class _FinanzasState extends State<Finanzas> {
         body: Stack(
           children: [
             Container(
-              height: size.height * .35,
+              height: size.height * .30,
               decoration: BoxDecoration(color: Colors.lightGreen[700]),
             ),
             Container(
@@ -168,15 +167,15 @@ class _FinanzasState extends State<Finanzas> {
                       ),
                       Container(
                           padding: EdgeInsets.only(
-                              top: size.width / 8,
+                              top: size.width / 6,
                               left: size.width / 300,
                               right: size.width / 300),
                           child: localList.isEmpty
                               ? Center(
                                   child: itsTrue == false
                                       ? Container(
-                                          padding:
-                                               EdgeInsets.only(top: size.width/ 90),
+                                          padding: EdgeInsets.only(
+                                              top: size.width / 10),
                                           child: Column(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.center,
@@ -198,7 +197,16 @@ class _FinanzasState extends State<Finanzas> {
                                           ))
                                       : CircularProgressIndicator(),
                                 )
-                              : mainView())
+                              : ListView(
+                                  shrinkWrap: true,
+                                  children: [
+                                    InkWell(
+                                        onTap: () {
+                                          HapticFeedback.mediumImpact();
+                                        },
+                                        child: VistaTarjeta()),
+                                  ],
+                                ))
                     ],
                   ),
                 ]),

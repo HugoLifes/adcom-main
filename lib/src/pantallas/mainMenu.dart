@@ -19,11 +19,14 @@ class MainMenu extends StatefulWidget {
   _MainMenuState createState() => _MainMenuState();
 }
 
-somData(user, userType) async {
+somData(user, userType, idCom, idPrimario, userId) async {
   await MainMenu.init();
 
   prefs!.setString('user', user);
   prefs!.setInt('userType', userType);
+  prefs!.setInt('idCom', idCom);
+  prefs!.setInt('idPrimario', idPrimario);
+  prefs!.setInt('userId', userId);
 }
 
 class _MainMenuState extends State<MainMenu> {
@@ -49,75 +52,7 @@ class _MainMenuState extends State<MainMenu> {
     //final args = ModalRoute.of(context)!.settings.arguments as LoginPage;
     var size = MediaQuery.of(context).size;
     return Scaffold(
-        body: size.width >= 880
-            ? Stack(
-                children: [
-                  Container(
-                    height: size.height * .40,
-                    decoration: BoxDecoration(color: Colors.red),
-                  ),
-                  Container(
-                      padding: EdgeInsets.only(
-                          top: size.width >= 880 ? 150 : 190, right: 21),
-                      alignment: Alignment.topRight,
-                      child: Image.asset(
-                        'assets/images/AdCom.png',
-                        width: 192,
-                      )),
-                  SafeArea(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            height: size.width >= 880 ? 34 : 24,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                              left: 12,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  height: size.width / 10,
-                                ),
-                                Text(
-                                  '¡${greeting()}! \n${user == null ? '' : user}',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontFamily: 'Roboto',
-                                      fontSize: 35,
-                                      fontWeight: FontWeight.w700),
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Container(
-                                    alignment: Alignment.centerLeft,
-                                    height: 50,
-                                    width: 150,
-                                    margin: size.width >= 880
-                                        ? EdgeInsets.all(25)
-                                        : EdgeInsets.only(left: 10, top: 46),
-                                    child: SizedBox())
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            height: size.width >= 880 ? 35 : 10,
-                          ),
-                          GridDashboard(
-                            userId: userType,
-                          )
-                        ],
-                      ),
-                    ),
-                  )
-                ],
-              )
-            : Stack(
+        body: Stack(
                 children: [
                   Container(
                     height: size.height * .34,
@@ -175,9 +110,7 @@ class _MainMenuState extends State<MainMenu> {
                           ),
 
                           //no mover
-                          SizedBox(
-                            height: size.width <= 640 ? 0 : size.height / 13,
-                          ),
+                         
 
                           GridDashboard(
                             userId: userType,

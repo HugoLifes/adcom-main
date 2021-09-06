@@ -36,6 +36,8 @@ Future<Places?> amenidades() async {
   final response = await http.post(url, body: {
     "params": json.encode({"usuarioId": id})
   });
+
+  
   if (response.statusCode == 200) {
     var data = response.body;
 
@@ -143,7 +145,7 @@ class _EventDashboardState extends State<EventDashboard> {
         ? Center(
             child: itsTrue == false
                 ? Container(
-                    padding: EdgeInsets.only(top: size / 100),
+                    padding: EdgeInsets.only(top: size / 60),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
