@@ -34,8 +34,20 @@ class _AvisosDashboardState extends State<AvisosDashboard2> {
   String progress = '0';
   bool isDownloaded = false;
 
+  List<AvisosUsuario>? avisosRevers = [];
+  List<dynamic> namesRev = [];
+  List<dynamic> linksRev = [];
+
+  reversedList(){
+    avisosRevers = widget.avisos!.reversed.toList();
+    namesRev = widget.name!.reversed.toList();
+    linksRev = widget.links!.reversed.toList();
+
+  }
+
   @override
   void initState() {
+    reversedList();
     _showPersBottomSheetCallBack = _showPersBottomSheetCallBack;
     super.initState();
   }
@@ -49,34 +61,34 @@ class _AvisosDashboardState extends State<AvisosDashboard2> {
   viewAvisos({size}) {
     return Flexible(
         child: GridView.builder(
-            padding: EdgeInsets.only(),
-            itemCount: widget.avisos!.length,
+            padding: EdgeInsets.only(left: 10, right: 10, top: 15),
+            itemCount: avisosRevers!.length,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 1,
-              childAspectRatio: 1.65,
+              childAspectRatio: size / 250,
               crossAxisSpacing: 25,
               mainAxisSpacing: 20,
             ),
             itemBuilder: (_, int data) {
               return Container(
                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    border:
-                        Border.all(color: Color(0xFF455A64).withOpacity(0.3))),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.grey,
+                                blurRadius: 10,
+                                offset: Offset(0, 5))
+                          ]),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    whoPublish(size),
+                    whoPublish(data, size),
                     Divider(
                       color: Color(0xFF455A64).withOpacity(0.3),
                     ),
                     postMessage(data, size),
-                    SizedBox(
-                      height: size / 30,
-                    ),
-                    Divider(
-                      color: Color(0xFF455A64).withOpacity(0.3),
-                    ),
+                   
                   ],
                 ),
               );
@@ -88,20 +100,23 @@ class _AvisosDashboardState extends State<AvisosDashboard2> {
       padding: EdgeInsets.only(left: 10, right: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        
         children: [
           Padding(
-            padding: EdgeInsets.only(left: size / 50),
+            padding: EdgeInsets.only(left: size / 51),
             child: SizedBox(
               width: size/1,
               child: Text(
-                'Comunicado! ${widget.avisos![data].avisos}',
-                style: TextStyle(fontSize: 20),
+                'Comunicado! ${avisosRevers![data].avisos}',
+                style: TextStyle(fontSize: size/20 ),
               ),
             ),
           ),
+
           SizedBox(
-            height: size/ 20,
+            height: size/6,
           ),
+          
           InkWell(
             onTap: () {
               _showModalSheet(data);
@@ -128,19 +143,19 @@ class _AvisosDashboardState extends State<AvisosDashboard2> {
   }
 
   void _showModalSheet(int data) {
-    if (names.length == widget.name![data].length) {
+    if (names.length == namesRev[data].length) {
     } else {
-      for (int i = 0; i < widget.name![data].length; i++) {
-        names.add(widget.name![data][i]);
+      for (int i = 0; i < namesRev[data].length; i++) {
+        names.add(namesRev[data][i]);
       }
     }
 
-    if (links.length == widget.links![data].length) {
+    if (links.length == linksRev[data].length) {
       print('here${links.length}');
       print(' ya no cabe');
     } else {
-      for (int i = 0; i < widget.links![data].length; i++) {
-        links.add(widget.links![data][i]);
+      for (int i = 0; i < linksRev[data].length; i++) {
+        links.add(linksRev[data][i]);
 
         print(links[i]);
       }
@@ -300,7 +315,7 @@ class _AvisosDashboardState extends State<AvisosDashboard2> {
     
   }
 
-  Container whoPublish(size) {
+  Container whoPublish(data,size) {
     return Container(
       padding: EdgeInsets.only(top: 10, left: 10),
       child: Row(
@@ -318,7 +333,11 @@ class _AvisosDashboardState extends State<AvisosDashboard2> {
           Text(
             'Administrador',
             style: (TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-          )
+          ),
+          SizedBox(
+            width: size/35
+          ),
+          Text('${avisosRevers![data].fecha!.day}/${avisosRevers![data].fecha!.month}/${avisosRevers![data].fecha!.year}')
         ],
       ),
     );

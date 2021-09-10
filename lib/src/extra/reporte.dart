@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:adcom/json/jsonReporte.dart';
+import 'package:adcom/src/extra/add_reporte.dart';
 import 'package:adcom/src/extra/report_edit_page.dart';
 import 'package:adcom/src/models/event_provider.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +36,7 @@ Future<GetReportes?> getReportes() async {
 
   if (response.statusCode == 200) {
     var data = response.body;
-    print(data);
+   
 
     return getReportesFromJson(data);
   } else {
@@ -47,10 +48,12 @@ class _LevantarReporteState extends State<LevantarReporte> {
   List<DataReporte> myList = [];
     List<Progreso> listProgreso = [];
   List<dynamic> idProgress = [];
+
   // progreso data
   var maps = <dynamic, Map>{};
   var progreso = <dynamic, dynamic>{};
   List<Map<dynamic, Map>> superMap = [];
+  
 
   // datos del progreso
   //mapeado dinamico que espera otro mapeado
@@ -100,18 +103,22 @@ class _LevantarReporteState extends State<LevantarReporte> {
       }
        superMap2.add(maps2);
       superMap.add(maps);
-      print(superMap[0]);
-      print(superMap2[0]);
+     
 
       superMap = superMap;
     }
+   
+    
   }
+ 
 
   @override
   void initState() {
     data();
+    
     super.initState();
     Future.delayed(Duration(milliseconds: 988), () => {refresh()});
+    
   }
 
   refresh() {
@@ -145,7 +152,7 @@ class _LevantarReporteState extends State<LevantarReporte> {
           : listview(),
       floatingActionButton: FloatingActionButton(
         elevation: 7,
-        onPressed: () => Navigator.of(context).popAndPushNamed('/screen18'),
+        onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_)=> AddReorte())),
         backgroundColor: Colors.blue,
         child: Icon(
           Icons.add,
@@ -155,9 +162,12 @@ class _LevantarReporteState extends State<LevantarReporte> {
     );
   }
 
-  Container listview() {
+  listview() {
+
+    
     return Container(
       child: ListView.separated(
+        
         separatorBuilder: (context, index) {
           return Divider(
             thickness: 3,

@@ -114,7 +114,7 @@ class _FinanzasState extends State<Finanzas> {
         body: Stack(
           children: [
             Container(
-              height: size.height * .30,
+              height: size.height * .32,
               decoration: BoxDecoration(color: Colors.lightGreen[700]),
             ),
             Container(
@@ -186,7 +186,7 @@ class _FinanzasState extends State<Finanzas> {
                                                 height: 200,
                                               ),
                                               Text(
-                                                'Lo sentimos nuestra magia no funciona en este lugar',
+                                                'Si ha llegado hasta aqui, felicidades! no cuenta con adeudos',
                                                 style: TextStyle(
                                                   fontSize: size.width / 20,
                                                   color: Colors.lightGreen[700],

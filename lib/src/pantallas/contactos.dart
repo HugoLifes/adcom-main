@@ -34,13 +34,13 @@ class _ContactosState extends State<Contactos> {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      floatingActionButton: FloatingActionButton(
+    /*   floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.greenAccent[700],
         onPressed: () => _openFilterDialog(residentes),
         child: Icon(
           Icons.filter_list,
         ),
-      ),
+      ), */
       appBar: AppBar(
         leading: BackButton(
           onPressed: () {
@@ -57,7 +57,7 @@ class _ContactosState extends State<Contactos> {
       body: Stack(
         children: [
           Container(
-            height: size.height * .31,
+            height: size.height * .35,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(
                     bottomRight: Radius.circular(5),
@@ -74,7 +74,7 @@ class _ContactosState extends State<Contactos> {
             child: Icon(
               Icons.contacts,
               color: Colors.white,
-              size: 165,
+              size: size.width/3,
             ),
           ),
           SafeArea(
@@ -84,7 +84,7 @@ class _ContactosState extends State<Contactos> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(
-                  height: 10,
+                  height: 5,
                 ),
                 Text(
                   "Directorio",
@@ -95,21 +95,25 @@ class _ContactosState extends State<Contactos> {
                       fontWeight: FontWeight.w700),
                 ),
                 SizedBox(
-                  height: 10,
-                ),
-                Text(
-                  'Contacta a tus personas de confianza',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
+                  height: 5,
                 ),
                 SizedBox(
-                  height: 10,
+                  width: size.width/2,
+                  child: Text(
+                    'Contacta a tus personas de confianza',
+                    style: TextStyle(
+                      fontSize: 15,
+                        fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
                 ),
                 SizedBox(
-                  width: size.width * .5,
+                  height: 5,
+                ),
+                SizedBox(
+                  width: size.width * .7,
                   child: Text(
                     'Mantente conectado con tu comunidad o asesores de tu comunidad',
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: Colors.white, fontSize: size.width/22 ),
                   ),
                 ),
                 SizedBox(
@@ -129,7 +133,7 @@ class _ContactosState extends State<Contactos> {
 
   searchBar(List<Items> residentes) {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 30),
+      margin: EdgeInsets.symmetric(vertical: 10),
       padding: EdgeInsets.symmetric(horizontal: 30, vertical: 5),
       decoration: BoxDecoration(
           color: Colors.white, borderRadius: BorderRadius.circular(29.5)),
@@ -166,7 +170,7 @@ class _ContactosState extends State<Contactos> {
       child: GridView.builder(
           shrinkWrap: false,
           itemCount: itemSeleccion!.length,
-          padding: EdgeInsets.only(left: 4, right: 4, top: 17),
+          padding: EdgeInsets.only(left: 4, right:  4, top: 17),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 1,
             childAspectRatio: 2.9,

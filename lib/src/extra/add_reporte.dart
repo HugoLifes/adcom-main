@@ -242,7 +242,7 @@ class _AddReorteState extends State<AddReorte> {
 
   //funcion que abre la camara y muestra
   void openCamera() async {
-    var image = await _picker.pickImage(source: ImageSource.camera);
+    var image = await _picker.pickImage(source: ImageSource.camera, imageQuality: 30);
 
     setState(() {
       if (image != null) {
@@ -270,7 +270,7 @@ class _AddReorteState extends State<AddReorte> {
       fontSize: 17.0);
   // funcion que abre la galeria para las fotos
   void openGallery() async {
-    var image = await _picker.pickImage(source: ImageSource.gallery);
+    var image = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 70 );
     setState(() {
       if (image != null) {
         images.add(File(image.path));
@@ -285,6 +285,7 @@ class _AddReorteState extends State<AddReorte> {
   alerta() {
     Widget okButton = TextButton(
         onPressed: () {
+          Navigator.of(context).pop();
           saveForm();
         },
         child: Text(
@@ -332,6 +333,7 @@ class _AddReorteState extends State<AddReorte> {
 
   // envia las fotos al serv mas toda su informacion que reqiere como los params
   sendingData(String titulo, String descrip, List<File> file) async {
+    await addata();
     try {
       List<String> filesArr = [];
       Dio dio = Dio();
@@ -350,7 +352,7 @@ class _AddReorteState extends State<AddReorte> {
         'img[]': [
           for (int i = 0; i < file.length; i++)
             MultipartFile.fromFileSync(file[i].path,
-                filename: filesArr[i], contentType: MediaType('image', '*'))
+                filename: filesArr[i], contentType: MediaType('media', '*'))
         ]
       });
 
@@ -435,13 +437,14 @@ class _AddReorteState extends State<AddReorte> {
               titleController.text, descriptionController.text, images)
           .then((value) {
         provider.addReport(report);
-        Navigator.of(context).popAndPushNamed('/screen14');
+        Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(
           'Su reporte se ha realizado con exito!',
           style: TextStyle(fontSize: 19),
         )));
       });
+      print('aqui $response');
       return response;
     }
   }

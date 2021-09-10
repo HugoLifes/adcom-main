@@ -89,7 +89,7 @@ class _AmenidadesState extends State<Amenidades> {
         body: Stack(
           children: [
             Container(
-              height: size.height * .35,
+              height: size.height * .33,
               decoration: BoxDecoration(color: Colors.deepPurpleAccent),
             ),
             Container(
@@ -129,7 +129,7 @@ class _AmenidadesState extends State<Amenidades> {
                         fontSize: 15),
                   ),
                   SizedBox(
-                    height: 18,
+                    height: 15,
                   ),
                   SizedBox(
                     width: size.width * .5,

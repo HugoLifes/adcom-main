@@ -55,7 +55,7 @@ class _MainMenuState extends State<MainMenu> {
         body: Stack(
                 children: [
                   Container(
-                    height: size.height * .34,
+                    height: size.height * .36,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.only(
@@ -71,7 +71,7 @@ class _MainMenuState extends State<MainMenu> {
                   ),
                   Container(
                       padding: EdgeInsets.only(
-                          top: size.height * .18, right: size.width * .10),
+                          top: size.height * .18, right: size.width / 15,  ),
                       alignment: Alignment.topRight,
                       child: Image.asset(
                         'assets/images/AdCom3.png',
@@ -86,31 +86,43 @@ class _MainMenuState extends State<MainMenu> {
                           Padding(
                             padding: const EdgeInsets.only(
                               left: 12,
+                              top:10
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 SizedBox(
-                                  height: size.width / 19,
-                                ),
-                                Text(
-                                  '¡${greeting()}! \n${user == null ? '' : user}',
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontFamily: 'Roboto',
-                                      fontSize: size.width / 11,
-                                      fontWeight: FontWeight.w700),
+                                  width: size.height/3.5,
+                                  height: size.width/2.0,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Text('¡${greeting()}!', style: TextStyle(
+                                            color: Colors.black,
+                                            fontFamily: 'Roboto',
+                                            fontSize:  17,
+                                            fontWeight: FontWeight.w700),),
+                                        
+                                      Text(
+                                        '${user == null ? '' : user}',
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontFamily: 'Roboto',
+                                            fontSize: size.width / 10,
+                                            fontWeight: FontWeight.w700),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                                 //no mover
-                                SizedBox(
-                                  height: size.height / 5.5
-                                ),
+                              
                               ],
                             ),
                           ),
 
                           //no mover
-                         
+                          
 
                           GridDashboard(
                             userId: userType,

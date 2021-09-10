@@ -90,6 +90,7 @@ class _GridDashboardState extends State<GridDashboard> {
   List<Items> myList = [];
   @override
   Widget build(BuildContext context) {
+    var size=  MediaQuery.of(context).size;
     switch (widget.userId) {
       case 1:
         myList = [
@@ -121,7 +122,7 @@ class _GridDashboardState extends State<GridDashboard> {
     return Flexible(
         child: AnimationLimiter(
       child: GridView.count(
-          padding: EdgeInsets.only(left: 16, right: 16, top: 10),
+          padding: EdgeInsets.only(left: 16, right: 16, top: size.width/4.8),
           crossAxisCount: 2,
           childAspectRatio: 1.1,
           crossAxisSpacing: 15,

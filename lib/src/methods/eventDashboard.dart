@@ -145,7 +145,7 @@ class _EventDashboardState extends State<EventDashboard> {
         ? Center(
             child: itsTrue == false
                 ? Container(
-                    padding: EdgeInsets.only(top: size / 60),
+                    padding: EdgeInsets.only(top: size / 20),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -164,9 +164,12 @@ class _EventDashboardState extends State<EventDashboard> {
                         )
                       ],
                     ))
-                : CircularProgressIndicator(
-                    backgroundColor: Colors.white,
-                  ),
+                : Container(
+                  padding: EdgeInsets.only(top: size/20),
+                  child: CircularProgressIndicator(
+                      backgroundColor: Colors.white,
+                    ),
+                ),
           )
         : viewAmenidades(width: size, heigth: size2);
   }

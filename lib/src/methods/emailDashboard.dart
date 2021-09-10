@@ -124,11 +124,11 @@ class _ContactDashboardState extends State<ContactDashboard> {
   vistaContactos({size}) => Flexible(
         child: GridView.builder(
           shrinkWrap: false,
-          padding: EdgeInsets.only(left: 3, right: 3, top: 17),
+          padding: EdgeInsets.only(left: 3, right: 3, top: 18),
           itemCount: myList.length,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 1,
-            childAspectRatio: 3.1,
+            childAspectRatio: 2.5,
             crossAxisSpacing: 16,
             mainAxisSpacing: 16,
           ),
@@ -186,16 +186,7 @@ class _ContactDashboardState extends State<ContactDashboard> {
                           ),
                           Row(
                             children: [
-                              Text(
-                                'Comu:',
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(
-                                width: 3,
-                              ),
+                             
                               myList[index].comNombre == null
                                   ? Container()
                                   : Text("${myList[index].comNombre}",

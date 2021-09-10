@@ -29,7 +29,7 @@ class _AvisosState extends State<Avisos> {
   List<AvisosUsuario> avisos = [];
   List? links;
   List? name;
-
+  bool itsTrue = true;
   List<String> hLinks = [];
   var nombres = <dynamic, dynamic>{};
   var Link = <dynamic, Map>{};
@@ -77,7 +77,8 @@ class _AvisosState extends State<Avisos> {
     AvisosUsuario()
         .getAvisos(idComu)
         .then((value) => {
-              for (int i = 0; i < value!.data!.length; i++)
+            if(value!.data!.isNotEmpty){
+              for (int i = 0; i < value.data!.length; i++)
                 {
                   avisos.add(new AvisosUsuario(
                     avisos: value.data![i].aviso,
@@ -99,14 +100,27 @@ class _AvisosState extends State<Avisos> {
                       (index) =>
                           value.data![index2].archivos![index].nombreArchivo),
                   growable: true),
-            })
-        .whenComplete(() => refresh());
+        }else{
+          
+          esFalso()
+        }
+        }).whenComplete(() => refresh());
+  }
+
+  esFalso(){
+    setState(() {
+      itsTrue = false;
+    });
   }
 
   @override
   void initState() {
     userCheck();
     super.initState();
+    OneSignal.shared.setNotificationWillShowInForegroundHandler((OSNotificationReceivedEvent event) {
+  
+        event.complete(event.notification);                                 
+});
   }
 
   refresh() {
@@ -131,11 +145,11 @@ class _AvisosState extends State<Avisos> {
         body: Stack(
           children: [
             Container(
-              height: size.width / 2.6,
+              height: size.width / 1.9,
               decoration: BoxDecoration(color: Colors.blueGrey[700]),
             ),
             Container(
-              padding: EdgeInsets.only(top: 30, right: 30),
+              padding: EdgeInsets.only(top: size.height/ 15, right: size.width / 20),
               alignment: Alignment.topRight,
               child: Icon(
                 Icons.announcement_rounded,
@@ -172,10 +186,10 @@ class _AvisosState extends State<Avisos> {
                     height: 10,
                   ),
                   SizedBox(
-                    width: size.width * .6,
+                    width: size.width / 1.5,
                     child: Text(
                       'Enterate de lo que sucede en tu comunidad! Desde recordatorios, alertas, novedades y más.',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.white, fontSize: size.width/19 ),
                     ),
                   ),
                   SizedBox(
@@ -183,9 +197,32 @@ class _AvisosState extends State<Avisos> {
                   ),
                   avisos.isEmpty
                       ? Center(
-                          child: Container(
-                              padding: EdgeInsets.only(top: 25),
-                              child: CircularProgressIndicator()))
+                          child: itsTrue == false ? Container(
+                                          padding: EdgeInsets.only(
+                                              top: size.width / 10),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Image.asset(
+                                                'assets/images/magic.png',
+                                                width: size.width / 1,
+                                                height: 200,
+                                              ),
+                                              Text(
+                                                'Lo sentimos nuestra magia no funciona en este lugar',
+                                                style: TextStyle(
+                                                  fontSize: size.width / 20,
+                                                  color: Colors.lightGreen[700],
+                                                ),
+                                                textAlign: TextAlign.justify,
+                                              )
+                                            ],
+                                          )) :Container(
+                                            padding: EdgeInsets.only(top: size.width/20),
+                                            child: CircularProgressIndicator(),
+                                          ),
+                         )
                       : AvisosDashboard2(
                           links: links,
                           name: name,
@@ -301,7 +338,7 @@ class AvisosUsuario {
     this.tipoAviso,
     this.id,
   });
-
+ 
   Future<GetAvisos?> getAvisos(int id) async {
     Uri url = Uri.parse(
         "http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-avisos-by-residente");
