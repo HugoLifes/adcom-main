@@ -78,17 +78,26 @@ class _AmenidadesState extends State<Amenidades> {
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
+          title: Text(
+            "Amenidades",
+            style: TextStyle(
+                color: Colors.white,
+                fontSize: 30,
+                fontFamily: 'Roboto',
+                fontWeight: FontWeight.w700),
+          ),
           elevation: 6,
           backgroundColor: Colors.deepPurpleAccent,
         ),
         body: Stack(
           children: [
             Container(
-              height: size.height * .35,
+              height: size.height * .31,
               decoration: BoxDecoration(color: Colors.deepPurpleAccent),
             ),
             Container(
-              padding: EdgeInsets.only(top: 95),
+              padding:
+                  EdgeInsets.only(top: size.width / 7, right: size.width / 20),
               alignment: Alignment.topRight,
               child: Icon(
                 Icons.event,
@@ -103,18 +112,7 @@ class _AmenidadesState extends State<Amenidades> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    "Amenidades",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 40,
-                        fontFamily: 'Roboto',
-                        fontWeight: FontWeight.w700),
-                  ),
-                  SizedBox(
-                    height: 15,
+                    height: 20,
                   ),
                   Text(
                     'Disfruta las ventajas de tu comunidad',

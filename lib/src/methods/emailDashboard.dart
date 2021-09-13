@@ -108,27 +108,29 @@ class _ContactDashboardState extends State<ContactDashboard> {
 
   refresh() {
     setState(() {
-      vistaContactos();
+      var size = MediaQuery.of(context).size.width;
+      vistaContactos(size);
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size.width;
     return myList.isEmpty
         ? Center(
             child: CircularProgressIndicator(),
           )
-        : vistaContactos();
+        : vistaContactos(size);
   }
 
-  vistaContactos() => Flexible(
+  vistaContactos(size) => Flexible(
         child: GridView.builder(
           shrinkWrap: false,
-          padding: EdgeInsets.only(left: 4, right: 4, top: 17),
+          padding: EdgeInsets.only(left: 5, right: 5, top: 17),
           itemCount: myList.length,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 1,
-            childAspectRatio: 3.15,
+            childAspectRatio: 2.5,
             crossAxisSpacing: 16,
             mainAxisSpacing: 16,
           ),
@@ -171,60 +173,38 @@ class _ContactDashboardState extends State<ContactDashboard> {
                         children: [
                           myList[index].title == null
                               ? Container()
-                              : Text(
-                                  myList[index].title!.toUpperCase(),
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 14.5,
-                                      fontWeight: FontWeight.w600),
+                              : SizedBox(
+                                  width: size / 2.1,
+                                  child: Text(
+                                    myList[index].title!.toUpperCase(),
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: size / 29,
+                                        fontWeight: FontWeight.bold),
+                                  ),
                                 ),
                           SizedBox(
-                            height: 10,
+                            height: size / 20,
                           ),
                           Row(
                             children: [
-                              Text(
-                                'Comu:',
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold),
-                              ),
                               SizedBox(
                                 width: 3,
                               ),
                               myList[index].comNombre == null
                                   ? Container()
-                                  : Text("${myList[index].comNombre}",
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 15,
-                                      )),
+                                  : SizedBox(
+                                      width: size / 2,
+                                      child: Text("${myList[index].comNombre}",
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: size / 31,
+                                          )),
+                                    ),
                             ],
                           ),
                           SizedBox(
                             height: 10,
-                          ),
-                          Row(
-                            children: [
-                              Text(
-                                'Celular:',
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(
-                                width: 3,
-                              ),
-                              myList[index].telCel == null
-                                  ? Container()
-                                  : Text(myList[index].telCel!,
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 15,
-                                      )),
-                            ],
                           ),
                         ],
                       ),

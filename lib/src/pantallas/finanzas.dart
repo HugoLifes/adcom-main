@@ -109,6 +109,14 @@ class _FinanzasState extends State<Finanzas> {
     var size = MediaQuery.of(context).size;
     return Scaffold(
         appBar: AppBar(
+          title: Text(
+            'Mis Pagos',
+            style: TextStyle(
+                color: Colors.white,
+                fontSize: 30,
+                fontFamily: 'Roboto',
+                fontWeight: FontWeight.w700),
+          ),
           elevation: 7,
           backgroundColor: Colors.lightGreen[700],
         ),
@@ -116,11 +124,11 @@ class _FinanzasState extends State<Finanzas> {
         body: Stack(
           children: [
             Container(
-              height: size.height * .30,
+              height: size.height * .25,
               decoration: BoxDecoration(color: Colors.lightGreen[700]),
             ),
             Container(
-              padding: EdgeInsets.only(top: size.height / 12),
+              padding: EdgeInsets.only(top: size.height / 20),
               alignment: Alignment.topRight,
               child: Icon(
                 Icons.show_chart_rounded,
@@ -137,17 +145,6 @@ class _FinanzasState extends State<Finanzas> {
                     children: [
                       SizedBox(
                         height: size.width / 20,
-                      ),
-                      Text(
-                        'Mis Pagos',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 30,
-                            fontFamily: 'Roboto',
-                            fontWeight: FontWeight.w700),
-                      ),
-                      SizedBox(
-                        height: size.width / 19,
                       ),
                       Text(
                         'Toma el control de tus gastos',
@@ -169,9 +166,8 @@ class _FinanzasState extends State<Finanzas> {
                       ),
                       Container(
                           padding: EdgeInsets.only(
-                              top: size.width / 7,
-                              left: size.width >= 880 ? 5 : 0,
-                              right: size.width >= 880 ? 5 : 0),
+                            top: size.width / 5,
+                          ),
                           child: localList.isEmpty
                               ? Center(
                                   child: itsTrue == false
@@ -188,7 +184,7 @@ class _FinanzasState extends State<Finanzas> {
                                                 height: 200,
                                               ),
                                               Text(
-                                                'Lo sentimos nuestra magia no funciona en este lugar',
+                                                'Lo sentimos, por el momento no cuenta con adeudos',
                                                 style: TextStyle(
                                                   fontSize: size.width / 20,
                                                   color: Colors.lightGreen[700],
@@ -210,16 +206,11 @@ class _FinanzasState extends State<Finanzas> {
   }
 
   mainView() {
-    return ListView(
-      shrinkWrap: true,
-      children: [
-        InkWell(
-            onTap: () {
-              HapticFeedback.mediumImpact();
-            },
-            child: VistaTarjeta()),
-      ],
-    );
+    return InkWell(
+        onTap: () {
+          HapticFeedback.mediumImpact();
+        },
+        child: VistaTarjeta());
   }
 
   referenciaApagar() {

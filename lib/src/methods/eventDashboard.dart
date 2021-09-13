@@ -129,13 +129,13 @@ class _EventDashboardState extends State<EventDashboard> {
   }
 
   refresh() {
-    setState(() {
-      if (mounted) {
+    if (mounted) {
+      setState(() {
         var size = MediaQuery.of(context).size.width;
         var size2 = MediaQuery.of(context).size.height;
         viewAmenidades(width: size, heigth: size2);
-      }
-    });
+      });
+    }
   }
 
   @override
@@ -146,7 +146,7 @@ class _EventDashboardState extends State<EventDashboard> {
         ? Center(
             child: itsTrue == false
                 ? Container(
-                    padding: const EdgeInsets.only(top: 120),
+                    padding: EdgeInsets.only(top: size / 6),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

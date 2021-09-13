@@ -60,7 +60,7 @@ class _MainMenuState extends State<MainMenu> {
         body: Stack(
       children: [
         Container(
-          height: size.height * .34,
+          height: size.height * .35,
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(
@@ -73,8 +73,8 @@ class _MainMenuState extends State<MainMenu> {
           ),
         ),
         Container(
-            padding: EdgeInsets.only(
-                top: size.height * .18, right: size.width * .10),
+            padding:
+                EdgeInsets.only(top: size.height * .18, right: size.width / 15),
             alignment: Alignment.topRight,
             child: Image.asset(
               'assets/images/AdCom3.png',
@@ -87,40 +87,54 @@ class _MainMenuState extends State<MainMenu> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(
-                    left: 12,
-                  ),
+                  padding: const EdgeInsets.only(left: 12, top: 10),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Column(
+                        children: [
+                          SizedBox(
+                            width: size.height / 3.5,
+                            height: size.width / 2.0,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text(
+                                  '¡${greeting()}!',
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontFamily: 'Roboto',
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w700),
+                                ),
+                                Text(
+                                  '${user == null ? '  ' : user}',
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontFamily: 'Roboto',
+                                      fontSize: size.width / 10,
+                                      fontWeight: FontWeight.w700),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                       SizedBox(
-                        height: size.width / 19,
-                      ),
-                      Text(
-                        '¡${greeting()}! \n${user == null ? '' : user}',
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontFamily: 'Roboto',
-                            fontSize: size.width / 11,
-                            fontWeight: FontWeight.w700),
-                      ),
-                      //no mover
-                      SizedBox(height: size.height / 5.5),
+                        width: size.width / 70,
+                      ), //no mover
                     ],
                   ),
                 ),
 
                 //no mover
-                SizedBox(
-                  height: size.width <= 640 ? 5 : size.height / 13,
-                ),
-
-                GridDashboard(
-                  userId: userType,
-                )
               ],
             ),
           ),
+        ),
+        GridDashboard(
+          userId: userType,
         )
       ],
     ));

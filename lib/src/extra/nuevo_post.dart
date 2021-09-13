@@ -217,11 +217,16 @@ class _MakeNewPostState extends State<MakeNewPost> {
                         sendId();
                       } else {
                         if (val != chosenValue) {
-                          print('aqui2');
+                          type.clear();
+                          setState(() {
+                            chosenValue = val;
+                          });
+                          sendId();
                         } else {
                           if (val == chosenValue) {
                           } else {
-                            sendId().then((value) => avisos.clear());
+                            type.clear();
+                            sendId();
                           }
                         }
                       }

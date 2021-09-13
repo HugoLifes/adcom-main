@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:adcom/json/jsonReporte.dart';
+import 'package:adcom/src/extra/add_reporte.dart';
 import 'package:adcom/src/extra/report_edit_page.dart';
 import 'package:adcom/src/models/event_provider.dart';
 import 'package:flutter/material.dart';
@@ -12,22 +13,14 @@ SharedPreferences? prefs;
 
 class LevantarReporte extends StatefulWidget {
   const LevantarReporte({Key? key}) : super(key: key);
-  static init() async {
-    prefs = await SharedPreferences.getInstance();
-  }
 
   @override
   _LevantarReporteState createState() => _LevantarReporteState();
 }
 
-dataOff5(id) async {
-  await LevantarReporte.init();
-  prefs!.setInt('id', id);
-}
-
 Future<GetReportes?> getReportes() async {
   prefs = await SharedPreferences.getInstance();
-  var id = prefs!.getInt('userId'); //CAMBIAR POR id
+  var id = prefs!.getInt('userId');
   Uri url = Uri.parse(
       'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-reportes');
 
@@ -46,25 +39,57 @@ class _LevantarReporteState extends State<LevantarReporte> {
   List<DataReporte> myList = [];
   List<Progreso> listProgreso = [];
   List<dynamic> idProgress = [];
-  // progreso data
+  List<DataReporte> myListReversed = [];
+  var progress = [];
+
+  /// progreso data
   var maps = <dynamic, Map>{};
   var progreso = <dynamic, dynamic>{};
   List<Map<dynamic, Map>> superMap = [];
 
-  // datos del progreso
-  //mapeado dinamico que espera otro mapeado
+  /// datos del progreso
+  ///     mapeado dinamico que espera otro mapeado
   var maps2 = <dynamic, Map>{};
-  // mapeado dinamico que espera dinamico
-  //dinamico es tu tipo de variable que toma cualquier valor
+
+  /// mapeado dinamico que espera dinamico
+  ///     dinamico es tu tipo de variable que toma cualquier valor
   var datos = <dynamic, dynamic>{};
-  //lista mapeada dinamica que espera otro mapeado
+
+  /// lista mapeada dinamica que espera otro mapeado
   List<Map<dynamic, Map>> superMap2 = [];
+
+  var fechasMap = <dynamic, Map>{};
+  var fDatos = <dynamic, dynamic>{};
+  List<Map<dynamic, Map>> fechasSuperMap = [];
+
+  /// Declaraciones de futuras listas en reversa
+  ///   checar la asignacion en la funcion data, antes de cualquier alteracion
+  ///
+  List<DataReporte> reversedList = [];
+  List<Map<dynamic, Map>> reversedList2 = [];
+  List<Map<dynamic, Map>> reversedList3 = [];
+  List<Map<dynamic, Map>> reversedList4 = [];
 
   GetReportes? cuentas;
 
-  //obtiene los datos del service
+  var idCom;
+  var idUser;
+
+  /// Activa el guardado en memoria
+  addata() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      /// obtiene el id comunidad y la del usuario
+      idCom = prefs!.getInt('idCom');
+      idUser = prefs!.getInt('userId');
+    });
+  }
+
+  /// Llama al service y asigna los datos obtenido a una clase
   data() async {
     cuentas = await getReportes();
+    await addata();
+
     for (int i = 0; i < cuentas!.data!.length; i++) {
       myList.add(new DataReporte(
           id: cuentas!.data![i].idReporte,
@@ -98,18 +123,24 @@ class _LevantarReporteState extends State<LevantarReporte> {
         datos = {"Datos": datosProgres};
         maps2.addAll({cuentas!.data![i].idReporte: datos});
 
-        /* listProgreso.add(new Progreso(
-            time: cuentas!.data![i].progreso![j].fechaSeg,
-            comentario: cuentas!.data![i].progreso![j].comentario,
-            progreso: cuentas!.data![i].progreso![j].progreso)); */
+        var fechasList = [];
+        cuentas!.data![i].progreso!.forEach((element) {
+          setState(() {
+            fechasList.add(element.fechaSeg);
+          });
+        });
+
+        fDatos = {"Fechas": fechasList};
+        fechasMap.addAll({cuentas!.data![i].idReporte: fDatos});
       }
+      fechasSuperMap.add(fechasMap);
       superMap2.add(maps2);
       superMap.add(maps);
-      print(superMap[0]);
-      print(superMap2[0]);
-
-      superMap = superMap;
     }
+    reversedList2 = fechasSuperMap.reversed.toList();
+    reversedList3 = superMap2.reversed.toList();
+    reversedList4 = superMap.reversed.toList();
+    reversedList = myList.reversed.toList();
   }
 
   @override
@@ -121,9 +152,11 @@ class _LevantarReporteState extends State<LevantarReporte> {
   }
 
   refresh() {
-    setState(() {
-      listview();
-    });
+    if (mounted) {
+      setState(() {
+        listview();
+      });
+    }
   }
 
   @override
@@ -134,7 +167,7 @@ class _LevantarReporteState extends State<LevantarReporte> {
         backgroundColor: Colors.blue,
         title: Text('Reportes'),
       ),
-      body: myList.length == 0
+      body: reversedList.length == 0
           ? SafeArea(
               child: Center(
                 child: Column(
@@ -151,7 +184,8 @@ class _LevantarReporteState extends State<LevantarReporte> {
           : listview(),
       floatingActionButton: FloatingActionButton(
         elevation: 7,
-        onPressed: () => Navigator.of(context).popAndPushNamed('/screen18'),
+        onPressed: () => Navigator.of(context)
+            .push(MaterialPageRoute(builder: (_) => AddReporte())),
         backgroundColor: Colors.blue,
         child: Icon(
           Icons.add,
@@ -161,7 +195,7 @@ class _LevantarReporteState extends State<LevantarReporte> {
     );
   }
 
-  Container listview() {
+  listview() {
     return Container(
       child: ListView.separated(
         separatorBuilder: (context, index) {
@@ -170,7 +204,7 @@ class _LevantarReporteState extends State<LevantarReporte> {
             color: Colors.grey[350],
           );
         },
-        itemCount: myList.length,
+        itemCount: reversedList.length,
         itemBuilder: (context, int index) {
           return Container(
             padding: EdgeInsets.all(8),
@@ -178,15 +212,15 @@ class _LevantarReporteState extends State<LevantarReporte> {
               onTap: () {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (_) => ReportEditPage(
-                          report: myList[index],
-                          data: listProgreso,
-                          progreso: superMap[index],
-                          datos: superMap2[index],
-                          id: myList[index].id,
-                        )));
+                        report: reversedList[index],
+                        data: listProgreso,
+                        progreso: reversedList4[index],
+                        datos: reversedList3[index],
+                        id: reversedList[index].id,
+                        fechas: reversedList2[index])));
               },
               title: Text(
-                '${myList[index].descripCorta}',
+                '${reversedList[index].descripCorta}',
                 style: TextStyle(
                   fontSize: 20,
                 ),
@@ -197,12 +231,12 @@ class _LevantarReporteState extends State<LevantarReporte> {
                   SizedBox(
                     width: 160,
                     child: Text(
-                      '${myList[index].desperfecto}',
+                      '${reversedList[index].desperfecto}',
                       style: TextStyle(fontSize: 18),
                     ),
                   ),
                   Text(
-                    '${myList[index].fechaRep!.day}/${myList[index].fechaRep!.month}/${myList[index].fechaRep!.year}',
+                    '${reversedList[index].fechaRep!.day}/${reversedList[index].fechaRep!.month}/${reversedList[index].fechaRep!.year}',
                     style: TextStyle(fontSize: 18),
                   )
                 ],

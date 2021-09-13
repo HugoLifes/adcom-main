@@ -36,6 +36,7 @@ class _AvisosState extends State<Avisos> {
   List<Map<dynamic, Map>> superMap2 = [];
   var typeUser;
   var idComu;
+  bool itsTrue = true;
   //funcion que checa el usuario y llama a las funciones si es el usuario maestro
   Future userCheck() async {
     prefs = await SharedPreferences.getInstance();
@@ -77,30 +78,47 @@ class _AvisosState extends State<Avisos> {
     AvisosUsuario()
         .getAvisos(idComu)
         .then((value) => {
-              for (int i = 0; i < value!.data!.length; i++)
+              if (value!.data!.isNotEmpty)
                 {
-                  avisos.add(new AvisosUsuario(
-                    avisos: value.data![i].aviso,
-                    tipoAviso: value.data![i].tipoAviso,
-                    fecha: value.data![i].fechaAviso,
-                  )),
-                },
-              links = List.generate(
-                  value.data!.length,
-                  (index2) => List.generate(
-                      value.data![index2].archivos!.length,
-                      (index) => value
-                          .data![index2].archivos![index].direccionArchivo),
-                  growable: true),
-              name = List.generate(
-                  value.data!.length,
-                  (index2) => List.generate(
-                      value.data![index2].archivos!.length,
-                      (index) =>
-                          value.data![index2].archivos![index].nombreArchivo),
-                  growable: true),
+                  for (int i = 0; i < value.data!.length; i++)
+                    {
+                      avisos.add(new AvisosUsuario(
+                        avisos: value.data![i].aviso,
+                        tipoAviso: value.data![i].tipoAviso,
+                        fecha: value.data![i].fechaAviso,
+                      )),
+                    },
+                  links = List.generate(
+                      value.data!.length,
+                      (index2) => List.generate(
+                          value.data![index2].archivos!.length,
+                          (index) => value
+                              .data![index2].archivos![index].direccionArchivo),
+                      growable: true),
+                  name = List.generate(
+                      value.data!.length,
+                      (index2) => List.generate(
+                          value.data![index2].archivos!.length,
+                          (index) => value
+                              .data![index2].archivos![index].nombreArchivo),
+                      growable: true),
+                }
+              else
+                {esFalso()}
             })
-        .whenComplete(() => refresh());
+        .whenComplete(() => mounted == true
+            ? setState(() {
+                AvisosDashboard(
+                  avisos: avisos,
+                );
+              })
+            : null);
+  }
+
+  esFalso() {
+    setState(() {
+      itsTrue = false;
+    });
   }
 
   @override
@@ -109,21 +127,19 @@ class _AvisosState extends State<Avisos> {
     super.initState();
   }
 
-  refresh() {
-    setState(() {
-      if (mounted) {
-        AvisosDashboard(
-          avisos: avisos,
-        );
-      }
-    });
-  }
+  refresh() {}
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return Scaffold(
         appBar: AppBar(
+          title: Text('Avisos',
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 25,
+                  fontFamily: 'Roboto',
+                  fontWeight: FontWeight.w700)),
           elevation: 4.0,
           backgroundColor: Colors.blueGrey[700],
         ),
@@ -131,16 +147,17 @@ class _AvisosState extends State<Avisos> {
         body: Stack(
           children: [
             Container(
-              height: size.height * .20,
+              height: size.width / 2.0,
               decoration: BoxDecoration(color: Colors.blueGrey[700]),
             ),
             Container(
-              padding: EdgeInsets.only(top: 30, right: 30),
+              padding: EdgeInsets.only(
+                  top: size.height / 30, right: size.width / 20),
               alignment: Alignment.topRight,
               child: Icon(
                 Icons.announcement_rounded,
                 color: Colors.white,
-                size: size.width / 4,
+                size: size.width / 4.5,
               ),
             ),
             SafeArea(
@@ -153,39 +170,49 @@ class _AvisosState extends State<Avisos> {
                     height: size.width / 50,
                   ),
                   Text(
-                    "Avisos",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 40,
-                        fontFamily: 'Roboto',
-                        fontWeight: FontWeight.w700),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Text(
                     'Comunicados de la comunidad',
                     style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white),
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: 15),
                   ),
                   SizedBox(
-                    height: 10,
+                    height: 20,
                   ),
                   SizedBox(
-                    width: size.width * .6,
+                    width: size.width / 1.5,
                     child: Text(
                       'Enterate de lo que sucede en tu comunidad! Desde recordatorios, alertas, novedades y más.',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(
+                          color: Colors.white, fontSize: size.width / 19),
                     ),
-                  ),
-                  SizedBox(
-                    height: size.width / 12,
                   ),
                   avisos.isEmpty
                       ? Center(
-                          child: Container(
-                              padding: EdgeInsets.only(top: 25),
-                              child: CircularProgressIndicator()))
+                          child: itsTrue == false
+                              ? Container(
+                                  padding: const EdgeInsets.only(top: 90),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Image.asset(
+                                        'assets/images/magic.png',
+                                        width: size.width / 1,
+                                        height: 200,
+                                      ),
+                                      Text(
+                                        'Lo sentimos, por el momento no hay avisos',
+                                        style: TextStyle(
+                                          fontSize: size.width / 20,
+                                          color: Colors.blueGrey[700],
+                                        ),
+                                        textAlign: TextAlign.justify,
+                                      )
+                                    ],
+                                  ))
+                              : Container(
+                                  padding: EdgeInsets.only(top: size.width / 5),
+                                  child: CircularProgressIndicator()))
                       : AvisosDashboard(
                           links: links,
                           name: name,
@@ -309,7 +336,7 @@ class AvisosUsuario {
 
     if (response.statusCode == 200) {
       var data = response.body;
-
+      print(data);
       return getAvisosFromJson(data);
     }
   }

@@ -33,10 +33,20 @@ class _AvisosDashboardState extends State<AvisosDashboard> {
   bool downloading = false;
   String progress = '0';
   bool isDownloaded = false;
+  List<AvisosUsuario>? avisosRevers = [];
+  List<dynamic> namesRev = [];
+  List<dynamic> linksrev = [];
+
+  reversedList() {
+    avisosRevers = widget.avisos!.reversed.toList();
+    namesRev = widget.name!.reversed.toList();
+    linksrev = widget.links!.reversed.toList();
+  }
 
   @override
   void initState() {
     _showPersBottomSheetCallBack = _showPersBottomSheetCallBack;
+    reversedList();
     super.initState();
   }
 
@@ -49,33 +59,35 @@ class _AvisosDashboardState extends State<AvisosDashboard> {
   viewAvisos({size}) {
     return Flexible(
         child: GridView.builder(
-            padding: EdgeInsets.only(),
-            itemCount: widget.avisos!.length,
+            padding: EdgeInsets.only(left: 10, right: 10, top: 20),
+            itemCount: avisosRevers!.length,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 1,
               childAspectRatio: 1.65,
-              crossAxisSpacing: 25,
+              crossAxisSpacing: 29,
               mainAxisSpacing: 20,
             ),
             itemBuilder: (_, int data) {
               return Container(
                 decoration: BoxDecoration(
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
-                    border:
-                        Border.all(color: Color(0xFF455A64).withOpacity(0.3))),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.grey,
+                          blurRadius: 7,
+                          offset: Offset(0, 5))
+                    ]),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    whoPublish(size),
+                    whoPublish(data, size),
                     Divider(
                       color: Color(0xFF455A64).withOpacity(0.3),
                     ),
                     postMessage(data, size),
                     SizedBox(
                       height: 10,
-                    ),
-                    Divider(
-                      color: Color(0xFF455A64).withOpacity(0.3),
                     ),
                   ],
                 ),
@@ -92,8 +104,8 @@ class _AvisosDashboardState extends State<AvisosDashboard> {
           Padding(
             padding: EdgeInsets.only(left: size / 50),
             child: Text(
-              'Comunicado! ${widget.avisos![data].avisos}',
-              style: TextStyle(fontSize: 20),
+              '${avisosRevers![data].avisos}',
+              style: TextStyle(fontSize: size / 20),
             ),
           ),
           SizedBox(
@@ -125,19 +137,19 @@ class _AvisosDashboardState extends State<AvisosDashboard> {
   }
 
   void _showModalSheet(int data) {
-    if (names.length == widget.name![data].length) {
+    if (names.length == namesRev[data].length) {
     } else {
-      for (int i = 0; i < widget.name![data].length; i++) {
-        names.add(widget.name![data][i]);
+      for (int i = 0; i < namesRev[data].length; i++) {
+        names.add(namesRev[data][i]);
       }
     }
 
-    if (links.length == widget.links![data].length) {
+    if (links.length == linksrev[data].length) {
       print('here${links.length}');
       print(' ya no cabe');
     } else {
-      for (int i = 0; i < widget.links![data].length; i++) {
-        links.add(widget.links![data][i]);
+      for (int i = 0; i < linksrev[data].length; i++) {
+        links.add(linksrev[data][i]);
 
         print(links[i]);
       }
@@ -287,7 +299,7 @@ class _AvisosDashboardState extends State<AvisosDashboard> {
     return filePath;
   }
 
-  Container whoPublish(size) {
+  Container whoPublish(data, size) {
     return Container(
       padding: EdgeInsets.only(top: 10, left: 10),
       child: Row(
@@ -305,7 +317,12 @@ class _AvisosDashboardState extends State<AvisosDashboard> {
           Text(
             'Administrador',
             style: (TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-          )
+          ),
+          SizedBox(
+            width: size / 35,
+          ),
+          Text(
+              '${avisosRevers![data].fecha!.day}/${avisosRevers![data].fecha!.month}/${avisosRevers![data].fecha!.year}')
         ],
       ),
     );

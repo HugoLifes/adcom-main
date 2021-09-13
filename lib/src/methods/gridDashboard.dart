@@ -96,6 +96,7 @@ class _GridDashboardState extends State<GridDashboard> {
   List<Items> myList = [];
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
     switch (widget.userId) {
       case 1:
         myList = [item1, item5, item4, item2];
@@ -114,61 +115,63 @@ class _GridDashboardState extends State<GridDashboard> {
         myList = [item8, item9];
         break;
     }
-    return Flexible(
-        child: AnimationLimiter(
-      child: GridView.count(
-          padding: EdgeInsets.only(left: 16, right: 16, top: 10),
-          crossAxisCount: 2,
-          childAspectRatio: 1.1,
-          crossAxisSpacing: 15,
-          mainAxisSpacing: 15,
-          children: myList.map((data) {
-            return AnimationConfiguration.staggeredGrid(
-              columnCount: myList.length,
-              duration: Duration(milliseconds: 375),
-              position: 2,
-              child: ScaleAnimation(
-                scale: 0.5,
-                child: FadeInAnimation(
-                  child: InkWell(
-                    onTap: () {
-                      HapticFeedback.mediumImpact();
-                      Navigator.pushNamed(context, data.route!,
-                          arguments: GridDashboard());
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.grey,
-                                blurRadius: 10,
-                                offset: Offset(0, 5))
-                          ]),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          data.icon!,
-                          SizedBox(
-                            height: 14,
-                          ),
-                          Text(
-                            data.title!,
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600),
-                          ),
-                        ],
+    return AnimationLimiter(
+      child: Container(
+        child: GridView.count(
+            padding:
+                EdgeInsets.only(left: 16, right: 16, top: size.height / 2.5),
+            crossAxisCount: 2,
+            childAspectRatio: 1.1,
+            crossAxisSpacing: 15,
+            mainAxisSpacing: 12,
+            children: myList.map((data) {
+              return AnimationConfiguration.staggeredGrid(
+                columnCount: myList.length,
+                duration: Duration(milliseconds: 375),
+                position: 2,
+                child: ScaleAnimation(
+                  scale: 0.5,
+                  child: FadeInAnimation(
+                    child: InkWell(
+                      onTap: () {
+                        HapticFeedback.mediumImpact();
+                        Navigator.pushNamed(context, data.route!,
+                            arguments: GridDashboard());
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.grey,
+                                  blurRadius: 10,
+                                  offset: Offset(0, 5))
+                            ]),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            data.icon!,
+                            SizedBox(
+                              height: 14,
+                            ),
+                            Text(
+                              data.title!,
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            );
-          }).toList()),
-    ));
+              );
+            }).toList()),
+      ),
+    );
   }
 }
 

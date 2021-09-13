@@ -1,3 +1,5 @@
+import 'package:adcom/json/json.dart';
+import 'package:adcom/src/extra/filter_section.dart';
 import 'package:adcom/src/methods/emailDashboard.dart';
 import 'package:adcom/src/models/event_provider.dart';
 import 'package:filter_list/filter_list.dart';
@@ -15,7 +17,8 @@ class _ContactosState extends State<Contactos> {
   List<Items>? itemSeleccion = [];
   List<String>? newArr = [];
   TextEditingController? _controller = TextEditingController();
-
+  late Welcome? dt;
+  List<Items> myList = [];
   @override
   void initState() {
     super.initState();
@@ -30,18 +33,27 @@ class _ContactosState extends State<Contactos> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+    var size2 = MediaQuery.of(context).size.width;
     final residentes = Provider.of<EventProvider>(context).items;
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      floatingActionButton: FloatingActionButton(
+      /* floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.greenAccent[700],
-        onPressed: () => _openFilterDialog(residentes),
+        onPressed: () => _openFilterDialog(myList),
         child: Icon(
           Icons.filter_list,
         ),
-      ),
+      ), */
       appBar: AppBar(
+        title: Text(
+          "Directorio",
+          style: TextStyle(
+              color: Colors.white,
+              fontSize: 30,
+              fontFamily: 'Roboto',
+              fontWeight: FontWeight.w700),
+        ),
         leading: BackButton(
           onPressed: () {
             itemSeleccion!.clear();
@@ -57,7 +69,7 @@ class _ContactosState extends State<Contactos> {
       body: Stack(
         children: [
           Container(
-            height: size.height * .31,
+            height: size.height * .30,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(
                     bottomRight: Radius.circular(5),
@@ -69,12 +81,12 @@ class _ContactosState extends State<Contactos> {
                 color: Colors.greenAccent[700]),
           ),
           Container(
-            padding: EdgeInsets.only(top: 56),
+            padding: EdgeInsets.only(top: 56, right: size.width / 28),
             alignment: Alignment.topRight,
             child: Icon(
               Icons.contacts,
               color: Colors.white,
-              size: 165,
+              size: size.width / 3,
             ),
           ),
           SafeArea(
@@ -84,41 +96,36 @@ class _ContactosState extends State<Contactos> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(
-                  height: 10,
-                ),
-                Text(
-                  "Directorio",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 40,
-                      fontFamily: 'Roboto',
-                      fontWeight: FontWeight.w700),
+                  height: 8,
                 ),
                 SizedBox(
-                  height: 10,
-                ),
-                Text(
-                  'Contacta a tus personas de confianza',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.white),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                SizedBox(
-                  width: size.width * .5,
+                  width: size.width / 2,
                   child: Text(
-                    'Mantente conectado con tu comunidad o asesores de tu comunidad',
-                    style: TextStyle(color: Colors.white),
+                    'Contacta a tus personas de confianza',
+                    style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
                   ),
                 ),
                 SizedBox(
-                  width: size.width * .55,
+                  height: 10,
+                ),
+                SizedBox(
+                  width: size.width / 2,
+                  height: size.height / 8,
+                  child: Text(
+                    'Mantente conectado con tu comunidad o asesores de tu comunidad',
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                ),
+                SizedBox(
+                  width: size.width / 2,
                   child: searchBar(residentes),
                 ),
                 itemSeleccion == null || itemSeleccion!.length == 0
                     ? ContactDashboard()
-                    : filterView(),
+                    : filterView(size2),
               ],
             ),
           )),
@@ -129,8 +136,8 @@ class _ContactosState extends State<Contactos> {
 
   searchBar(List<Items> residentes) {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 30),
-      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 5),
+      margin: EdgeInsets.symmetric(vertical: 10),
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
       decoration: BoxDecoration(
           color: Colors.white, borderRadius: BorderRadius.circular(29.5)),
       child: TextField(
@@ -162,14 +169,14 @@ class _ContactosState extends State<Contactos> {
     }
   }
 
-  filterView() => Flexible(
+  filterView(size2) => Flexible(
       child: GridView.builder(
           shrinkWrap: false,
           itemCount: itemSeleccion!.length,
           padding: EdgeInsets.only(left: 4, right: 4, top: 17),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 1,
-            childAspectRatio: 3.1,
+            childAspectRatio: 2.5,
             crossAxisSpacing: 15,
             mainAxisSpacing: 15,
           ),
@@ -210,55 +217,35 @@ class _ContactosState extends State<Contactos> {
                         children: [
                           itemSeleccion![index].title == null
                               ? Container()
-                              : Text(itemSeleccion![index].title!.toUpperCase(),
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600)),
+                              : SizedBox(
+                                  width: size2 / 2.1,
+                                  child: Text(
+                                      itemSeleccion![index]
+                                          .title!
+                                          .toUpperCase(),
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: size2 / 33,
+                                          fontWeight: FontWeight.bold)),
+                                ),
                           SizedBox(
-                            height: 10,
+                            height: size2 / 20,
                           ),
                           Row(
                             children: [
-                              Text('Comunidad',
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold)),
-                              SizedBox(
-                                width: 3,
-                              ),
                               itemSeleccion![index].comNombre == null
                                   ? Container()
-                                  : Text(itemSeleccion![index].comNombre!,
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 15,
-                                      ))
+                                  : SizedBox(
+                                      width: size2 / 2,
+                                      child:
+                                          Text(itemSeleccion![index].comNombre!,
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 16,
+                                              )),
+                                    )
                             ],
                           ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Row(
-                            children: [
-                              Text('Numero',
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold)),
-                              SizedBox(
-                                width: 3,
-                              ),
-                              itemSeleccion![index].telCel == null
-                                  ? Container()
-                                  : Text(itemSeleccion![index].telCel!,
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 15,
-                                      ))
-                            ],
-                          )
                         ],
                       )
                     ],

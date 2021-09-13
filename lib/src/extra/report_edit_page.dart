@@ -11,8 +11,15 @@ class ReportEditPage extends StatefulWidget {
   final DataReporte report;
   final List<Progreso> data;
 
+  /// variable que indiga el progreso actual del estatus.
   Map<dynamic, Map>? progreso;
+
+  ///  variable que muestra los comentarios por progreso.
   Map<dynamic, Map>? datos;
+
+  /// variables que muestra las fechas de los comentarios.
+  Map<dynamic, Map>? fechas;
+
   Map? superMap = <dynamic, Map>{};
 
   ReportEditPage(
@@ -21,6 +28,7 @@ class ReportEditPage extends StatefulWidget {
       required this.data,
       this.datos,
       this.progreso,
+      this.fechas,
       this.id})
       : super(key: key);
 
@@ -34,12 +42,9 @@ class _ReportEditPageState extends State<ReportEditPage> {
   var data;
   List<ProgressIndicator> progres = [];
   List<DatosProgreso> datosp = [];
+  bool finalizado = false;
+  List<FechaReporte> f = [];
 
-  List<int> progresFromJson(String str) =>
-      List<int>.from(json.decode(str).map((x) => x));
-
-  String progresToJson(List<dynamic> data) =>
-      json.encode(List<dynamic>.from(data.map((x) => x)));
   estatus() {
     widget.progreso!.forEach((key, value) {
       if (widget.id == key) {
@@ -47,6 +52,7 @@ class _ReportEditPageState extends State<ReportEditPage> {
           if (key == 'Progreso') {
             setState(() {
               for (int i = 0; i < value.length; i++) {
+                value.sort();
                 progres.add(new ProgressIndicator(id: value[i]));
               }
             });
@@ -76,18 +82,44 @@ class _ReportEditPageState extends State<ReportEditPage> {
     });
   }
 
+  fechasR() {
+    widget.fechas!.forEach((key, value) {
+      if (widget.id == key) {
+        value.forEach((key, value) {
+          if (key == 'Fechas') {
+            setState(() {
+              for (int i = 0; i < value.length; i++) {
+                f.add(new FechaReporte(f: value[i]));
+              }
+            });
+          }
+        });
+      }
+    });
+  }
+
   @override
   void initState() {
     estatus();
     datos();
+    fechasR();
 
     super.initState();
+  }
+
+  isFinalizado() {
+    if (progres.last.id == 4) {
+      setState(() {
+        finalizado = true;
+      });
+    }
+    return finalizado;
   }
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size.width;
-    var size2 = MediaQuery.of(context).size.width;
+    //var size2 = MediaQuery.of(context).size.width;
     return Scaffold(
         appBar: AppBar(
           title: Text('Seguimiento de reporte'),
@@ -99,6 +131,7 @@ class _ReportEditPageState extends State<ReportEditPage> {
           child: Column(
             children: [
               IconStepper(
+                enableStepTapping: isFinalizado(),
                 icons: [
                   Icon(Icons.supervised_user_circle),
                   Icon(Icons.check),
@@ -153,119 +186,181 @@ class _ReportEditPageState extends State<ReportEditPage> {
   Widget plainText(size) {
     switch (progres.isEmpty ? 0 : progres.last.id) {
       case 1:
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Atencion:',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Text(
-              'Se ha enviado su reporte',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w300),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Text(
-              'Se le notificara el cambio de estado del reporte',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w300),
-            )
-          ],
-        );
-      case 2:
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Asesor:',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Text(
-              'Su estado se encuentra en revisión',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w300),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Text(
-              'Se le notificara el cambio de estado del reporte',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w300),
-            )
-          ],
-        );
-      case 3:
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Asesor:',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Text('Tu estado se ha revisado y se esta atendiendo',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w300,
-                )),
-            SizedBox(
-              height: 10,
-            ),
-            Row(
-              children: [
-                Text(
-                  'Comentarios:',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                ),
-                SizedBox(
-                  width: size / 20,
-                ),
-                SizedBox(
-                  width: size / 2,
-                  child: Text('${datosp[2].coment}',
+        return datosp.isEmpty
+            ? Container(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Asesor:',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        )),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      'Tu reporte se encuentra en revision',
                       style:
-                          TextStyle(fontWeight: FontWeight.w400, fontSize: 18)),
-                )
-              ],
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Text(
-              '',
-              style: TextStyle(fontWeight: FontWeight.w300, fontSize: 18),
-            )
-          ],
-        );
+                          TextStyle(fontWeight: FontWeight.w300, fontSize: 18),
+                    )
+                  ],
+                ),
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: size / 25,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 50),
+                    child: Text('Comentarios:',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        )),
+                  ),
+                  respuestaView(size),
+                ],
+              );
+      case 2:
+        return datosp.isEmpty
+            ? Container(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Asesor:',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        )),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      'Tu reporte esta siendo procesado',
+                      style:
+                          TextStyle(fontWeight: FontWeight.w300, fontSize: 18),
+                    )
+                  ],
+                ),
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: EdgeInsets.only(left: 50),
+                    child: Text('Comentarios:',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        )),
+                  ),
+                  respuestaView(size),
+                ],
+              );
+      case 3:
+        return datosp.isEmpty
+            ? Container(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Asesor:',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        )),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      'No hay comentarios',
+                      style:
+                          TextStyle(fontWeight: FontWeight.w300, fontSize: 18),
+                    )
+                  ],
+                ),
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Respuesta de Asesor:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      )),
+                  respuestaView(size),
+                ],
+              );
       case 4:
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Asesor:',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                )),
-            SizedBox(
-              height: 10,
-            ),
-            Text(
-              'Tu reporte se ha atendido y ha finalizado con éxito',
-              style: TextStyle(fontWeight: FontWeight.w300, fontSize: 18),
-            )
-          ],
-        );
+        return datosp.isEmpty
+            ? Container(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Asesor:',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        )),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      'Tu reporte se ha atendido y ha finalizado con éxito',
+                      style:
+                          TextStyle(fontWeight: FontWeight.w300, fontSize: 18),
+                    )
+                  ],
+                ),
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: EdgeInsets.only(left: 30),
+                    child: Text('Respuestas:',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 19,
+                        )),
+                  ),
+                  respuestaView(size),
+                ],
+              );
       default:
         return Container();
     }
+  }
+
+  ListView respuestaView(size) {
+    return ListView.builder(
+        padding: EdgeInsets.only(left: size / 4.3, top: 10),
+        shrinkWrap: true,
+        itemCount: datosp.length,
+        itemBuilder: (_, int index) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 5,
+              ),
+              Text(
+                  '${f[index].f!.day}/${f[index].f!.month}/${f[index].f!.year}',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+              SizedBox(
+                height: 5,
+              ),
+              SizedBox(
+                width: size / 2,
+                child: Text(datosp[index].coment,
+                    style:
+                        TextStyle(fontSize: 15, fontWeight: FontWeight.w400)),
+              ),
+            ],
+          );
+        });
   }
 
   Color? stepColor() {
@@ -287,9 +382,9 @@ class _ReportEditPageState extends State<ReportEditPage> {
   String? headerText() {
     switch (progres.isEmpty ? 0 : progres.last.id) {
       case 1:
-        return 'En proceso';
+        return 'Revisión';
       case 2:
-        return 'Revision';
+        return 'En proceso';
       case 3:
         return 'Respuesta';
       case 4:
@@ -321,12 +416,17 @@ class _ReportEditPageState extends State<ReportEditPage> {
           child: Column(
             //crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                alignment: Alignment.topLeft,
-                child: Text(
-                  widget.report.descripCorta!,
-                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                ),
+              Row(
+                children: [
+                  Container(
+                    alignment: Alignment.topLeft,
+                    child: Text(
+                      widget.report.descripCorta!,
+                      style:
+                          TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
               ),
               SizedBox(
                 height: 15,
@@ -354,6 +454,12 @@ class ProgressIndicator {
   var id;
 
   ProgressIndicator({this.id});
+}
+
+class FechaReporte {
+  DateTime? f;
+
+  FechaReporte({this.f});
 }
 
 class DatosProgreso {
