@@ -55,53 +55,29 @@ class _FinanzasState extends State<Finanzas> {
   Accounts? cuentas;
   List<DatosCuenta> mylist = [];
   List<DatosCuenta>? mylist2 = [];
-  List localList = [];
+  List<DatosCuenta> localList = [];
   int? idComu;
   var montoCuota;
   Timer? timer;
   VoidCallback? _showPersBottomSheetCallBack;
   bool itsTrue = true;
 
-  data() async {
-    cuentas = await getAdeudos();
-
-    if (cuentas!.data!.isNotEmpty) {
-      for (int i = 0; i < cuentas!.data!.length; i++) {
-        localList.add(new DatosCuenta(
-            idComu: cuentas!.data![i].idComu,
-            montoCuota: cuentas!.data![i].montoCuota,
-            fechaGenerada: cuentas!.data![i].fechaGeneracion!,
-            fechaLimite: cuentas!.data![i].fechaLimite!,
-            fechaPago: cuentas!.data![i].fechaPago,
-            referencia: cuentas!.data![i].referencia,
-            pago: cuentas!.data![i].pago));
-      }
-    } else {
-      setState(() {
-        if (mounted) {
-          itsTrue = false;
-        }
-      });
-    }
-  }
-
+  /// El init state inicializa funciones cuando abre el boton mis pagos
   @override
   void initState() {
     super.initState();
+
+    /// no tocar, muestra la vista para pagar con tarjeta
     _showPersBottomSheetCallBack = _showPersBottomSheetCallBack;
+
+    /// funcion que obtiene datos del service
     data();
+
+    ///refresqueo cuando hay datos
     if (itsTrue == false) {
     } else {
       Future.delayed(Duration(seconds: 1), () => {refresh()});
     }
-  }
-
-  refresh() {
-    setState(() {
-      if (mounted) {
-        mainView();
-      }
-    });
   }
 
   @override
@@ -205,282 +181,52 @@ class _FinanzasState extends State<Finanzas> {
         ));
   }
 
+  refresh() {
+    setState(() {
+      if (mounted) {
+        mainView();
+      }
+    });
+  }
+
+  data() async {
+    cuentas = await getAdeudos();
+
+    if (cuentas!.data!.isNotEmpty) {
+      for (int i = 0; i < cuentas!.data!.length; i++) {
+        localList.add(new DatosCuenta(
+            idComu: cuentas!.data![i].idComu,
+            montoCuota: cuentas!.data![i].montoCuota,
+            fechaGenerada: cuentas!.data![i].fechaGeneracion!,
+            fechaLimite: cuentas!.data![i].fechaLimite!,
+            fechaPago: cuentas!.data![i].fechaPago,
+            pago: cuentas!.data![i].pago!,
+            totalApagar: cuentas!.data![i].totalApagar,
+            referencia: cuentas!.data![i].referencia,
+            pagoTardio: cuentas!.data![i].pagoTardio,
+            montoTardio: cuentas!.data![i].montoPagoTardio));
+      }
+    } else {
+      setState(() {
+        if (mounted) {
+          itsTrue = false;
+        }
+      });
+    }
+  }
+
   mainView() {
     return InkWell(
         onTap: () {
           HapticFeedback.mediumImpact();
         },
-        child: VistaTarjeta());
-  }
 
-  referenciaApagar() {
-    final deudas = Provider.of<EventProvider>(context, listen: false).deudas;
-
-    String? ref;
-    for (int i = 0; i < deudas.length; i++) {
-      if (deudas[i].pago == 1) {
-        //no debe
-      } else {
-        //si debe
-        setState(() {
-          ref = deudas[i].referencia!;
-        });
-      }
-    }
-    return ref;
+        /// vista para la tarjeta
+        child: VistaTarjeta(
+          newList: localList,
+        ));
   }
 }
-
-// ignore: must_be_immutable
-class EstadoCuenta extends StatefulWidget {
-  late dynamic? d;
-  late int? m;
-  late int? yy;
-
-  EstadoCuenta({Key? key, this.d, this.m, this.yy}) : super(key: key);
-
-  @override
-  _EstadoCuentaState createState() => _EstadoCuentaState();
-}
-
-class _EstadoCuentaState extends State<EstadoCuenta> {
-  Accounts? cuentas;
-
-  List<DatosCuenta> mylist = [];
-  data() async {
-    cuentas = await getAdeudos();
-
-    for (int i = 0; i < cuentas!.data!.length; i++) {
-      mylist.add(new DatosCuenta(
-          idComu: cuentas!.data![i].idComu,
-          montoCuota: cuentas!.data![i].montoCuota,
-          fechaGenerada: cuentas!.data![i].fechaGeneracion!,
-          fechaLimite: cuentas!.data![i].fechaLimite!,
-          fechaPago: cuentas!.data![i].fechaPago,
-          referencia: cuentas!.data![i].referencia,
-          pago: cuentas!.data![i].pago!));
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    data();
-    Future.delayed(Duration(seconds: 1), () {
-      setState(() {
-        ultimaDeuda();
-      });
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      height: 175,
-      decoration: BoxDecoration(boxShadow: [
-        BoxShadow(color: Colors.grey, blurRadius: 6, offset: Offset(0, 1))
-      ], color: Colors.white, borderRadius: BorderRadius.circular(10)),
-      child: Padding(
-        padding:
-            const EdgeInsets.only(left: 13, right: 13, top: 10, bottom: 20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Estado de cuenta',
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13),
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Text(
-                          'Información Actualizada:',
-                          style: TextStyle(
-                              fontSize: size.width / 28,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(
-                          width: size.width * .19,
-                        ),
-                        Text(
-                          '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        )
-                      ],
-                    )
-                  ],
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Expanded(
-                    child: InkWell(
-                  child: Text(
-                    'Ultimo mes',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.black),
-                  ),
-                )),
-                Text('|', style: TextStyle(color: Colors.black)),
-                Expanded(
-                    child: InkWell(
-                  onTap: () {
-                    HapticFeedback.mediumImpact();
-                  },
-                  child: Text('Fecha limite de pago',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.black)),
-                ))
-              ],
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: Center(
-                    child: Text(
-                      '\$${ultimaDeuda()}MXN',
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: size.width / 17),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  width: 20,
-                ),
-                Expanded(
-                    child: Center(
-                  child: Text(
-                    '${fechadepago()}',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                ))
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  ultimaDeuda() {
-    double debe = 0.0;
-    double? monto;
-    int? total;
-    for (int i = 0; i < mylist.length; i++) {
-      monto = double.parse(mylist[i].montoCuota!);
-      if (mylist[i].pago == 1 && mylist[i].pagoTardio == 0) {
-      } else {
-        if (DateTime.now().day <= mylist[i].fechaLimite!.day &&
-            DateTime.now().month <= mylist[i].fechaLimite!.month &&
-            DateTime.now().year <= mylist[i].fechaLimite!.year) {
-          return debe = monto;
-        } else {
-          if (mylist[i].pagoTardio == 0 || mylist[i].pagoTardio == null) {
-            return debe = monto;
-          } else {
-            total = int.parse(mylist[i].montoTardio!);
-            print('${total}');
-            return debe = monto + total;
-          }
-        }
-      }
-    }
-    return debe == 0.0 ? '0.0' : debe;
-  }
-
-  referenciaApagar() {
-    String? ref;
-    for (int i = 0; i < mylist.length; i++) {
-      if (mylist[i].pago == 1 && mylist[i].pagoTardio == 0) {
-        print('no debe');
-      } else {
-        setState(() {
-          ref = mylist[i].referencia!;
-        });
-        return ref == null ? " " : ref;
-      }
-    }
-    return ref == null ? " " : ref;
-  }
-
-  //te dice cuanto dinero debe
-  saldoDeudor() {
-    double contador = 0.0;
-    double deuda;
-    for (int i = 0; i < mylist.length; i++) {
-      deuda = double.parse(mylist[i].montoCuota!);
-      if (mylist[i].pago == 1) {
-      } else {
-        if (DateTime.now().day <= mylist[i].fechaLimite!.day &&
-            DateTime.now().month <= mylist[i].fechaLimite!.month &&
-            DateTime.now().year <= mylist[i].fechaLimite!.year) {
-        } else {
-          setState(() {
-            contador += deuda;
-          });
-        }
-      }
-    }
-    return contador;
-  }
-
-  fechadepago() {
-    int? dia;
-    int? mes;
-    int? year;
-    for (int i = 0; i < mylist.length; i++) {
-      if (mylist[i].pago == 1) {
-        print('no debe');
-      } else {
-        setState(() {
-          dia = mylist[i].fechaLimite!.day;
-          mes = mylist[i].fechaLimite!.month;
-          year = mylist[i].fechaLimite!.year;
-        });
-        return dia == null ? '' : '$dia/$mes/$year';
-      }
-    }
-
-    return dia == null ? '' : '$dia/$mes/$year';
-  }
-
-  //te dice cuantos meses debe
-  /* cuantoDebe() {
-    int contador = 0;
-    for (int i = 0; i < mylist.length; i++) {
-      if (mylist[i].pago == 1) {
-      } else {
-        if (DateTime.now().day <= mylist[i].fechaLimite!.day &&
-            DateTime.now().month <= mylist[i].fechaLimite!.month &&
-            DateTime.now().year <= mylist[i].fechaLimite!.year) {
-        } else {
-          setState(() {
-            contador++;
-          });
-        }
-      }
-    }
-    return contador.toString();
-  } */
-}
-// ignore: must_be_immutable
 
 class DatosCuenta {
   int? idComu;

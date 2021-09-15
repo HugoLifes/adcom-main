@@ -5,14 +5,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 SharedPreferences? prefs;
 int? initScreen;
 
-class AvisosDashboard extends StatefulWidget {
-  const AvisosDashboard({Key? key}) : super(key: key);
+class ReportesDashboard extends StatefulWidget {
+  const ReportesDashboard({Key? key}) : super(key: key);
 
   @override
-  _AvisosDashboardState createState() => _AvisosDashboardState();
+  _ReportesDashboardState createState() => _ReportesDashboardState();
 }
 
-class _AvisosDashboardState extends State<AvisosDashboard> {
+class _ReportesDashboardState extends State<ReportesDashboard> {
   @override
   void initState() {
     super.initState();

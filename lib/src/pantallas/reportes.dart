@@ -1,6 +1,6 @@
 import 'package:adcom/json/jsonReporte.dart';
 import 'package:adcom/json/jsonRespuesta.dart';
-import 'package:adcom/src/methods/avisoDashboard.dart';
+import 'package:adcom/src/methods/reporteDashboard.dart';
 import 'package:adcom/src/methods/searchBar.dart';
 import 'package:flutter/material.dart';
 
@@ -46,7 +46,7 @@ class _ReportesState extends State<Reportes> {
       body: Stack(
         children: [
           Container(
-            height: size.height * .40,
+            height: size.height * .35,
             decoration: BoxDecoration(color: Colors.blue),
           ),
           Container(
@@ -84,13 +84,13 @@ class _ReportesState extends State<Reportes> {
                   child: Text(
                     'Reporta incidencias en tu comunidad para que todos estén al tanto de comportamientos inusuales o faltas a la comunidad.',
                     style: TextStyle(
-                        color: Colors.white, fontSize: size.width / 21),
+                        color: Colors.white, fontSize: size.width / 20),
                   ),
                 ),
                 SizedBox(
                   height: size.width / 8,
                 ),
-                AvisosDashboard()
+                ReportesDashboard()
               ],
             ),
           ))

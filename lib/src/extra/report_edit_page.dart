@@ -45,9 +45,13 @@ class _ReportEditPageState extends State<ReportEditPage> {
   bool finalizado = false;
   List<FechaReporte> f = [];
 
+  /// funcion que retorna el estatus y lo asigna en arreglo
+  /// recorre el mapeado de dos niveles
   estatus() {
+    /// recorre el mapeado
     widget.progreso!.forEach((key, value) {
       if (widget.id == key) {
+        /// recorre el segundo mapeado
         value.forEach((key, value) {
           if (key == 'Progreso') {
             setState(() {
@@ -64,6 +68,8 @@ class _ReportEditPageState extends State<ReportEditPage> {
     });
   }
 
+  ///mismo metodo que el mapeato del estatus
+  /// chechar [estatus]
   datos() {
     widget.datos!.forEach((key, value) {
       if (widget.id == key) {
@@ -82,6 +88,8 @@ class _ReportEditPageState extends State<ReportEditPage> {
     });
   }
 
+  ///Funcion para mapeado de fecha
+  /// checar estatus
   fechasR() {
     widget.fechas!.forEach((key, value) {
       if (widget.id == key) {
@@ -100,6 +108,8 @@ class _ReportEditPageState extends State<ReportEditPage> {
 
   @override
   void initState() {
+    /// carga los datos para poder procesarlos
+    /// en lo que abre la pantalla
     estatus();
     datos();
     fechasR();
@@ -107,11 +117,17 @@ class _ReportEditPageState extends State<ReportEditPage> {
     super.initState();
   }
 
+  /// validacion que indica el exito de un proceso
   isFinalizado() {
-    if (progres.last.id == 4) {
-      setState(() {
-        finalizado = true;
-      });
+    if (progres.isNotEmpty) {
+      if (progres.last.id == 4) {
+        setState(() {
+          /// enciende estados como el click en el stepper
+          finalizado = true;
+        });
+      } else {
+        finalizado = false;
+      }
     }
     return finalizado;
   }
@@ -164,6 +180,8 @@ class _ReportEditPageState extends State<ReportEditPage> {
         ));
   }
 
+  /// funcion que muesta el encabezado del proceso
+  /// [setpColor] sirve para cambiar el color segun el proceso
   Widget header() {
     return Container(
       decoration: BoxDecoration(
@@ -183,6 +201,8 @@ class _ReportEditPageState extends State<ReportEditPage> {
     );
   }
 
+  /// Switch case que muestra el estatus del reporte
+  /// cada case es un caso del proceso del 1 al 4
   Widget plainText(size) {
     switch (progres.isEmpty ? 0 : progres.last.id) {
       case 1:
@@ -334,10 +354,13 @@ class _ReportEditPageState extends State<ReportEditPage> {
     }
   }
 
+  /// es la vista de la respuesta
   ListView respuestaView(size) {
     return ListView.builder(
         padding: EdgeInsets.only(left: size / 4.3, top: 10),
         shrinkWrap: true,
+
+        /// recorre el largo de los datos procesados
         itemCount: datosp.length,
         itemBuilder: (_, int index) {
           return Column(
@@ -363,6 +386,7 @@ class _ReportEditPageState extends State<ReportEditPage> {
         });
   }
 
+  ///  funcion que cambia de color segun en el estatus
   Color? stepColor() {
     switch (progres.isEmpty ? 0 : progres.last.id) {
       case 1:
@@ -379,6 +403,7 @@ class _ReportEditPageState extends State<ReportEditPage> {
     }
   }
 
+  ///muesta el nombre segun el estatus
   String? headerText() {
     switch (progres.isEmpty ? 0 : progres.last.id) {
       case 1:
@@ -394,6 +419,7 @@ class _ReportEditPageState extends State<ReportEditPage> {
     }
   }
 
+  /// funcion que constuye la imagen o la cantidad de imagenes
   buildImage() => GridView.builder(
         shrinkWrap: true,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -408,6 +434,8 @@ class _ReportEditPageState extends State<ReportEditPage> {
         },
       );
 
+  ///muestra el titulo del reporte y las imagenes del reporte
+  /// chechar buildImage para cualquier detalle de imagenes
   help() {
     return Column(
       children: [

@@ -12,7 +12,8 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class VistaTarjeta extends StatefulWidget {
-  VistaTarjeta({Key? key}) : super(key: key);
+  List<DatosCuenta>? newList = [];
+  VistaTarjeta({Key? key, this.newList}) : super(key: key);
 
   @override
   _VistaTarjetaState createState() => _VistaTarjetaState();
@@ -31,10 +32,12 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
     data();
 
     Future.delayed(Duration(seconds: 1), () {
-      setState(() {
-        ultimaDeuda();
-        estadodepago();
-      });
+      if (mounted) {
+        setState(() {
+          ultimaDeuda();
+          estadodepago();
+        });
+      }
     });
   }
 
@@ -443,16 +446,16 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
     double contador = 0.0;
     double deuda;
     double tardio;
-    for (int i = 0; i < mylist.length; i++) {
-      deuda = double.parse(mylist[i].montoCuota!);
-      tardio = double.parse(mylist[i].montoTardio!);
-      if (mylist[i].pago == 1) {
+    for (int i = 0; i < widget.newList!.length; i++) {
+      deuda = double.parse(widget.newList![i].montoCuota!);
+      tardio = double.parse(widget.newList![i].montoTardio!);
+      if (widget.newList![i].pago == 1) {
         contador;
       } else {
-        if (mylist[i].pagoTardio == 0) {
-          if (DateTime.now().day <= mylist[i].fechaLimite!.day &&
-              DateTime.now().month <= mylist[i].fechaLimite!.month &&
-              DateTime.now().year <= mylist[i].fechaLimite!.year) {
+        if (widget.newList![i].pagoTardio == 0) {
+          if (DateTime.now().day <= widget.newList![i].fechaLimite!.day &&
+              DateTime.now().month <= widget.newList![i].fechaLimite!.month &&
+              DateTime.now().year <= widget.newList![i].fechaLimite!.year) {
             setState(() {
               contador += deuda;
             });
@@ -473,14 +476,14 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
 
   estadodepago() {
     String? estado;
-    for (int i = 0; i < mylist.length; i++) {
-      if (mylist[i].pago == 1) {
+    for (int i = 0; i < widget.newList!.length; i++) {
+      if (widget.newList![i].pago == 1) {
         estado = 'No deudas';
       } else {
-        if (DateTime.now().day <= mylist[i].fechaLimite!.day &&
-                DateTime.now().month <= mylist[i].fechaLimite!.month &&
-                DateTime.now().year <= mylist[i].fechaLimite!.year ||
-            mylist[i].fechaLimite!.isAfter(DateTime.now())) {
+        if (DateTime.now().day <= widget.newList![i].fechaLimite!.day &&
+                DateTime.now().month <= widget.newList![i].fechaLimite!.month &&
+                DateTime.now().year <= widget.newList![i].fechaLimite!.year ||
+            widget.newList![i].fechaLimite!.isAfter(DateTime.now())) {
           setState(() {
             estado = 'Pendiente';
           });
@@ -498,13 +501,13 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
 
   cuotaExtra() {
     bool? estado;
-    for (int i = 0; i < mylist.length; i++) {
-      if (mylist[i].pago == 1) {
+    for (int i = 0; i < widget.newList!.length; i++) {
+      if (widget.newList![i].pago == 1) {
         estado = true;
       } else {
-        if (DateTime.now().day <= mylist[i].fechaLimite!.day &&
-            DateTime.now().month <= mylist[i].fechaLimite!.month &&
-            DateTime.now().year <= mylist[i].fechaLimite!.year) {
+        if (DateTime.now().day <= widget.newList![i].fechaLimite!.day &&
+            DateTime.now().month <= widget.newList![i].fechaLimite!.month &&
+            DateTime.now().year <= widget.newList![i].fechaLimite!.year) {
           return estado = true;
         } else {
           return estado = false;
@@ -514,16 +517,17 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
     return estado;
   }
 
+  ///ok
   estadodepagoColor() {
     Color? estado;
-    for (int i = 0; i < mylist.length; i++) {
-      if (mylist[i].pago == 1) {
+    for (int i = 0; i < widget.newList!.length; i++) {
+      if (widget.newList![i].pago == 1) {
         estado = Colors.lightGreen[700];
       } else {
-        if (DateTime.now().day <= mylist[i].fechaLimite!.day &&
-                DateTime.now().month <= mylist[i].fechaLimite!.month &&
-                DateTime.now().year <= mylist[i].fechaLimite!.year ||
-            mylist[i].fechaLimite!.isAfter(DateTime.now())) {
+        if (DateTime.now().day <= widget.newList![i].fechaLimite!.day &&
+                DateTime.now().month <= widget.newList![i].fechaLimite!.month &&
+                DateTime.now().year <= widget.newList![i].fechaLimite!.year ||
+            widget.newList![i].fechaLimite!.isAfter(DateTime.now())) {
           return estado = Colors.amber[400];
         } else {
           return estado = Colors.red[700];
@@ -533,25 +537,27 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
     return estado == null ? estado = Colors.lightGreen[700] : estado;
   }
 
+  ///ok
   atraso() {
     int? atraso = 0;
 
-    for (int i = 0; i < mylist.length; i++) {
-      if (mylist[i].pago == 1 && mylist[i].pagoTardio == 0) {
+    for (int i = 0; i < widget.newList!.length; i++) {
+      if (widget.newList![i].pago == 1 && widget.newList![i].pagoTardio == 0) {
         return atraso = 0;
       } else {
-        return atraso = int.parse(mylist[i].montoTardio!);
+        return atraso = int.parse(widget.newList![i].montoTardio!);
       }
     }
     return atraso;
   }
 
+  ///ok
   totalApagars() {
     late int total;
 
-    for (int i = 0; i < mylist.length; i++) {
-      total = mylist[i].totalApagar!;
-      if (mylist[i].pagoTardio == 1) {
+    for (int i = 0; i < widget.newList!.length; i++) {
+      total = widget.newList![i].totalApagar!;
+      if (widget.newList![i].pagoTardio == 1) {
         return total;
       } else {
         total = 0;
@@ -559,13 +565,14 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
     }
   }
 
+  ///ok
   referenciaApagar() {
     String? ref;
-    for (int i = 0; i < mylist.length; i++) {
-      if (mylist[i].pago == 1 && mylist[i].pagoTardio == 0) {
+    for (int i = 0; i < widget.newList!.length; i++) {
+      if (widget.newList![i].pago == 1 && widget.newList![i].pagoTardio == 0) {
       } else {
         setState(() {
-          ref = mylist[i].referencia!;
+          ref = widget.newList![i].referencia!;
         });
 
         return ref;

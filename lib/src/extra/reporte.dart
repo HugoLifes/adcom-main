@@ -141,14 +141,14 @@ class _LevantarReporteState extends State<LevantarReporte> {
     reversedList3 = superMap2.reversed.toList();
     reversedList4 = superMap.reversed.toList();
     reversedList = myList.reversed.toList();
+
+    refresh();
   }
 
   @override
   void initState() {
     data();
     super.initState();
-
-    Future.delayed(Duration(milliseconds: 988), () => {refresh()});
   }
 
   refresh() {

@@ -100,16 +100,23 @@ class _MainMenuState extends State<MainMenu> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
+                                user == null || user == ''
+                                    ? Text('¡${greeting()}!',
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontFamily: 'Roboto',
+                                            fontSize: 35,
+                                            fontWeight: FontWeight.w700))
+                                    : Text(
+                                        '¡${greeting()}!',
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontFamily: 'Roboto',
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.w700),
+                                      ),
                                 Text(
-                                  '¡${greeting()}!',
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontFamily: 'Roboto',
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.w700),
-                                ),
-                                Text(
-                                  '${user == null ? '  ' : user}',
+                                  '${user == null || user == '' ? '' : user}',
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontFamily: 'Roboto',
