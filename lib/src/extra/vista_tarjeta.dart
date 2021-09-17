@@ -402,16 +402,16 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
     double debe = 0.0;
     double? monto;
 
-    for (int i = 0; i < mylist.length; i++) {
-      monto = double.parse(mylist[i].montoCuota!);
-      if (mylist[i].pago == 1 && mylist[i].pagoTardio == 0) {
+    for (int i = 0; i < widget.newList!.length; i++) {
+      monto = double.parse(widget.newList![i].montoCuota!);
+      if (widget.newList![i].pago == 1 && widget.newList![i].pagoTardio == 0) {
       } else {
-        if (DateTime.now().day <= mylist[i].fechaLimite!.day &&
-            DateTime.now().month <= mylist[i].fechaLimite!.month &&
-            DateTime.now().year <= mylist[i].fechaLimite!.year) {
+        if (DateTime.now().day <= widget.newList![i].fechaLimite!.day &&
+            DateTime.now().month <= widget.newList![i].fechaLimite!.month &&
+            DateTime.now().year <= widget.newList![i].fechaLimite!.year) {
           return debe = monto;
         } else {
-          if (mylist[i].pagoTardio == 0) {
+          if (widget.newList![i].pagoTardio == 0) {
             return debe = monto;
           } else {
             return debe = monto;
@@ -426,14 +426,14 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
     int? dia;
     int? mes;
     int? year;
-    for (int i = 0; i < mylist.length; i++) {
-      if (mylist[i].pago == 1) {
+    for (int i = 0; i < widget.newList!.length; i++) {
+      if (widget.newList![i].pago == 1) {
         print('no debe');
       } else {
         setState(() {
-          dia = mylist[i].fechaLimite!.day;
-          mes = mylist[i].fechaLimite!.month;
-          year = mylist[i].fechaLimite!.year;
+          dia = widget.newList![i].fechaLimite!.day;
+          mes = widget.newList![i].fechaLimite!.month;
+          year = widget.newList![i].fechaLimite!.year;
         });
         return dia == null ? '' : '$dia/$mes/$year';
       }
