@@ -231,49 +231,6 @@ class _AvisosDashboardState extends State<AvisosDashboard> {
             )).then((value) => {names.clear()});
   }
 
-  Future<void>? downloadLink(link, names) async {
-    setState(() {
-      downloading = true;
-    });
-    Dio dio = Dio();
-    String savePath = await getPath(names);
-
-    print('${savePath}');
-    print('aquui');
-    String urlPath = link;
-    dio.download(
-      urlPath,
-      savePath,
-      onReceiveProgress: (rcv, total) {
-        print(
-            'received: ${rcv.toStringAsFixed(0)} out of total: ${total.toStringAsFixed(0)}');
-
-        setState(() {
-          progress = ((rcv / total) * 100).toStringAsFixed(0);
-        });
-
-        if (progress == '100') {
-          setState(() {
-            isDownloaded = true;
-          });
-        } else if (double.parse(progress) < 100) {
-          print('aqui');
-        }
-      },
-      deleteOnError: true,
-    ).then((_) {
-      setState(() {
-        if (progress == '100') {
-          isDownloaded = true;
-        }
-
-        downloading = false;
-      });
-    }).onError((error, stackTrace) {
-      print('$error');
-    });
-  }
-
   Future download2(String url, String names) async {
     Dio dio = Dio();
 
@@ -302,20 +259,6 @@ class _AvisosDashboardState extends State<AvisosDashboard> {
     await OpenFile.open(filePath);
   }
 
-  download3(String url, String names) async {
-    final externalDir = await getExternalStorageDirectory();
-    final taskId = await FlutterDownloader.enqueue(
-      url: url,
-      savedDir: externalDir!.path,
-      showNotification:
-          true, // show download progress in status bar (for Android)
-      openFileFromNotification:
-          true, // click on notification to open downloaded file (for Android)
-    );
-
-    return taskId;
-  }
-
   static downloadCallback(id, status, progress) {
     SendPort? sendPort = IsolateNameServer.lookupPortByName("Descargando");
 
@@ -329,13 +272,12 @@ class _AvisosDashboardState extends State<AvisosDashboard> {
   }
 
   Future<String> getPath(names) async {
-    String path = await ExternalPath.getExternalStoragePublicDirectory(
-        ExternalPath.DIRECTORY_DOWNLOADS);
+    Directory path = await getApplicationDocumentsDirectory();
 
-    print(path);
+    print(path.path);
 
     setState(() {
-      filePath = path + '/$names';
+      filePath = path.path + '/$names';
     });
 
     return filePath;
