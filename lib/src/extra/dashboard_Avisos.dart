@@ -1,12 +1,16 @@
 import 'dart:io';
+import 'dart:isolate';
+import 'dart:ui';
 
 import 'package:adcom/src/pantallas/avisos.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import 'package:external_path/external_path.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:glyphicon/glyphicon.dart';
+import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 
 // ignore: must_be_immutable
@@ -36,7 +40,8 @@ class _AvisosDashboardState extends State<AvisosDashboard> {
   List<AvisosUsuario>? avisosRevers = [];
   List<dynamic> namesRev = [];
   List<dynamic> linksrev = [];
-
+  var filePath;
+  ReceivePort _receivePort = ReceivePort();
   reversedList() {
     avisosRevers = widget.avisos!.reversed.toList();
     namesRev = widget.name!.reversed.toList();
@@ -46,6 +51,15 @@ class _AvisosDashboardState extends State<AvisosDashboard> {
   @override
   void initState() {
     _showPersBottomSheetCallBack = _showPersBottomSheetCallBack;
+    IsolateNameServer.registerPortWithName(
+        _receivePort.sendPort, "Descargando");
+
+    _receivePort.listen((message) {
+      setState(() {
+        progress = message[2];
+      });
+    });
+    FlutterDownloader.registerCallback(downloadCallback);
     reversedList();
     super.initState();
   }
@@ -191,17 +205,21 @@ class _AvisosDashboardState extends State<AvisosDashboard> {
                                   itemBuilder: (_, int index) {
                                     return TextButton(
                                       onPressed: () async {
-                                        download2(links[index], names[index])
-                                            .then((value) {
-                                          Fluttertoast.showToast(
-                                              msg: "Archivo en Descargas",
-                                              toastLength: Toast.LENGTH_SHORT,
-                                              gravity: ToastGravity.CENTER,
-                                              timeInSecForIosWeb: 1,
-                                              backgroundColor: Colors.white,
-                                              textColor: Colors.black,
-                                              fontSize: 17.0);
-                                        });
+                                        try {
+                                          download2(links[index], names[index])
+                                              .then((value) {
+                                            Fluttertoast.showToast(
+                                                msg: "Descargando",
+                                                toastLength: Toast.LENGTH_SHORT,
+                                                gravity: ToastGravity.CENTER,
+                                                timeInSecForIosWeb: 1,
+                                                backgroundColor: Colors.white,
+                                                textColor: Colors.black,
+                                                fontSize: 17.0);
+                                          });
+                                        } catch (e) {
+                                          print(e);
+                                        }
                                         /* downloadLink(
                                             links[index], names[index]); */
                                       },
@@ -281,6 +299,27 @@ class _AvisosDashboardState extends State<AvisosDashboard> {
     } catch (e) {
       print(e);
     }
+    await OpenFile.open(filePath);
+  }
+
+  download3(String url, String names) async {
+    final externalDir = await getExternalStorageDirectory();
+    final taskId = await FlutterDownloader.enqueue(
+      url: url,
+      savedDir: externalDir!.path,
+      showNotification:
+          true, // show download progress in status bar (for Android)
+      openFileFromNotification:
+          true, // click on notification to open downloaded file (for Android)
+    );
+
+    return taskId;
+  }
+
+  static downloadCallback(id, status, progress) {
+    SendPort? sendPort = IsolateNameServer.lookupPortByName("Descargando");
+
+    sendPort!.send([id, status, progress]);
   }
 
   void showDownloadProgress(received, total) {
@@ -294,7 +333,10 @@ class _AvisosDashboardState extends State<AvisosDashboard> {
         ExternalPath.DIRECTORY_DOWNLOADS);
 
     print(path);
-    var filePath = path + '/$names';
+
+    setState(() {
+      filePath = path + '/$names';
+    });
 
     return filePath;
   }
