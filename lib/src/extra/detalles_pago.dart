@@ -17,6 +17,8 @@ class _DetallesPagoState extends State<DetallesPago> {
   List<double> debt = [];
   bool checked = false;
   List<dynamic> check = [];
+  double contador = 0.0;
+  bool checkedAll = false;
 
   @override
   void initState() {
@@ -54,14 +56,14 @@ class _DetallesPagoState extends State<DetallesPago> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
-                    padding: EdgeInsets.only(left: 20),
+                    padding: EdgeInsets.only(left: 20, top: 10),
                     child: SizedBox(
                       width: size.width / 2,
                       height: 100,
                       child: Text(
                         'Elije lo que decidas pagar y genera tu referencia maestra.',
                         style: TextStyle(
-                            fontSize: size.height / 50,
+                            fontSize: size.height / 40,
                             fontWeight: FontWeight.w500,
                             color: Colors.white),
                         textAlign: TextAlign.justify,
@@ -86,6 +88,23 @@ class _DetallesPagoState extends State<DetallesPago> {
                   child: Text(
                     'Pagos pendietes',
                     style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Flexible(
+                  child: Container(
+                    padding: EdgeInsets.only(left: 20, top: 10),
+                    child: CheckboxListTile(
+                      value: checkedAll,
+                      title: Text('Pagar todo'),
+                      onChanged: (v) {
+                        setState(() {
+                          checkedAll = v!;
+                        });
+                      },
+                      controlAffinity: ListTileControlAffinity.platform,
+                      activeColor: Colors.lightGreen[700],
+                      checkColor: Colors.black,
+                    ),
                   ),
                 )
               ],
@@ -112,7 +131,8 @@ class _DetallesPagoState extends State<DetallesPago> {
                         width: size.width / 25,
                       ),
                       Text(
-                        '\$ ${saldoDeudor()}MXN',
+                        //saldoDeudor()
+                        '\$ ${contador} MXN',
                         style: TextStyle(fontSize: 19),
                       ),
                       SizedBox(
@@ -180,10 +200,13 @@ class _DetallesPagoState extends State<DetallesPago> {
                   onChanged: (bool? v) {
                     if (v!) {
                       setState(() {
+                        contador += debt[data];
+
                         check.add(data);
                       });
                     } else {
                       setState(() {
+                        contador -= debt[data];
                         check.remove(data);
                       });
                     }
