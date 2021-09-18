@@ -47,7 +47,7 @@ class _AddReporteState extends State<AddReporte> {
   List<File> images = [];
   int? pages = 0;
   List<Slide>? _slides = [];
-
+  bool isLoading = false;
   int _currentStep = 0;
   int? idCom;
   int? idUser;
@@ -94,7 +94,6 @@ class _AddReporteState extends State<AddReporte> {
             Navigator.of(context).pop();
           },
         ),
-        actions: buildEditingActions(),
       ),
       resizeToAvoidBottomInset: true,
       //stepper, propiedades y acciones
@@ -105,7 +104,11 @@ class _AddReporteState extends State<AddReporte> {
 
       floatingActionButton: FloatingActionButton(
           backgroundColor: Colors.blue,
-          child: Icon(Icons.camera),
+          child: isLoading == true
+              ? CircularProgressIndicator(
+                  backgroundColor: Colors.white,
+                )
+              : Icon(Icons.camera),
           onPressed: () => {
                 HapticFeedback.lightImpact(),
                 images.length == 3 ? mensaje() : _optionsCamera(),
@@ -370,6 +373,11 @@ class _AddReporteState extends State<AddReporte> {
   // envia las fotos al serv mas toda su informacion que reqiere como los params
   sendingData(String titulo, String descrip, List<File> file) async {
     await addata();
+
+    setState(() {
+      isLoading = true;
+    });
+
     try {
       List<String> filesArr = [];
       Dio dio = Dio();
@@ -462,6 +470,12 @@ class _AddReporteState extends State<AddReporte> {
         },
       );
 
+  cargando() {
+    return isLoading == true
+        ? Center(child: CircularProgressIndicator())
+        : null;
+  }
+
   Future saveForm() async {
     final isValid = _formKey.currentState!.validate();
     final isValid2 = _formKey2.currentState!.validate();
@@ -472,11 +486,13 @@ class _AddReporteState extends State<AddReporte> {
           description: descriptionController.text,
           image: images,
           time: DateTime.now());
-      final provider = Provider.of<EventProvider>(context, listen: false);
+
       final Response? response = await sendingData(
               titleController.text, descriptionController.text, images)
           .then((value) {
-        provider.addReport(report);
+        setState(() {
+          isLoading = false;
+        });
         Navigator.of(context).pop();
 
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
