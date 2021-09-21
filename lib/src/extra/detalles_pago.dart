@@ -131,8 +131,8 @@ class _DetallesPagoState extends State<DetallesPago> {
                         width: size.width / 25,
                       ),
                       Text(
-                        //saldoDeudor()
-                        '\$ ${contador} MXN',
+                        //contador
+                        '\$ ${pagarTodo()} MXN',
                         style: TextStyle(fontSize: 19),
                       ),
                       SizedBox(
@@ -173,6 +173,51 @@ class _DetallesPagoState extends State<DetallesPago> {
           );
   }
 
+  /// FUNCION QUE SE USA PARA PAGAR TODO
+  pagarTodo() {
+    double? cuota;
+    double? cuotaDeudora;
+    int meses;
+    double deuda;
+    if (checkedAll == true) {
+      for (int i = 0; i < widget.list!.length; i++) {
+        setState(() {
+          cuota = double.parse(widget.list![i].montoCuota!);
+        });
+        deuda = double.parse(widget.list![i].montoTardio!);
+        if (widget.list![i].pagoTardio == 1) {
+          setState(() {
+            cuotaDeudora = cuota! + deuda;
+          });
+
+          print(cuota);
+        } else {
+          setState(() {
+            cuota;
+          });
+        }
+      }
+
+      meses = widget.list!.first.fechaLimite!.month;
+
+      for (meses; meses <= 12; meses++) {
+        setState(() {
+          contador += cuota!;
+        });
+
+        print('${contador}');
+      }
+
+      return contador;
+    } else {
+      setState(() {
+        contador = 0;
+      });
+
+      return '0.0';
+    }
+  }
+
   mesesView() {
     return Flexible(
         child: GridView.builder(
@@ -211,7 +256,7 @@ class _DetallesPagoState extends State<DetallesPago> {
                       });
                     }
 
-                    if (check.contains(data)) {
+                    if (check.contains(data) || checkedAll == true) {
                       setState(() {
                         checked = v;
                         showButton();

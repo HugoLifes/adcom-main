@@ -28,36 +28,17 @@ class _OpcionesEdoCuentaState extends State<OpcionesEdoCuenta> {
   DateTime? timenow = DateTime.now().toUtc();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: BackButton(
-          color: Colors.black,
-        ),
-        backgroundColor: Colors.white,
-        title: Text(
-          'Historial de pagos',
-          style: TextStyle(color: Colors.black),
-        ),
-      ),
-      body: SafeArea(
-        child: Container(
-          margin: EdgeInsets.all(15.0),
-          child: Column(
-            children: [
-              accountItems("Mensual", "\$ 1,500 MXN",
-                  'Esté al pendiente de sus pagos del mes', 'Descargar',
-                  oddColour: Color(0xFFF7F7F9)),
-            ],
-          ),
-        ),
-      ),
-    );
+    return accountItems("Mensual", "\$ 1,500 MXN",
+        'Esté al pendiente de sus pagos del mes', 'Descargar',
+        oddColour: Color(0xFFF7F7F9));
   }
 
   accountItems(String item, String charge, String dateString, String type,
           {Color oddColour = Colors.white}) =>
       Container(
-        decoration: BoxDecoration(color: oddColour),
+        decoration: BoxDecoration(boxShadow: [
+          BoxShadow(color: Colors.grey, blurRadius: 6, offset: Offset(0, 1))
+        ], color: Colors.white, borderRadius: BorderRadius.circular(10)),
         padding:
             EdgeInsets.only(top: 20.0, bottom: 20.0, left: 5.0, right: 5.0),
         child: Column(

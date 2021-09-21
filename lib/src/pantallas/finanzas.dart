@@ -216,15 +216,18 @@ class _FinanzasState extends State<Finanzas> {
   }
 
   mainView() {
-    return InkWell(
-        onTap: () {
-          HapticFeedback.mediumImpact();
-        },
-
-        /// vista para la tarjeta
-        child: VistaTarjeta(
+    return ListView(
+      shrinkWrap: true,
+      children: [
+        VistaTarjeta(
           newList: localList,
-        ));
+        ),
+        SizedBox(
+          height: 15,
+        ),
+        OpcionesEdoCuenta()
+      ],
+    );
   }
 }
 
