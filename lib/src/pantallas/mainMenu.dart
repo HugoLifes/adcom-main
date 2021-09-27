@@ -1,12 +1,14 @@
 import 'dart:async';
 
 import 'package:adcom/json/jsonAmenidades.dart';
+import 'package:adcom/src/extra/servicios.dart';
 import 'package:adcom/src/methods/eventDashboard.dart';
 import 'package:adcom/src/methods/gridDashboard.dart';
 import 'package:adcom/src/models/event_provider.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:glyphicon/glyphicon.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -41,6 +43,8 @@ class _MainMenuState extends State<MainMenu> {
   int? idCom;
   bool entrada = true;
   Places? acceso;
+  var size;
+  int _selectedIndex = 0;
 
   ConnectivityResult _connectionStatus = ConnectivityResult.none;
   final Connectivity _connectivity = Connectivity();
@@ -82,6 +86,12 @@ class _MainMenuState extends State<MainMenu> {
     });
   }
 
+  void onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -96,14 +106,43 @@ class _MainMenuState extends State<MainMenu> {
   void dispose() {
     _connectivitySubscription.cancel();
     super.dispose();
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     //final args = ModalRoute.of(context)!.settings.arguments as LoginPage;
-    var size = MediaQuery.of(context).size;
+    Size size = MediaQuery.of(context).size;
+    List<Widget> _widgetOptions = [mainMenuView(size), Services()];
     return Scaffold(
-        body: Stack(
+      body: _widgetOptions.elementAt(_selectedIndex),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+              icon: Icon(
+                Icons.home,
+                size: 30,
+              ),
+              label: 'Menu',
+              backgroundColor: Colors.red),
+          BottomNavigationBarItem(
+              icon: Icon(
+                Glyphicon.list,
+                size: 30,
+              ),
+              label: 'Servicios',
+              backgroundColor: Colors.blue)
+        ],
+        elevation: 10,
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.red[900],
+        onTap: onItemTapped,
+      ),
+    );
+  }
+
+  Stack mainMenuView(Size size) {
+    return Stack(
       children: [
         Container(
           height: size.height * .35,
@@ -120,7 +159,7 @@ class _MainMenuState extends State<MainMenu> {
         ),
         Container(
             padding:
-                EdgeInsets.only(top: size.height * .18, right: size.width / 15),
+                EdgeInsets.only(top: size.height * .18, right: size.width / 18),
             alignment: Alignment.topRight,
             child: Image.asset(
               'assets/images/AdCom3.png',
@@ -190,7 +229,7 @@ class _MainMenuState extends State<MainMenu> {
           userId: userType,
         )
       ],
-    ));
+    );
   }
 
   String greeting() {

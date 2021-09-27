@@ -1,0 +1,2 @@
+Esta carpeta hace uso de algunos estados que maneja la app como el inicio de sesion para mantener iniciada la sesion,
+de preferencia no borrar estados, algunas partes de la app usa estados para cambiar

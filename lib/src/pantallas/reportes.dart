@@ -46,12 +46,12 @@ class _ReportesState extends State<Reportes> {
       body: Stack(
         children: [
           Container(
-            height: size.height * .35,
+            height: size.height * .32,
             decoration: BoxDecoration(color: Colors.blue),
           ),
           Container(
             padding:
-                EdgeInsets.only(top: size.width / 12, right: size.width / 40),
+                EdgeInsets.only(top: size.width / 10, right: size.width / 40),
             alignment: Alignment.topRight,
             child: Icon(
               Icons.report,
@@ -74,7 +74,7 @@ class _ReportesState extends State<Reportes> {
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
-                      fontSize: 16),
+                      fontSize: 17),
                 ),
                 SizedBox(
                   height: 18,
@@ -84,7 +84,7 @@ class _ReportesState extends State<Reportes> {
                   child: Text(
                     'Reporta incidencias en tu comunidad para que todos estén al tanto de comportamientos inusuales o faltas a la comunidad.',
                     style: TextStyle(
-                        color: Colors.white, fontSize: size.width / 20),
+                        color: Colors.white, fontSize: size.width / 17),
                   ),
                 ),
                 SizedBox(

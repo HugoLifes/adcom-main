@@ -61,6 +61,11 @@ class _FinanzasState extends State<Finanzas> {
   Timer? timer;
   VoidCallback? _showPersBottomSheetCallBack;
   bool itsTrue = true;
+  String? mes;
+  String? ref;
+  List<Users> users = [];
+  String? userName;
+  DatosUsuario? datosUsuario;
 
   /// El init state inicializa funciones cuando abre el boton mis pagos
   @override
@@ -181,6 +186,15 @@ class _FinanzasState extends State<Finanzas> {
         ));
   }
 
+  SharedPreferences? prefs;
+  getNameUser() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      userName = prefs!.getString('user');
+    });
+  }
+
+  //Se usa para atualizar el estado de la tarjeta
   refresh() {
     setState(() {
       if (mounted) {
@@ -189,9 +203,228 @@ class _FinanzasState extends State<Finanzas> {
     });
   }
 
+  recargos() {
+    for (int i = 0; i < localList.length; i++) {
+      if (localList[i].pagoTardio == 1) {}
+    }
+  }
+
+  /// esta funcion se usa para crear el pdf
+  /// pasa el ultimo mes pagado,
+  /// no retrona valor
+  ultimoMes() async {
+    int? mesPagado;
+    double monto;
+    double tardio;
+    String tipoPago;
+    int folio;
+    var fecha;
+    print(' ${localList.length}');
+    for (int i = 0; i < localList.length; i++) {
+      monto = double.parse(localList[i].montoPago!);
+      tardio = double.parse(localList[i].montoTardio!);
+      if (localList[i].pago == 1) {
+        mesPagado = localList[i].fechaPago!.month;
+        fecha =
+            '${localList[i].fechaPago!.day}/${localList[i].fechaPago!.month}/${localList[i].fechaPago!.year}';
+        tipoPago = localList[i].formaDePago!;
+        folio = localList[i].folio!;
+
+        if (localList[i].pagoTardio == 1) {
+          setState(() {
+            monto += tardio;
+          });
+        } else {
+          setState(() {
+            monto;
+          });
+        }
+
+        print(fecha);
+
+        switch (mesPagado) {
+          case 1:
+            setState(() {
+              users.add(new Users(
+                  concepto: 'Enero',
+                  monto: monto,
+                  referencia: int.parse(
+                    localList[i].referencia!,
+                  ),
+                  fecha: fecha,
+                  deuda: tardio,
+                  folio: folio,
+                  tipoPago: tipoPago));
+            });
+            break;
+          case 2:
+            setState(() {
+              users.add(new Users(
+                  concepto: 'Febrero',
+                  monto: monto,
+                  referencia: int.parse(
+                    localList[i].referencia!,
+                  ),
+                  fecha: fecha,
+                  deuda: tardio,
+                  folio: folio,
+                  tipoPago: tipoPago));
+            });
+            break;
+          case 3:
+            setState(() {
+              users.add(new Users(
+                  concepto: 'Marzo',
+                  monto: monto,
+                  fecha: fecha,
+                  referencia: int.parse(
+                    localList[i].referencia!,
+                  ),
+                  deuda: tardio,
+                  folio: folio,
+                  tipoPago: tipoPago));
+            });
+            break;
+          case 4:
+            setState(() {
+              users.add(new Users(
+                  concepto: 'Abril',
+                  monto: monto,
+                  fecha: fecha,
+                  referencia: int.parse(
+                    localList[i].referencia!,
+                  ),
+                  deuda: tardio,
+                  folio: folio,
+                  tipoPago: tipoPago));
+            });
+            break;
+          case 5:
+            setState(() {
+              users.add(new Users(
+                  concepto: 'Mayo',
+                  monto: monto,
+                  referencia: int.parse(
+                    localList[i].referencia!,
+                  ),
+                  fecha: fecha,
+                  deuda: tardio,
+                  folio: folio,
+                  tipoPago: tipoPago));
+            });
+            break;
+
+          case 6:
+            setState(() {
+              users.add(new Users(
+                  concepto: 'Junio',
+                  monto: monto,
+                  fecha: fecha,
+                  referencia: int.parse(
+                    localList[i].referencia!,
+                  ),
+                  deuda: tardio,
+                  folio: folio,
+                  tipoPago: tipoPago));
+            });
+            break;
+          case 7:
+            setState(() {
+              users.add(new Users(
+                  concepto: 'Julio',
+                  monto: monto,
+                  fecha: fecha,
+                  referencia: int.parse(
+                    localList[i].referencia!,
+                  ),
+                  deuda: tardio,
+                  folio: folio,
+                  tipoPago: tipoPago));
+            });
+            break;
+          case 8:
+            setState(() {
+              users.add(new Users(
+                  concepto: 'Agosto',
+                  monto: monto,
+                  fecha: fecha,
+                  referencia: int.parse(
+                    localList[i].referencia!,
+                  ),
+                  deuda: tardio,
+                  folio: folio,
+                  tipoPago: tipoPago));
+            });
+            break;
+          case 9:
+            setState(() {
+              users.add(new Users(
+                  concepto: 'Septiembre',
+                  monto: monto,
+                  fecha: fecha,
+                  referencia: int.parse(
+                    localList[i].referencia!,
+                  ),
+                  deuda: tardio,
+                  folio: folio,
+                  tipoPago: tipoPago));
+            });
+
+            break;
+          case 10:
+            setState(() {
+              users.add(new Users(
+                  concepto: 'Octubre',
+                  monto: monto,
+                  fecha: fecha,
+                  referencia: int.parse(
+                    localList[i].referencia!,
+                  ),
+                  deuda: tardio,
+                  folio: folio,
+                  tipoPago: tipoPago));
+            });
+            break;
+          case 11:
+            setState(() {
+              users.add(new Users(
+                  concepto: 'Noviembre',
+                  monto: monto,
+                  fecha: fecha,
+                  referencia: int.parse(
+                    localList[i].referencia!,
+                  ),
+                  deuda: tardio,
+                  folio: folio,
+                  tipoPago: tipoPago));
+            });
+            break;
+          case 12:
+            setState(() {
+              users.add(new Users(
+                  concepto: 'Diciembre',
+                  monto: monto,
+                  fecha: fecha,
+                  referencia: int.parse(
+                    localList[i].referencia!,
+                  ),
+                  deuda: tardio,
+                  folio: folio,
+                  tipoPago: tipoPago));
+            });
+            break;
+        }
+
+        print(users[i].concepto);
+      } else {
+        return;
+      }
+    }
+  }
+
   data() async {
     cuentas = await getAdeudos();
-
+    await getNameUser();
     if (cuentas!.data!.isNotEmpty) {
       for (int i = 0; i < cuentas!.data!.length; i++) {
         localList.add(new DatosCuenta(
@@ -201,11 +434,24 @@ class _FinanzasState extends State<Finanzas> {
             fechaLimite: cuentas!.data![i].fechaLimite!,
             fechaPago: cuentas!.data![i].fechaPago,
             pago: cuentas!.data![i].pago!,
+            montoPago: cuentas!.data![i].montoPago,
             totalApagar: cuentas!.data![i].totalApagar,
             referencia: cuentas!.data![i].referencia,
             pagoTardio: cuentas!.data![i].pagoTardio,
-            montoTardio: cuentas!.data![i].montoPagoTardio));
+            montoTardio: cuentas!.data![i].montoPagoTardio,
+            folio: cuentas!.data![i].folio!,
+            formaDePago: cuentas!.data![i].formaPago));
       }
+
+      setState(() {
+        datosUsuario = DatosUsuario(
+            noExt: cuentas!.data2!.noExterno,
+            noInt: cuentas!.data2!.noInterior,
+            calle: cuentas!.data2!.calle,
+            comunidad: cuentas!.data2!.comunidad,
+            cp: cuentas!.data2!.cp,
+            tipoLote: cuentas!.data2!.tipoLote);
+      });
     } else {
       setState(() {
         if (mounted) {
@@ -213,11 +459,11 @@ class _FinanzasState extends State<Finanzas> {
         }
       });
     }
+    await ultimoMes();
   }
 
   mainView() {
-    return ListView(
-      shrinkWrap: true,
+    return Column(
       children: [
         VistaTarjeta(
           newList: localList,
@@ -225,7 +471,25 @@ class _FinanzasState extends State<Finanzas> {
         SizedBox(
           height: 15,
         ),
-        OpcionesEdoCuenta()
+        users.isEmpty
+            ? SizedBox()
+            : OpcionesEdoCuenta(
+                newList: localList,
+                users: users.length >= 2 ? users[users.length - 2] : users.last,
+                userName: userName,
+                datosUsuario: datosUsuario,
+              ),
+        SizedBox(
+          height: 15,
+        ),
+        users.length >= 2
+            ? OpcionesEdoCuenta(
+                newList: localList,
+                users: users.last,
+                userName: userName,
+                datosUsuario: datosUsuario,
+              )
+            : SizedBox()
       ],
     );
   }
@@ -246,6 +510,8 @@ class DatosCuenta {
   DateTime? fechaPago;
   int? pago;
   int? totalApagar;
+  String? formaDePago;
+  int? folio;
 
   DatosCuenta(
       {this.idComu,
@@ -261,5 +527,24 @@ class DatosCuenta {
       this.pagoTardio,
       this.referencia,
       this.pago,
-      this.totalApagar});
+      this.totalApagar,
+      this.folio,
+      this.formaDePago});
+}
+
+class DatosUsuario {
+  String? noInt;
+  String? noExt;
+  String? tipoLote;
+  String? cp;
+  String? comunidad;
+  String? calle;
+
+  DatosUsuario(
+      {this.noExt,
+      this.calle,
+      this.comunidad,
+      this.cp,
+      this.noInt,
+      this.tipoLote});
 }

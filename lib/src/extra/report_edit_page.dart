@@ -68,7 +68,7 @@ class _ReportEditPageState extends State<ReportEditPage> {
     });
   }
 
-  ///mismo metodo que el mapeato del estatus
+  ///mismo metodo que el mapeado del estatus
   /// chechar [estatus]
   datos() {
     widget.datos!.forEach((key, value) {

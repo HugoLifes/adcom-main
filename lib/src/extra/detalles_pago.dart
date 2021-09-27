@@ -18,6 +18,7 @@ class _DetallesPagoState extends State<DetallesPago> {
   bool checked = false;
   List<dynamic> check = [];
   double contador = 0.0;
+  double contadorTotal = 0.0;
   bool checkedAll = false;
 
   @override
@@ -30,6 +31,7 @@ class _DetallesPagoState extends State<DetallesPago> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+    var size2 = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         title: Text('Detalles de pago'),
@@ -79,27 +81,52 @@ class _DetallesPagoState extends State<DetallesPago> {
               ),
             ),
             SizedBox(
-              height: size.height / 30,
+              height: size.height / 50,
+            ),
+            Text(
+              'Seleccioné lo que desee pagar',
+              style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
             ),
             Row(
               children: [
                 Container(
                   padding: EdgeInsets.only(left: 20, top: 10),
                   child: Text(
-                    'Pagos pendietes',
-                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                    'Pagar uno por uno',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.only(left: 30, top: 10),
+                  child: Text(
+                    'ó',
+                    style: TextStyle(fontSize: 16),
                   ),
                 ),
                 Flexible(
                   child: Container(
-                    padding: EdgeInsets.only(left: 20, top: 10),
+                    padding: EdgeInsets.only(left: 20, top: 10, right: 20),
                     child: CheckboxListTile(
+                      tileColor: Colors.grey.withOpacity(0.2),
                       value: checkedAll,
-                      title: Text('Pagar todo'),
+                      title: Text('Pagar el año'),
                       onChanged: (v) {
-                        setState(() {
-                          checkedAll = v!;
-                        });
+                        if (v == true) {
+                          setState(() {
+                            checkedAll = v!;
+                          });
+                        } else {
+                          setState(() {
+                            contadorTotal = 0.0;
+                            setState(() {
+                              checkedAll = v!;
+                            });
+                          });
+                        }
+
+                        if (contadorTotal != 0.0) {
+                          showButton();
+                        }
                       },
                       controlAffinity: ListTileControlAffinity.platform,
                       activeColor: Colors.lightGreen[700],
@@ -112,7 +139,7 @@ class _DetallesPagoState extends State<DetallesPago> {
             SizedBox(
               height: size.width / 19,
             ),
-            mesesView(),
+            mesesView(size2),
             Divider(
               color: Colors.grey,
             ),
@@ -128,13 +155,16 @@ class _DetallesPagoState extends State<DetallesPago> {
                             fontSize: 25, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(
-                        width: size.width / 25,
+                        width: size.width / 26,
                       ),
-                      Text(
-                        //contador
-                        '\$ ${pagarTodo()} MXN',
-                        style: TextStyle(fontSize: 19),
-                      ),
+                      checkedAll == true
+                          ? Text('${pagarTodo()} MXN',
+                              style: TextStyle(fontSize: 19))
+                          : Text(
+                              //contador
+                              '\$ ${contador} MXN',
+                              style: TextStyle(fontSize: 19),
+                            ),
                       SizedBox(
                         height: size.height / 10,
                       )
@@ -143,7 +173,7 @@ class _DetallesPagoState extends State<DetallesPago> {
                 )
               ],
             ),
-            showButton()
+            showButton(),
           ],
         ),
       ),
@@ -151,7 +181,7 @@ class _DetallesPagoState extends State<DetallesPago> {
   }
 
   showButton() {
-    return checked == false
+    return (checked || checkedAll) == false
         ? Text('')
         : Container(
             padding: EdgeInsets.only(bottom: 25, left: 10, right: 10),
@@ -165,7 +195,7 @@ class _DetallesPagoState extends State<DetallesPago> {
                   Colors.lightGreen[600]!,
                   Colors.lightGreen[700]!
                 ]),
-                elevation: 6,
+                elevation: 5.0,
                 increaseHeightBy: 28,
                 increaseWidthBy: double.infinity,
                 shape: RoundedRectangleBorder(
@@ -179,146 +209,171 @@ class _DetallesPagoState extends State<DetallesPago> {
     double? cuotaDeudora;
     int meses;
     double deuda;
+    bool flag = false;
+
+    ///el checked all se obtiene en el check de pagar todo
     if (checkedAll == true) {
+      ///
       for (int i = 0; i < widget.list!.length; i++) {
-        setState(() {
-          cuota = double.parse(widget.list![i].montoCuota!);
-        });
+        /// se saca la cuota
+        cuota = double.parse(widget.list![i].montoCuota!);
+
+        /// la deuda que se cobra
         deuda = double.parse(widget.list![i].montoTardio!);
+
+        /// si es tardio suma la deuda a la cuota
         if (widget.list![i].pagoTardio == 1) {
           setState(() {
-            cuotaDeudora = cuota! + deuda;
+            flag = true;
           });
-
-          print(cuota);
+          cuotaDeudora = cuota + deuda;
         } else {
+          /// solo es la cuota
           setState(() {
-            cuota;
+            flag = false;
           });
+          cuotaDeudora = cuota;
         }
       }
 
+      /// asigno el mes en numero
       meses = widget.list!.first.fechaLimite!.month;
 
+      ///Recorro el me hasta el mes 12
+      /// ejem  mes = 8 entonces lo que falte para llegar a 12
       for (meses; meses <= 12; meses++) {
-        setState(() {
-          contador += cuota!;
-        });
-
-        print('${contador}');
+        if (flag == true) {
+          contadorTotal += cuotaDeudora!;
+        } else {
+          contadorTotal += cuota!;
+        }
       }
 
-      return contador;
+      return contadorTotal;
     } else {
+      print(contadorTotal);
       setState(() {
-        contador = 0;
+        contadorTotal = 0.0;
       });
 
-      return '0.0';
+      return contadorTotal;
     }
   }
 
-  mesesView() {
-    return Flexible(
-        child: GridView.builder(
-            padding: EdgeInsets.only(left: 10, right: 10),
-            itemCount: mesFormat.length,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 1,
-              childAspectRatio: 5.0,
-              crossAxisSpacing: 22,
-              mainAxisSpacing: 15,
-            ),
-            itemBuilder: (_, int data) {
-              return Container(
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.grey,
-                          blurRadius: 7,
-                          offset: Offset(0, 5))
-                    ]),
-                child: CheckboxListTile(
-                  value: check.contains(data),
-                  onChanged: (bool? v) {
-                    if (v!) {
-                      setState(() {
-                        contador += debt[data];
-
-                        check.add(data);
-                      });
-                    } else {
-                      setState(() {
-                        contador -= debt[data];
-                        check.remove(data);
-                      });
-                    }
-
-                    if (check.contains(data) || checkedAll == true) {
-                      setState(() {
-                        checked = v;
-                        showButton();
-                      });
-                    } else {
-                      setState(() {
-                        checked = v;
-                      });
-                    }
-                  },
-                  controlAffinity: ListTileControlAffinity.platform,
-                  activeColor: Colors.lightGreen[700],
-                  checkColor: Colors.black,
-                  title: Container(
-                    padding: EdgeInsets.only(
-                        top: 10.0, bottom: 20.0, left: 20.0, right: 20.0),
-                    child: Column(
-                      children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Text('Concepto',
-                                style: TextStyle(
-                                    fontSize: 17.0,
-                                    fontWeight: FontWeight.bold)),
-                            Text('Monto',
-                                style: TextStyle(
-                                    fontSize: 17.0,
-                                    fontWeight: FontWeight.bold))
-                          ],
-                        ),
-                        SizedBox(
-                          height: 10.0,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Text(
-                                '${sacarConcepto()} de Mantenimiento: ${mesFormat[data]}',
-                                style: TextStyle(
-                                    color: Colors.grey[800], fontSize: 14.0)),
-                            Text('${debt[data]}',
-                                style: TextStyle(
-                                    color: Colors.grey[800], fontSize: 14.0))
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
+  /// la vista a los checked list
+  mesesView(size) {
+    return checkedAll == true
+        ? SizedBox()
+        : Flexible(
+            child: GridView.builder(
+                padding: EdgeInsets.only(left: 10, right: 10),
+                itemCount: mesFormat.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 1,
+                  childAspectRatio: 5.0,
+                  crossAxisSpacing: 22,
+                  mainAxisSpacing: 15,
                 ),
-              );
-            }));
+                itemBuilder: (_, int data) {
+                  return Container(
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.grey,
+                              blurRadius: 7,
+                              offset: Offset(0, 5))
+                        ]),
+                    child: CheckboxListTile(
+                      value: check.contains(data),
+                      onChanged: (bool? v) {
+                        if (checkedAll == false) {
+                          if (v!) {
+                            setState(() {
+                              ///contadors que va sumando el adeudo
+                              contador += debt[data];
+
+                              ///funciona que los añade a una lista de adeudos
+                              check.add(data);
+                            });
+                          } else {
+                            setState(() {
+                              ///hace lo opuesto a añadir y sumar
+                              contador -= debt[data];
+                              check.remove(data);
+                            });
+                          }
+
+                          ///si la lista contiene datos muestra el boton
+                          if (check.contains(data)) {
+                            setState(() {
+                              checked = v;
+                              showButton();
+                            });
+                          } else {
+                            setState(() {
+                              checked = v;
+                            });
+                          }
+                        } else {
+                          checked = false;
+                        }
+                      },
+                      controlAffinity: ListTileControlAffinity.platform,
+                      activeColor: Colors.lightGreen[700],
+                      checkColor: Colors.black,
+                      title: Container(
+                        padding: EdgeInsets.only(
+                            top: 10.0, bottom: 20.0, left: 20.0, right: 20.0),
+                        child: Column(
+                          children: <Widget>[
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Text('Concepto',
+                                    style: TextStyle(
+                                        fontSize: 17.0,
+                                        fontWeight: FontWeight.bold)),
+                                Text('Monto',
+                                    style: TextStyle(
+                                        fontSize: 17.0,
+                                        fontWeight: FontWeight.bold))
+                              ],
+                            ),
+                            SizedBox(
+                              height: 10.0,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Text(
+                                    '${sacarConcepto()} de Mant: ${mesFormat[data]}',
+                                    style: TextStyle(
+                                        color: Colors.grey[800],
+                                        fontSize: 14.0)),
+                                Text('${debt[data]}',
+                                    style: TextStyle(
+                                        color: Colors.grey[800],
+                                        fontSize: 14.0))
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }));
   }
 
   sacarConcepto() {
     String? estado;
     for (int i = 0; i < widget.list!.length; i++) {
       if (widget.list![i].pago == 0) {
-        estado = 'Cuota';
-      } else {
         if (widget.list![i].pagoTardio == 1) {
-          estado = 'Multa de atrazo';
+          estado = 'Multa + Cuota';
+        } else {
+          estado = 'Cuota';
         }
       }
     }
