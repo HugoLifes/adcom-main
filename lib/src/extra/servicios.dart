@@ -1,4 +1,5 @@
 import 'package:adcom/src/extra/pedirServicio.dart';
+import 'package:grouped_list/grouped_list.dart';
 
 /// este apartado es para el servicio de las comunidades como el gas, entre otros que se pueden implementar
 
@@ -69,6 +70,52 @@ class _ServicesState extends State<Services> {
           },
         ),
       ),
+    );
+  }
+
+  agrupado() {
+    GroupedListView<dynamic, String>(
+      elements: servicios,
+      groupBy: (element) => element['group'],
+      groupSeparatorBuilder: (String groupByValue) => Text(groupByValue),
+      itemBuilder: (context, dynamic index) {
+        return InkWell(
+          onTap: () {
+            Navigator.of(context)
+                .push(MaterialPageRoute(builder: (_) => PedirServicio()));
+          },
+          child: Container(
+              child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Container(
+                child: Image.asset('assets/images/k19.png', width: 110),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    servicios[index].descripcion!,
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Text(
+                    servicios[index].horario!,
+                    style: TextStyle(fontSize: 16),
+                  )
+                ],
+              )
+            ],
+          )),
+        );
+      },
+      itemComparator: (item1, item2) =>
+          item1['name'].compareTo(item2['name']), // optional
+      useStickyGroupSeparators: true, // optional
+      floatingHeader: true, // optional
+      order: GroupedListOrder.ASC, // optional
     );
   }
 }

@@ -13,7 +13,8 @@ import 'package:provider/provider.dart';
 
 class VistaTarjeta extends StatefulWidget {
   List<DatosCuenta>? newList = [];
-  VistaTarjeta({Key? key, this.newList}) : super(key: key);
+  List<DatosCuenta>? refP = [];
+  VistaTarjeta({Key? key, this.newList, this.refP}) : super(key: key);
 
   @override
   _VistaTarjetaState createState() => _VistaTarjetaState();
@@ -90,6 +91,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
                     onPressed: () {
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (_) => RefView(
+                                refP: widget.refP,
                                 list: widget.newList,
                               )));
                     },
@@ -435,7 +437,12 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
     double deuda;
     double tardio;
     for (int i = 0; i < widget.newList!.length; i++) {
-      deuda = double.parse(widget.newList![i].montoCuota!);
+      if (widget.newList![i].montoCuota == null) {
+        deuda = 0.0;
+      } else {
+        deuda = double.parse(widget.newList![i].montoCuota!);
+      }
+
       tardio = double.parse(widget.newList![i].montoTardio!);
       if (widget.newList![i].pago == 1) {
         contador;

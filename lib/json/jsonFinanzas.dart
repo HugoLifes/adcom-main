@@ -41,30 +41,30 @@ class Accounts {
 }
 
 class Datum {
-  Datum({
-    this.idAdeudo,
-    this.idComu,
-    this.idResidente,
-    this.montoCuota,
-    this.idConcepto,
-    this.fechaGeneracion,
-    this.fechaLimite,
-    this.fechaPago,
-    this.montoPago,
-    this.idFormaPago,
-    this.idTipoCuota,
-    this.referencia,
-    this.pagoTardio,
-    this.montoPagoTardio,
-    this.impAplicado,
-    this.impMonto,
-    this.inpcPorcentaje,
-    this.pago,
-    this.totalApagar,
-    this.formaPago,
-    this.fechaAcreditacion,
-    this.folio,
-  });
+  Datum(
+      {this.idAdeudo,
+      this.idComu,
+      this.idResidente,
+      this.montoCuota,
+      this.idConcepto,
+      this.fechaGeneracion,
+      this.fechaLimite,
+      this.fechaPago,
+      this.montoPago,
+      this.idFormaPago,
+      this.idTipoCuota,
+      this.referencia,
+      this.pagoTardio,
+      this.montoPagoTardio,
+      this.impAplicado,
+      this.impMonto,
+      this.inpcPorcentaje,
+      this.pago,
+      this.totalApagar,
+      this.formaPago,
+      this.fechaAcreditacion,
+      this.folio,
+      this.referencaiP});
 
   int? idAdeudo;
   int? idComu;
@@ -88,6 +88,7 @@ class Datum {
   String? formaPago;
   DateTime? fechaAcreditacion;
   dynamic? folio;
+  String? referencaiP;
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
         idAdeudo: json["ID_ADEUDO"] == null ? null : json["ID_ADEUDO"],
@@ -122,6 +123,7 @@ class Datum {
             ? null
             : DateTime.parse(json["FECHA_ACREDITACION"]),
         folio: json["FOLIO"] == "" ? 0 : json["FOLIO"],
+        referencaiP: json["REFERENCAI_P"] == null ? null : json["REFERENCAI_P"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -151,6 +153,7 @@ class Datum {
             ? null
             : fechaAcreditacion!.toIso8601String(),
         "FOLIO": folio == null ? null : folio,
+        "REFERENCAI_P": referencaiP == null ? null : referencaiP,
       };
 }
 

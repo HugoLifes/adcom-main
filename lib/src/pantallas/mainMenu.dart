@@ -106,7 +106,6 @@ class _MainMenuState extends State<MainMenu> {
   void dispose() {
     _connectivitySubscription.cancel();
     super.dispose();
-    setState(() {});
   }
 
   @override
@@ -205,7 +204,7 @@ class _MainMenuState extends State<MainMenu> {
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontFamily: 'Roboto',
-                                      fontSize: size.width / 10,
+                                      fontSize: size.width / 11,
                                       fontWeight: FontWeight.w700),
                                 ),
                               ],

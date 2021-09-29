@@ -19,18 +19,9 @@ SharedPreferences? prefs;
 class Finanzas extends StatefulWidget {
   final id;
   Finanzas({Key? key, this.id}) : super(key: key);
-  static init() async {
-    prefs = await SharedPreferences.getInstance();
-  }
 
   @override
   _FinanzasState createState() => _FinanzasState();
-}
-
-dataOff3(id) async {
-  await Finanzas.init();
-
-  prefs!.setInt('u', id);
 }
 
 Future<Accounts?> getAdeudos() async {
@@ -62,10 +53,12 @@ class _FinanzasState extends State<Finanzas> {
   VoidCallback? _showPersBottomSheetCallBack;
   bool itsTrue = true;
   String? mes;
+  bool hayRefPadre = false;
   String? ref;
   List<Users> users = [];
   String? userName;
   DatosUsuario? datosUsuario;
+  List<DatosCuenta>? refPadre;
 
   /// El init state inicializa funciones cuando abre el boton mis pagos
   @override
@@ -189,9 +182,11 @@ class _FinanzasState extends State<Finanzas> {
   SharedPreferences? prefs;
   getNameUser() async {
     prefs = await SharedPreferences.getInstance();
-    setState(() {
-      userName = prefs!.getString('user');
-    });
+    if (mounted) {
+      setState(() {
+        userName = prefs!.getString('user');
+      });
+    }
   }
 
   //Se usa para atualizar el estado de la tarjeta
@@ -425,22 +420,47 @@ class _FinanzasState extends State<Finanzas> {
   data() async {
     cuentas = await getAdeudos();
     await getNameUser();
+    prefs = await SharedPreferences.getInstance();
     if (cuentas!.data!.isNotEmpty) {
       for (int i = 0; i < cuentas!.data!.length; i++) {
-        localList.add(new DatosCuenta(
-            idComu: cuentas!.data![i].idComu,
-            montoCuota: cuentas!.data![i].montoCuota,
-            fechaGenerada: cuentas!.data![i].fechaGeneracion!,
-            fechaLimite: cuentas!.data![i].fechaLimite!,
-            fechaPago: cuentas!.data![i].fechaPago,
-            pago: cuentas!.data![i].pago!,
-            montoPago: cuentas!.data![i].montoPago,
-            totalApagar: cuentas!.data![i].totalApagar,
-            referencia: cuentas!.data![i].referencia,
-            pagoTardio: cuentas!.data![i].pagoTardio,
-            montoTardio: cuentas!.data![i].montoPagoTardio,
-            folio: cuentas!.data![i].folio!,
-            formaDePago: cuentas!.data![i].formaPago));
+        if (cuentas!.data![i].idConcepto == "PA        ") {
+          setState(() {
+            hayRefPadre = true;
+          });
+
+          refPadre!.add(new DatosCuenta(
+              referenciaP: cuentas!.data![i].referencaiP,
+              idConcepto: cuentas!.data![i].idConcepto));
+        } else {
+          if (cuentas!.data![i].idConcepto == "ACCTEL    ") {
+          } else {
+            localList.add(new DatosCuenta(
+                idComu: cuentas!.data![i].idComu,
+                montoCuota: cuentas!.data![i].montoCuota,
+                idAdeudo: cuentas!.data![i].idAdeudo,
+                idConcepto: cuentas!.data![i].idConcepto,
+                fechaGenerada: cuentas!.data![i].fechaGeneracion!,
+                fechaLimite: cuentas!.data![i].fechaLimite == null
+                    ? DateTime.now()
+                    : cuentas!.data![i].fechaLimite,
+                fechaPago: cuentas!.data![i].fechaPago,
+                pago: cuentas!.data![i].pago!,
+                montoPago: cuentas!.data![i].montoPago,
+                totalApagar: cuentas!.data![i].totalApagar,
+                referencia: cuentas!.data![i].referencia,
+                pagoTardio: cuentas!.data![i].pagoTardio,
+                montoTardio: cuentas!.data![i].montoPagoTardio,
+                folio: cuentas!.data![i].folio!,
+                formaDePago: cuentas!.data![i].formaPago,
+                referenciaP: cuentas!.data![i].referencaiP));
+          }
+        }
+      }
+
+      if (hayRefPadre == true) {
+        prefs!.setBool('PA', true);
+      } else {
+        prefs!.setBool('PA', false);
       }
 
       setState(() {
@@ -462,12 +482,12 @@ class _FinanzasState extends State<Finanzas> {
     await ultimoMes();
   }
 
+  // main view representa la vista a la tarjeta, donde salen los adeudos
   mainView() {
     return Column(
       children: [
-        VistaTarjeta(
-          newList: localList,
-        ),
+        //vista tarejeta es la tarjeta en si
+        VistaTarjeta(newList: localList, refP: refPadre),
         SizedBox(
           height: 15,
         ),
@@ -498,6 +518,7 @@ class _FinanzasState extends State<Finanzas> {
 class DatosCuenta {
   int? idComu;
   int? idResidente;
+  int? idAdeudo;
   String? montoCuota;
   String? idConcepto;
   String? montoPago;
@@ -512,7 +533,7 @@ class DatosCuenta {
   int? totalApagar;
   String? formaDePago;
   int? folio;
-
+  String? referenciaP;
   DatosCuenta(
       {this.idComu,
       this.fechaGenerada,
@@ -529,7 +550,9 @@ class DatosCuenta {
       this.pago,
       this.totalApagar,
       this.folio,
-      this.formaDePago});
+      this.idAdeudo,
+      this.formaDePago,
+      this.referenciaP});
 }
 
 class DatosUsuario {
