@@ -61,13 +61,14 @@ class EventProvider extends ChangeNotifier {
   }
 
   var userd;
-  void login(user, pass, ctx) async {
+  void login(user, pass, ctx, TextEditingController tk,
+      TextEditingController tk2) async {
     _loading = false;
     notifyListeners();
 
     try {
-      _loading = true;
       await loginAcces(user, pass).then((value) {
+        _loading = true;
         var userId;
         var post = value;
         if (post!.value == 1) {
@@ -77,16 +78,6 @@ class EventProvider extends ChangeNotifier {
           userd = post.nombreResidente;
           var userType = post.idPerfil;
           somData(userd, userType, comId, idPrimario, userId);
-          //obtainId(userType);
-
-          /* dataOff2(idPrimario, userType);
-          dataOff4(idPrimario);
-          someData(comId, userId);
-          //Adeudos
-          dataOff3(userId);
-          //amenidades
-
-          dataOff5(userId); */
 
           Navigator.pushReplacementNamed(ctx, '/');
         }
@@ -103,11 +94,14 @@ class EventProvider extends ChangeNotifier {
       }
     } catch (e) {
       {
+        _loading = false;
         HapticFeedback.lightImpact();
         Widget okButton = TextButton(
             onPressed: () {
-              Navigator.of(ctx).popAndPushNamed('/');
-              ;
+              Navigator.of(ctx).pushNamedAndRemoveUntil('/', (route) => false);
+              tk.clear();
+
+              tk2.clear();
             },
             child: Text('OK'));
 
@@ -127,10 +121,11 @@ class EventProvider extends ChangeNotifier {
     var id = pref.getString('user');
     if (pref.containsKey('isLoggedIn')) {
       _islogged = id != null;
-      _loading = false;
+
       notifyListeners();
     } else {
       _loading = false;
+      _islogged = false;
       notifyListeners();
     }
   }

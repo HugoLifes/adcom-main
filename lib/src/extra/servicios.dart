@@ -1,4 +1,5 @@
 import 'package:adcom/src/extra/pedirServicio.dart';
+import 'package:glyphicon/glyphicon.dart';
 import 'package:grouped_list/grouped_list.dart';
 
 /// este apartado es para el servicio de las comunidades como el gas, entre otros que se pueden implementar
@@ -15,9 +16,37 @@ class Services extends StatefulWidget {
 class _ServicesState extends State<Services> {
   List<ServiceStore> servicios = [
     new ServiceStore(
-        nombre: 'K19',
-        descripcion: 'Surtido de gas estacionario',
-        horario: '8:00 am - 6:00 pm')
+        nombre: 'Gas',
+        descripcion: 'Servicios de Gas LP',
+        horario: '8:00 am - 6:00 pm',
+        icon: Icon(
+          Icons.fireplace,
+          size: 50,
+        )),
+    new ServiceStore(
+        nombre: 'Plomeria',
+        descripcion: 'Servicios para el hogar',
+        horario: '8:00 am - 6:00 pm',
+        icon: Icon(
+          Icons.handyman,
+          size: 50,
+        )),
+    new ServiceStore(
+        nombre: 'Agua',
+        descripcion: 'Agua a domicilio',
+        horario: '8:00 am - 6:00 pm',
+        icon: Icon(
+          Icons.water_damage,
+          size: 50,
+        )),
+    new ServiceStore(
+        nombre: 'Otros',
+        descripcion: 'Otros servicios',
+        horario: '8:00 am - 6:00 pm',
+        icon: Icon(
+          Icons.work_outline_outlined,
+          size: 50,
+        ))
   ];
 
   @override
@@ -28,7 +57,7 @@ class _ServicesState extends State<Services> {
         elevation: 7,
         backgroundColor: Colors.white,
         title: Text(
-          'Servicios para la comunidad',
+          'Servicios de la comunidad',
           style: TextStyle(color: Colors.black),
         ),
       ),
@@ -42,30 +71,32 @@ class _ServicesState extends State<Services> {
                     .push(MaterialPageRoute(builder: (_) => PedirServicio()));
               },
               child: Container(
+                  padding: EdgeInsets.all(12),
                   child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Container(
-                    child: Image.asset('assets/images/k19.png', width: 110),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Text(
-                        servicios[index].descripcion!,
-                        style: TextStyle(fontSize: 18),
+                      Container(
+                        ///Image.asset('assets/images/k19.png', width: 110)
+                        child: servicios[index].icon,
                       ),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      Text(
-                        servicios[index].horario!,
-                        style: TextStyle(fontSize: 16),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            servicios[index].descripcion!,
+                            style: TextStyle(fontSize: 18),
+                          ),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            servicios[index].horario!,
+                            style: TextStyle(fontSize: 16),
+                          )
+                        ],
                       )
                     ],
-                  )
-                ],
-              )),
+                  )),
             );
           },
         ),
@@ -125,6 +156,8 @@ class ServiceStore {
   String? descripcion;
   String? horario;
   Image? image;
+  Icon? icon;
 
-  ServiceStore({this.descripcion, this.horario, this.image, this.nombre});
+  ServiceStore(
+      {this.descripcion, this.horario, this.image, this.nombre, this.icon});
 }
