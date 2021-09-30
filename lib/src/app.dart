@@ -38,14 +38,9 @@ class _MyAppState extends State<MyApp> {
   var id = 'icono';
   bool _loggedIn = false;
 
-  init() async {
-    prefs = await SharedPreferences.getInstance();
-  }
-
   @override
   void initState() {
     super.initState();
-    init();
   }
 
   @override
