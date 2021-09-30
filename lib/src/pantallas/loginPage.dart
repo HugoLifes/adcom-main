@@ -122,7 +122,7 @@ class _LoginPageState extends State<LoginPage> {
                             }
                             return null;
                           },
-                          autofocus: false,
+                          autofocus: true,
                           decoration: InputDecoration(
                               enabledBorder: UnderlineInputBorder(
                                   borderSide:
@@ -156,7 +156,6 @@ class _LoginPageState extends State<LoginPage> {
                             return null;
                           },
                           obscureText: true,
-                          autofocus: false,
                           decoration: InputDecoration(
                               enabledBorder: UnderlineInputBorder(
                                   borderSide:
@@ -198,7 +197,7 @@ class _LoginPageState extends State<LoginPage> {
                             _formKey2.currentState!.validate()) {
                           try {
                             Provider.of<EventProvider>(context, listen: false)
-                                .login(user, pass, context);
+                                .login(user, pass, context, tk, tk2);
                           } catch (e) {
                             HapticFeedback.heavyImpact();
                             showAlertDialog();

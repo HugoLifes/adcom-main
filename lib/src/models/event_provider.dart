@@ -61,13 +61,20 @@ class EventProvider extends ChangeNotifier {
   }
 
   var userd;
-  void login(user, pass, ctx) async {
+
+  /// funcion de login
+  void login(user, pass, ctx, TextEditingController tk,
+      TextEditingController tk2) async {
     _loading = false;
     notifyListeners();
 
+    /// primer intento
     try {
-      _loading = true;
       await loginAcces(user, pass).then((value) {
+        /// el estado de carga se vuelve true
+        _loading = true;
+
+        /// carga todos los datos necesarios para el login
         var userId;
         var post = value;
         if (post!.value == 1) {
@@ -77,37 +84,54 @@ class EventProvider extends ChangeNotifier {
           userd = post.nombreResidente;
           var userType = post.idPerfil;
           somData(userd, userType, comId, idPrimario, userId);
-          //obtainId(userType);
 
-          /* dataOff2(idPrimario, userType);
-          dataOff4(idPrimario);
-          someData(comId, userId);
-          //Adeudos
-          dataOff3(userId);
-          //amenidades
-
-          dataOff5(userId); */
-
+          /// despues de hacer la carga y que todo este bien hace el push a otra pagina
           Navigator.pushReplacementNamed(ctx, '/');
         }
+        /* else {
+          {
+            /// caso comentado, en caso de no estar bien los datos pasa aqui
+            /// se cambio por el try catch
+            HapticFeedback.lightImpact();
+            Widget okButton = TextButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                },
+                child: Text('OK'));
+
+            AlertDialog alert = AlertDialog(
+              title: Text('Atencion!'),
+              content: Text('Usuario o Contraseña incorrectos'),
+              actions: [okButton],
+            );
+
+            showDialog(context: ctx, builder: (_) => alert);
+          }
+        } */
       });
 
+      /// informa al estate provider, que todo esta en orden y que permanezca logeado siempre
       _loading = true;
       if (userd != null) {
         _islogged = true;
         pref.setBool('isLoggedIn', true);
         notifyListeners();
       } else {
+        _loading = false;
         _islogged = false;
         notifyListeners();
       }
     } catch (e) {
       {
+        _loading = false;
+
         HapticFeedback.lightImpact();
         Widget okButton = TextButton(
             onPressed: () {
-              Navigator.of(ctx).popAndPushNamed('/');
-              ;
+              Navigator.of(ctx).pushNamedAndRemoveUntil('/', (route) => false);
+              tk.clear();
+
+              tk2.clear();
             },
             child: Text('OK'));
 
@@ -122,6 +146,7 @@ class EventProvider extends ChangeNotifier {
     }
   }
 
+  ///este estado chequea si esta logeado o no
   void loginState() async {
     pref = await SharedPreferences.getInstance();
     var id = pref.getString('user');
