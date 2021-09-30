@@ -13,7 +13,8 @@ import 'package:provider/provider.dart';
 
 class VistaTarjeta extends StatefulWidget {
   List<DatosCuenta>? newList = [];
-  VistaTarjeta({Key? key, this.newList}) : super(key: key);
+  List<DatosCuenta>? refP = [];
+  VistaTarjeta({Key? key, this.newList, this.refP}) : super(key: key);
 
   @override
   _VistaTarjetaState createState() => _VistaTarjetaState();
@@ -29,15 +30,11 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
   void initState() {
     super.initState();
     _showPersBottomSheetCallBack = _showPersBottomSheetCallBack;
-    data();
+    //data();
 
-    Future.delayed(Duration(seconds: 1), () {
-      if (mounted) {
-        setState(() {
-          ultimaDeuda();
-          estadodepago();
-        });
-      }
+    setState(() {
+      ultimaDeuda();
+      estadodepago();
     });
   }
 
@@ -51,126 +48,117 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
     var size = MediaQuery.of(context).size;
     var size2 = MediaQuery.of(context).size.width;
 
-    return mylist.isEmpty
-        ? SizedBox()
-        : Container(
-            width: MediaQuery.of(context).size.width,
-            height: 220,
-            decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.grey, blurRadius: 6, offset: Offset(0, 1))
-                ],
-                color: estadodepagoColor(),
-                borderRadius: BorderRadius.circular(10)),
-            child: Padding(
-              padding: const EdgeInsets.only(
-                  left: 13, right: 13, top: 13, bottom: 20),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Monto de cuota',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15),
-                          ),
-                          SizedBox(
-                            height: 2.0,
-                          ),
-                          Text(
-                            '${estadodepago()}',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                            ),
-                          )
-                        ],
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: 220,
+      decoration: BoxDecoration(boxShadow: [
+        BoxShadow(color: Colors.grey, blurRadius: 6, offset: Offset(0, 1))
+      ], color: estadodepagoColor(), borderRadius: BorderRadius.circular(10)),
+      child: Padding(
+        padding:
+            const EdgeInsets.only(left: 13, right: 13, top: 13, bottom: 20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Monto de cuota',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15),
+                    ),
+                    SizedBox(
+                      height: 2.0,
+                    ),
+                    Text(
+                      '${estadodepago()}',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 14,
                       ),
-                      Container(
-                        height: 30,
-                        child: OutlinedButton(
-                          onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (_) => RefView(
-                                      list: mylist,
-                                    )));
-                          },
-                          child: Icon(Icons.add, size: 25, color: Colors.white),
-                          style: OutlinedButton.styleFrom(
-                              side: BorderSide(
-                                  width: 1.0, color: Colors.transparent)),
-                        ),
-                      )
-                    ],
+                    )
+                  ],
+                ),
+                Container(
+                  height: 30,
+                  child: OutlinedButton(
+                    onPressed: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (_) => RefView(
+                                list: widget.newList,
+                              )));
+                    },
+                    child: Icon(Icons.add, size: 25, color: Colors.white),
+                    style: OutlinedButton.styleFrom(
+                        side:
+                            BorderSide(width: 1.0, color: Colors.transparent)),
                   ),
-                  Column(
-                    children: [
-                      Text(
-                        '\$ ${saldoDeudor()}',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 28),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Text(
-                        mylist.isEmpty
-                            ? 'Pagar antes del día: '
-                            : 'Pagar antes del día: ${fechadepago()}',
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w400,
-                            fontSize: 14),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      OutlinedButton(
-                        onPressed: () {
-                          _showModalSheet();
-                        },
-                        child: Text(
-                          'Pagar Ahora',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.white, fontSize: 14),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                            side: BorderSide(width: 1.0, color: Colors.white)),
-                      ),
-                      //Text('|', style: TextStyle(color: Colors.white, fontSize: 15)),
-
-                      OutlinedButton(
-                        onPressed: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (_) => DetallesPago(
-                                    list: mylist,
-                                  )));
-                        },
-                        child: Text('Detalles',
-                            textAlign: TextAlign.center,
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 15)),
-                        style: OutlinedButton.styleFrom(
-                            side: BorderSide(width: 1.0, color: Colors.white)),
-                      )
-                    ],
-                  )
-                ],
-              ),
+                )
+              ],
             ),
-          );
+            Column(
+              children: [
+                Text(
+                  '\$ ${saldoDeudor()}',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 28),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  'Pagar antes del día: ${fechadepago()}',
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w400,
+                      fontSize: 14),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                OutlinedButton(
+                  onPressed: () {
+                    _showModalSheet();
+                  },
+                  child: Text(
+                    'Pagar Ahora',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white, fontSize: 14),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                      side: BorderSide(width: 1.0, color: Colors.white)),
+                ),
+                //Text('|', style: TextStyle(color: Colors.white, fontSize: 15)),
+
+                OutlinedButton(
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (_) => DetallesPago(
+                              list: widget.newList!,
+                            )));
+                  },
+                  child: Text('Detalles',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white, fontSize: 15)),
+                  style: OutlinedButton.styleFrom(
+                      side: BorderSide(width: 1.0, color: Colors.white)),
+                )
+              ],
+            )
+          ],
+        ),
+      ),
+    );
   }
 
   void _showModalSheet() {
@@ -358,11 +346,11 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
   mesesDeAtraso() {
     DateTime? mesesAtrazo;
 
-    for (int i = 0; i < mylist.length; i++) {
-      if (mylist[i].pago == 1) {
+    for (int i = 0; i < widget.newList!.length; i++) {
+      if (widget.newList![i].pago == 1) {
       } else {
         setState(() {
-          mesesAtrazo = mylist[i].fechaGenerada;
+          mesesAtrazo = widget.newList![i].fechaGenerada;
           mesFormat
               .add((DateFormat('MMM').format(DateTime(0, mesesAtrazo!.month))));
         });
@@ -377,19 +365,20 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
     double debe = 0.0;
     double? monto;
     int? total;
-    for (int i = 0; i < mylist.length; i++) {
-      monto = double.parse(mylist[i].montoCuota!);
-      if (mylist[i].pago == 1 && mylist[i].pagoTardio == 0) {
+    for (int i = 0; i < widget.newList!.length; i++) {
+      monto = double.parse(widget.newList![i].montoCuota!);
+      if (widget.newList![i].pago == 1 && widget.newList![i].pagoTardio == 0) {
       } else {
-        if (DateTime.now().day <= mylist[i].fechaLimite!.day &&
-            DateTime.now().month <= mylist[i].fechaLimite!.month &&
-            DateTime.now().year <= mylist[i].fechaLimite!.year) {
+        if (DateTime.now().day <= widget.newList![i].fechaLimite!.day &&
+            DateTime.now().month <= widget.newList![i].fechaLimite!.month &&
+            DateTime.now().year <= widget.newList![i].fechaLimite!.year) {
           return debe = monto;
         } else {
-          if (mylist[i].pagoTardio == 0 || mylist[i].pagoTardio == null) {
+          if (widget.newList![i].pagoTardio == 0 ||
+              widget.newList![i].pagoTardio == null) {
             return debe = monto;
           } else {
-            total = int.parse(mylist[i].montoTardio!);
+            total = int.parse(widget.newList![i].montoTardio!);
             return debe = monto + total;
           }
         }
@@ -402,16 +391,16 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
     double debe = 0.0;
     double? monto;
 
-    for (int i = 0; i < mylist.length; i++) {
-      monto = double.parse(mylist[i].montoCuota!);
-      if (mylist[i].pago == 1 && mylist[i].pagoTardio == 0) {
+    for (int i = 0; i < widget.newList!.length; i++) {
+      monto = double.parse(widget.newList![i].montoCuota!);
+      if (widget.newList![i].pago == 1 && widget.newList![i].pagoTardio == 0) {
       } else {
-        if (DateTime.now().day <= mylist[i].fechaLimite!.day &&
-            DateTime.now().month <= mylist[i].fechaLimite!.month &&
-            DateTime.now().year <= mylist[i].fechaLimite!.year) {
+        if (DateTime.now().day <= widget.newList![i].fechaLimite!.day &&
+            DateTime.now().month <= widget.newList![i].fechaLimite!.month &&
+            DateTime.now().year <= widget.newList![i].fechaLimite!.year) {
           return debe = monto;
         } else {
-          if (mylist[i].pagoTardio == 0) {
+          if (widget.newList![i].pagoTardio == 0) {
             return debe = monto;
           } else {
             return debe = monto;
@@ -426,14 +415,14 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
     int? dia;
     int? mes;
     int? year;
-    for (int i = 0; i < mylist.length; i++) {
-      if (mylist[i].pago == 1) {
+    for (int i = 0; i < widget.newList!.length; i++) {
+      if (widget.newList![i].pago == 1) {
         print('no debe');
       } else {
         setState(() {
-          dia = mylist[i].fechaLimite!.day;
-          mes = mylist[i].fechaLimite!.month;
-          year = mylist[i].fechaLimite!.year;
+          dia = widget.newList![i].fechaLimite!.day;
+          mes = widget.newList![i].fechaLimite!.month;
+          year = widget.newList![i].fechaLimite!.year;
         });
         return dia == null ? '' : '$dia/$mes/$year';
       }
@@ -447,7 +436,12 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
     double deuda;
     double tardio;
     for (int i = 0; i < widget.newList!.length; i++) {
-      deuda = double.parse(widget.newList![i].montoCuota!);
+      if (widget.newList![i].montoCuota == null) {
+        deuda = 0.0;
+      } else {
+        deuda = double.parse(widget.newList![i].montoCuota!);
+      }
+
       tardio = double.parse(widget.newList![i].montoTardio!);
       if (widget.newList![i].pago == 1) {
         contador;

@@ -192,19 +192,31 @@ class _FinanzasState extends State<Finanzas> {
   data() async {
     cuentas = await getAdeudos();
 
+    prefs = await SharedPreferences.getInstance();
     if (cuentas!.data!.isNotEmpty) {
       for (int i = 0; i < cuentas!.data!.length; i++) {
-        localList.add(new DatosCuenta(
-            idComu: cuentas!.data![i].idComu,
-            montoCuota: cuentas!.data![i].montoCuota,
-            fechaGenerada: cuentas!.data![i].fechaGeneracion!,
-            fechaLimite: cuentas!.data![i].fechaLimite!,
-            fechaPago: cuentas!.data![i].fechaPago,
-            pago: cuentas!.data![i].pago!,
-            totalApagar: cuentas!.data![i].totalApagar,
-            referencia: cuentas!.data![i].referencia,
-            pagoTardio: cuentas!.data![i].pagoTardio,
-            montoTardio: cuentas!.data![i].montoPagoTardio));
+        if (cuentas!.data![i].idConcepto == "PA        ") {
+        } else {
+          if (cuentas!.data![i].idConcepto == "ACCTEL    ") {
+          } else {
+            localList.add(new DatosCuenta(
+              idComu: cuentas!.data![i].idComu,
+              montoCuota: cuentas!.data![i].montoCuota,
+              idConcepto: cuentas!.data![i].idConcepto,
+              fechaGenerada: cuentas!.data![i].fechaGeneracion!,
+              fechaLimite: cuentas!.data![i].fechaLimite == null
+                  ? DateTime.now()
+                  : cuentas!.data![i].fechaLimite,
+              fechaPago: cuentas!.data![i].fechaPago,
+              pago: cuentas!.data![i].pago!,
+              montoPago: cuentas!.data![i].montoPago,
+              totalApagar: cuentas!.data![i].totalApagar,
+              referencia: cuentas!.data![i].referencia,
+              pagoTardio: cuentas!.data![i].pagoTardio,
+              montoTardio: cuentas!.data![i].montoPagoTardio,
+            ));
+          }
+        }
       }
     } else {
       setState(() {

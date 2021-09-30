@@ -146,7 +146,11 @@ class _DetallesPagoState extends State<DetallesPago> {
     double deuda;
 
     for (int i = 0; i < widget.list!.length; i++) {
-      total = double.parse(widget.list![i].montoCuota!);
+      if (widget.list![i].montoCuota == null) {
+        total = 0.0;
+      } else {
+        total = double.parse(widget.list![i].montoCuota!);
+      }
       deuda = double.parse(widget.list![i].montoTardio!);
 
       if (widget.list![i].pago == 1) {
@@ -176,7 +180,12 @@ class _DetallesPagoState extends State<DetallesPago> {
     double deuda;
     double tardio;
     for (int i = 0; i < widget.list!.length; i++) {
-      deuda = double.parse(widget.list![i].montoCuota!);
+      if (widget.list![i].montoCuota == null) {
+        deuda = 0.0;
+      } else {
+        deuda = double.parse(widget.list![i].montoCuota!);
+      }
+
       tardio = double.parse(widget.list![i].montoTardio!);
       if (widget.list![i].pago == 1) {
         contador;
