@@ -259,10 +259,10 @@ class _AddReporteState extends State<AddReporte> {
         inputFormatters: [new LengthLimitingTextInputFormatter(50)],
       );
 
-  //funcion que abre la camara y muestra
+  ///funcion que abre la camara y muestra
   void openCamera() async {
     var image =
-        await _picker.pickImage(source: ImageSource.camera, imageQuality: 50);
+        await _picker.pickImage(source: ImageSource.camera, imageQuality: 30);
 
     setState(() {
       if (image != null) {

@@ -31,6 +31,9 @@ class MyApp extends StatefulWidget {
 }
 
 SharedPreferences? prefs;
+init() async {
+  prefs = await SharedPreferences.getInstance();
+}
 
 class _MyAppState extends State<MyApp> {
   final heroController = HeroController();
@@ -41,6 +44,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    init();
   }
 
   @override
