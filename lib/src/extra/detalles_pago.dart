@@ -217,7 +217,7 @@ class _DetallesPagoState extends State<DetallesPago> {
                                   ? Text('${pagarTodo()} MXN',
                                       style: TextStyle(fontSize: 19))
                                   : Text(
-                                      //contador
+                                      ///contador
                                       '\$ ${contador} MXN',
                                       style: TextStyle(fontSize: 19),
                                     ),
