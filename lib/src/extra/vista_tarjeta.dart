@@ -132,7 +132,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
                     _showModalSheet();
                   },
                   child: Text(
-                    'Pagar Ahora',
+                    'Saldo a favor',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.white, fontSize: 14),
                   ),
@@ -179,7 +179,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(
-                    'Seleccioné su método de pago',
+                    'Saldo a favor',
                     style: TextStyle(fontSize: 21),
                   ),
                   SizedBox(
@@ -196,20 +196,20 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
                         Row(
                           children: [
                             Image.asset(
-                              'assets/images/debit-card.gif',
+                              'assets/images/money.gif',
                               height: 40,
                               width: 50,
                             ),
                             SizedBox(
-                              width: 10,
+                              width: 5,
                             ),
                             Text(
-                              'Pago con tarjeta',
-                              style: TextStyle(fontSize: 20),
+                              '\$ 200.0 MXN',
+                              style: TextStyle(fontSize: 30),
                             ),
                           ],
                         ),
-                        Container(
+                        /* Container(
                           padding: EdgeInsets.only(right: 110),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -237,7 +237,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
                               )
                             ],
                           ),
-                        )
+                        ) */
                       ],
                     ),
                   )

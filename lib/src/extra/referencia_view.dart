@@ -42,14 +42,23 @@ class _RefViewState extends State<RefView> {
                         )));
                       });
                     },
-                    child: Text(
-                      '${referenciaApagar()}',
-                      style: TextStyle(
-                          fontSize: 35,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Roboto',
-                          decoration: TextDecoration.underline),
-                    ),
+                    child: widget.refP!.isNotEmpty
+                        ? Text(
+                            '${widget.refP!.last.referenciaP}',
+                            style: TextStyle(
+                                fontSize: 35,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Roboto',
+                                decoration: TextDecoration.underline),
+                          )
+                        : Text(
+                            'Genere una referencia',
+                            style: TextStyle(
+                                fontSize: 35,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Roboto',
+                                decoration: TextDecoration.underline),
+                          ),
                   ),
                   InkWell(
                       onTap: () {
@@ -97,17 +106,14 @@ class _RefViewState extends State<RefView> {
   referenciaApagar() {
     String? ref;
     for (int i = 0; i < widget.list!.length; i++) {
-      if (widget.list![i].pago == 1 && widget.list![i].pagoTardio == 0) {
-        return ref = 'No tiene deudas';
+      if (widget.refP![i].idConcepto == "PA        ") {
+        return ref = widget.refP![i].referenciaP;
       } else {
-        if (widget.refP![i].idConcepto == "PA        ") {
-          return ref = widget.refP![i].referenciaP;
+        if (widget.list![i].referenciaP == "0" ||
+            widget.list![i].referenciaP == null) {
+          return ref = "referencia no generada";
         } else {
-          if (widget.list![i].referenciaP == null) {
-            return ref = "referencia no generada";
-          } else {
-            return ref = widget.list![i].referenciaP;
-          }
+          return ref = widget.list![i].referencia;
         }
       }
     }

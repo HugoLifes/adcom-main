@@ -58,7 +58,7 @@ class _FinanzasState extends State<Finanzas> {
   List<Users> users = [];
   String? userName;
   DatosUsuario? datosUsuario;
-  List<DatosCuenta>? refPadre;
+  List<DatosCuenta> refPadre = [];
 
   /// El init state inicializa funciones cuando abre el boton mis pagos
   @override
@@ -428,9 +428,9 @@ class _FinanzasState extends State<Finanzas> {
             hayRefPadre = true;
           });
 
-          refPadre!.add(new DatosCuenta(
-              referenciaP: cuentas!.data![i].referencaiP,
-              idConcepto: cuentas!.data![i].idConcepto));
+          refPadre.add(new DatosCuenta(
+              referenciaP: cuentas!.data![i].referencaiP!,
+              idConcepto: cuentas!.data![i].idConcepto!));
         } else {
           if (cuentas!.data![i].idConcepto == "ACCTEL    ") {
           } else {

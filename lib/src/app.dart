@@ -31,16 +31,15 @@ class MyApp extends StatefulWidget {
 }
 
 SharedPreferences? prefs;
+init() async {
+  prefs = await SharedPreferences.getInstance();
+}
 
 class _MyAppState extends State<MyApp> {
   final heroController = HeroController();
   GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   var id = 'icono';
   bool _loggedIn = false;
-
-  init() async {
-    prefs = await SharedPreferences.getInstance();
-  }
 
   @override
   void initState() {

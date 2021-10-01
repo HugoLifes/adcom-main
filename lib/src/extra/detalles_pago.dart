@@ -33,7 +33,7 @@ class _DetallesPagoState extends State<DetallesPago> {
   List<int> idAdeudos = [];
   bool pa = false;
   List<String> conceptos = [];
-
+  bool usarSaldo = false;
   @override
   void initState() {
     super.initState();
@@ -147,7 +147,7 @@ class _DetallesPagoState extends State<DetallesPago> {
                   },
                   controlAffinity: ListTileControlAffinity.platform,
                   activeColor: Colors.lightGreen[700],
-                  checkColor: Colors.black,
+                  checkColor: Colors.white,
                 ),
               ),
             ),
@@ -166,6 +166,37 @@ class _DetallesPagoState extends State<DetallesPago> {
             mesesView(size2),
             Divider(
               color: Colors.grey,
+            ),
+            Container(
+              padding: EdgeInsets.only(left: 10),
+              child: Row(
+                children: [
+                  Checkbox(
+                      activeColor: Colors.lightGreen[700],
+                      value: usarSaldo,
+                      onChanged: (v) {
+                        setState(() {
+                          usarSaldo = v!;
+                        });
+                      }),
+                  Text(
+                    '¿Usar saldo a favor?',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(
+                    width: size.width / 23,
+                  ),
+                  usarSaldo == true
+                      ? Text('Saldo',
+                          style: TextStyle(
+                              fontSize: 19, fontWeight: FontWeight.bold))
+                      : Text(''),
+                  SizedBox(
+                    width: size.width / 26,
+                  ),
+                  usarSaldo == true ? Text('\$ 200 MXN') : Text('')
+                ],
+              ),
             ),
             pa == false
                 ? Row(
@@ -191,7 +222,7 @@ class _DetallesPagoState extends State<DetallesPago> {
                                       style: TextStyle(fontSize: 19),
                                     ),
                               SizedBox(
-                                height: size.height / 10,
+                                height: size.height / 20,
                               )
                             ],
                           ))
@@ -213,6 +244,7 @@ class _DetallesPagoState extends State<DetallesPago> {
                     ],
                   ),
             showButton(),
+            payButton()
           ],
         ),
       ),
@@ -281,7 +313,28 @@ class _DetallesPagoState extends State<DetallesPago> {
           );
   }
 
-  /// FUNCION QUE SE USA PARA PAGAR TODO
+  payButton() {
+    return (checked || checkedAll) == false
+        ? Text('')
+        : Container(
+            padding: EdgeInsets.only(bottom: 25, left: 10, right: 10),
+            child: GradientButton(
+                child: Text('Pagar ahora'),
+                callback: () {},
+                gradient: LinearGradient(colors: [
+                  Colors.lightGreen[500]!,
+                  Colors.lightGreen[600]!,
+                  Colors.lightGreen[700]!
+                ]),
+                elevation: 5.0,
+                increaseHeightBy: 28,
+                increaseWidthBy: double.infinity,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20))),
+          );
+  }
+
+  /// Funcion que se utiliza para pagar todo
   pagarTodo() {
     double? cuota;
     double? cuotaDeudora;
@@ -362,7 +415,7 @@ class _DetallesPagoState extends State<DetallesPago> {
                 itemCount: mesFormat.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 1,
-                  childAspectRatio: 5.0,
+                  childAspectRatio: 4.9,
                   crossAxisSpacing: 22,
                   mainAxisSpacing: 15,
                 ),
@@ -572,7 +625,7 @@ class _DetallesPagoState extends State<DetallesPago> {
     showDialog(context: context, builder: (_) => alert);
   }
 
-  //alerta  que sale cuando se ha generado una referencia de pago y se intenta otra
+  ///alerta  que sale cuando se ha generado una referencia de pago y se intenta otra
   alerta2() {
     Widget okButton = TextButton(
         onPressed: () {
