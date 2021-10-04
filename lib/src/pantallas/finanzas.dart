@@ -1,18 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:adcom/json/jsonFinanzas.dart';
-import 'package:adcom/main.dart';
-import 'package:adcom/src/extra/opciones_edoCuenta.dart';
-import 'package:adcom/src/extra/referencia_view.dart';
 import 'package:adcom/src/extra/vista_tarjeta.dart';
-import 'package:adcom/src/models/event_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:stripe_payment/stripe_payment.dart';
 
 SharedPreferences? prefs;
 

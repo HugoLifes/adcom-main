@@ -1,11 +1,7 @@
-import 'dart:convert';
-
 import 'package:adcom/json/jsonReporte.dart';
 import 'package:adcom/src/extra/add_reporte.dart';
 import 'package:adcom/src/extra/report_edit_page.dart';
-import 'package:adcom/src/models/event_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -82,12 +78,14 @@ class _LevantarReporteState extends State<LevantarReporte> {
   /// Activa el guardado en memoria
   addata() async {
     prefs = await SharedPreferences.getInstance();
-    setState(() {
-      /// obtiene el id comunidad y la del usuario
-      idCom = prefs!.getInt('idCom');
-      idUser = prefs!.getInt('userId');
-      userType = prefs!.getInt('userType');
-    });
+    if (mounted) {
+      setState(() {
+        /// obtiene el id comunidad y la del usuario
+        idCom = prefs!.getInt('idCom');
+        idUser = prefs!.getInt('userId');
+        userType = prefs!.getInt('userType');
+      });
+    }
   }
 
   /// Llama al service y asigna los datos obtenido a una clase

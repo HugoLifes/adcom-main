@@ -1,5 +1,4 @@
 import 'package:adcom/json/json.dart';
-import 'package:adcom/src/extra/filter_section.dart';
 import 'package:adcom/src/methods/emailDashboard.dart';
 import 'package:adcom/src/models/event_provider.dart';
 import 'package:filter_list/filter_list.dart';
@@ -255,6 +254,7 @@ class _ContactosState extends State<Contactos> {
             );
           }));
 
+  // ignore: unused_element
   void _openFilterDialog(res) async {
     await FilterListDialog.display<Items>(context,
         listData: res,

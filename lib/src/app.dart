@@ -39,7 +39,6 @@ class _MyAppState extends State<MyApp> {
   final heroController = HeroController();
   GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   var id = 'icono';
-  bool _loggedIn = false;
 
   @override
   void initState() {

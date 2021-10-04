@@ -1,9 +1,6 @@
 import 'package:adcom/json/jsonAmenidades.dart';
-import 'package:adcom/src/methods/eventDashboard.dart';
 import 'package:adcom/src/methods/gridDashboard.dart';
-import 'package:adcom/src/models/event_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 SharedPreferences? prefs;
