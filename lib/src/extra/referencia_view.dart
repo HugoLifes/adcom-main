@@ -32,8 +32,10 @@ class _RefViewState extends State<RefView> {
                 children: [
                   InkWell(
                     onTap: () {
-                      Clipboard.setData(
-                              new ClipboardData(text: referenciaApagar()))
+                      Clipboard.setData(new ClipboardData(
+                              text: widget.refP!.isNotEmpty
+                                  ? widget.refP!.last.referenciaP
+                                  : 'referencia no generada'))
                           .then((_) {
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                             content: Text(
