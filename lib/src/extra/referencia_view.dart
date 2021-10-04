@@ -107,13 +107,14 @@ class _RefViewState extends State<RefView> {
     String? ref;
     for (int i = 0; i < widget.list!.length; i++) {
       if (widget.refP![i].idConcepto == "PA        ") {
-        return ref = widget.refP![i].referenciaP;
+        // poner return
+        ref = widget.refP![i].referenciaP;
       } else {
         if (widget.list![i].referenciaP == "0" ||
             widget.list![i].referenciaP == null) {
-          return ref = "referencia no generada";
+          ref = "referencia no generada";
         } else {
-          return ref = widget.list![i].referencia;
+          ref = widget.list![i].referencia;
         }
       }
     }
