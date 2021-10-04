@@ -70,6 +70,11 @@ class _LevantarReporteState extends State<LevantarReporte> {
   List<Map<dynamic, Map>> reversedList3 = [];
   List<Map<dynamic, Map>> reversedList4 = [];
 
+  String? comunidad;
+  String? numero;
+  String? interior;
+  var userType;
+
   GetReportes? cuentas;
 
   var idCom;
@@ -82,6 +87,7 @@ class _LevantarReporteState extends State<LevantarReporte> {
       /// obtiene el id comunidad y la del usuario
       idCom = prefs!.getInt('idCom');
       idUser = prefs!.getInt('userId');
+      userType = prefs!.getInt('userType');
     });
   }
 
@@ -91,12 +97,25 @@ class _LevantarReporteState extends State<LevantarReporte> {
     await addata();
 
     for (int i = 0; i < cuentas!.data!.length; i++) {
-      myList.add(new DataReporte(
-          id: cuentas!.data![i].idReporte,
-          descripCorta: cuentas!.data![i].descCorta,
-          desperfecto: cuentas!.data![i].descDesperfecto,
-          fechaRep: cuentas!.data![i].fechaRep,
-          uri: cuentas!.data![i].evidencia!.toList()));
+      if (userType == 2) {
+        print('aqui?');
+        myList.add(new DataReporte(
+            id: cuentas!.data![i].idReporte,
+            descripCorta: cuentas!.data![i].descCorta,
+            desperfecto: cuentas!.data![i].descDesperfecto,
+            fechaRep: cuentas!.data![i].fechaRep,
+            uri: cuentas!.data![i].evidencia!.toList(),
+            comunidad: cuentas!.data![i].comunidad!.trimRight(),
+            numero: cuentas!.data![i].numero!.trimRight(),
+            interior: cuentas!.data![i].interior!.trimRight()));
+      } else {
+        myList.add(new DataReporte(
+            id: cuentas!.data![i].idReporte,
+            descripCorta: cuentas!.data![i].descCorta,
+            desperfecto: cuentas!.data![i].descDesperfecto,
+            fechaRep: cuentas!.data![i].fechaRep,
+            uri: cuentas!.data![i].evidencia!.toList()));
+      }
 
       for (int j = 0; j < cuentas!.data![i].progreso!.length; j++) {
         //mapeado del estatus asgigando id
@@ -235,10 +254,29 @@ class _LevantarReporteState extends State<LevantarReporte> {
                       style: TextStyle(fontSize: 18),
                     ),
                   ),
-                  Text(
-                    '${reversedList[index].fechaRep!.day}/${reversedList[index].fechaRep!.month}/${reversedList[index].fechaRep!.year}',
-                    style: TextStyle(fontSize: 18),
-                  )
+                  Column(children: [
+                    Text(
+                      '${reversedList[index].fechaRep!.day}/${reversedList[index].fechaRep!.month}/${reversedList[index].fechaRep!.year}',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    reversedList[index].comunidad == null
+                        ? Text('')
+                        : SizedBox(
+                            width: 100,
+                            child: Text(reversedList[index].comunidad!)),
+                    reversedList[index].numero == null
+                        ? Text('')
+                        : Row(
+                            children: [
+                              Text(reversedList[index].numero!),
+                              Text('-'),
+                              Text(reversedList[index].interior!)
+                            ],
+                          ),
+                  ]),
                 ],
               ),
             ),
@@ -269,6 +307,9 @@ class DataReporte {
   DateTime? fechaRep;
   List<String>? uri = [];
   List<dynamic>? progreso = [];
+  String? comunidad;
+  String? numero;
+  String? interior;
 
   DataReporte(
       {this.id,
@@ -276,5 +317,8 @@ class DataReporte {
       this.desperfecto,
       this.fechaRep,
       this.uri,
-      this.progreso});
+      this.progreso,
+      this.comunidad,
+      this.interior,
+      this.numero});
 }
