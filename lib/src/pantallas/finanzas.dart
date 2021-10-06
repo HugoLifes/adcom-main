@@ -1,18 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:adcom/json/jsonFinanzas.dart';
-import 'package:adcom/main.dart';
+
 import 'package:adcom/src/extra/opciones_edoCuenta.dart';
-import 'package:adcom/src/extra/referencia_view.dart';
+
 import 'package:adcom/src/extra/vista_tarjeta.dart';
-import 'package:adcom/src/models/event_provider.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+
 import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:stripe_payment/stripe_payment.dart';
 
 SharedPreferences? prefs;
 
@@ -42,6 +40,7 @@ Future<Accounts?> getAdeudos() async {
 }
 
 class _FinanzasState extends State<Finanzas> {
+  late GlobalKey<ScaffoldState> _scaffoldKey;
   bool isdone = false;
   Accounts? cuentas;
   List<DatosCuenta> mylist = [];
@@ -70,12 +69,19 @@ class _FinanzasState extends State<Finanzas> {
 
     /// funcion que obtiene datos del service
     data();
+    _scaffoldKey = GlobalKey();
 
     ///refresqueo cuando hay datos
     if (itsTrue == false) {
     } else {
       Future.delayed(Duration(seconds: 1), () => {refresh()});
     }
+  }
+
+  @override
+  void dispose() {
+    _scaffoldKey.currentState?.dispose();
+    super.dispose();
   }
 
   @override
@@ -113,66 +119,81 @@ class _FinanzasState extends State<Finanzas> {
             SafeArea(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20),
-                child: ListView(shrinkWrap: true, children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        height: size.width / 20,
-                      ),
-                      Text(
-                        'Toma el control de tus gastos',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: 17),
-                      ),
-                      SizedBox(
-                        height: size.width / 20,
-                      ),
-                      SizedBox(
-                        width: size.width * .6,
-                        child: Text(
-                          'Mantente actualizado revisando tus estados de cuenta y adeudos pendientes.',
-                          style: TextStyle(
-                              color: Colors.white, fontSize: size.width / 21),
+                child: RefreshIndicator(
+                  onRefresh: () {
+                    return Future.delayed(Duration(seconds: 1), () {
+                      setState(() {
+                        if (localList.isNotEmpty) {
+                          localList.clear();
+                          data();
+                        } else {
+                          data();
+                        }
+                      });
+                    });
+                  },
+                  child: ListView(children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: size.width / 20,
                         ),
-                      ),
-                      Container(
-                          padding: EdgeInsets.only(
-                            top: size.width / 5,
+                        Text(
+                          'Toma el control de tus gastos',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 17),
+                        ),
+                        SizedBox(
+                          height: size.width / 20,
+                        ),
+                        SizedBox(
+                          width: size.width * .6,
+                          child: Text(
+                            'Mantente actualizado revisando tus estados de cuenta y adeudos pendientes.',
+                            style: TextStyle(
+                                color: Colors.white, fontSize: size.width / 21),
                           ),
-                          child: localList.isEmpty
-                              ? Center(
-                                  child: itsTrue == false
-                                      ? Container(
-                                          padding:
-                                              const EdgeInsets.only(top: 90),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Image.asset(
-                                                'assets/images/magic.png',
-                                                width: size.width / 1,
-                                                height: 200,
-                                              ),
-                                              Text(
-                                                'Lo sentimos, por el momento no cuenta con adeudos',
-                                                style: TextStyle(
-                                                  fontSize: size.width / 20,
-                                                  color: Colors.lightGreen[700],
+                        ),
+                        Container(
+                            padding: EdgeInsets.only(
+                              top: size.width / 5,
+                            ),
+                            child: localList.isEmpty
+                                ? Center(
+                                    child: itsTrue == false
+                                        ? Container(
+                                            padding:
+                                                const EdgeInsets.only(top: 90),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Image.asset(
+                                                  'assets/images/magic.png',
+                                                  width: size.width / 1,
+                                                  height: 200,
                                                 ),
-                                                textAlign: TextAlign.justify,
-                                              )
-                                            ],
-                                          ))
-                                      : CircularProgressIndicator(),
-                                )
-                              : mainView())
-                    ],
-                  ),
-                ]),
+                                                Text(
+                                                  'Lo sentimos, por el momento no cuenta con adeudos',
+                                                  style: TextStyle(
+                                                    fontSize: size.width / 20,
+                                                    color:
+                                                        Colors.lightGreen[700],
+                                                  ),
+                                                  textAlign: TextAlign.justify,
+                                                )
+                                              ],
+                                            ))
+                                        : CircularProgressIndicator(),
+                                  )
+                                : mainView())
+                      ],
+                    ),
+                  ]),
+                ),
               ),
             ),
           ],
@@ -362,7 +383,8 @@ class _FinanzasState extends State<Finanzas> {
                     localList[i].referencia!,
                   ),
                   deuda: tardio,
-                  referenciaP: localList[i].referenciaP! == "0"
+                  referenciaP: localList[i].referenciaP == "0" ||
+                          localList[i].referenciaP == null
                       ? int.parse(localList[i].referenciaP!)
                       : int.parse(refPadre.last.referenciaP!),
                   folio: folio,

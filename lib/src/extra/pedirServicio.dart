@@ -30,6 +30,8 @@ class _PedirServicioState extends State<PedirServicio> {
   String? noInt;
   String? eleccion;
   bool? select;
+  bool? select2;
+  bool? select3;
   String? chosenValue2;
   late DateTime fromDate;
   late DateTime toDate;
@@ -59,6 +61,9 @@ class _PedirServicioState extends State<PedirServicio> {
   void initState() {
     super.initState();
     getDt();
+    select = false;
+    select2 = false;
+    select3 = false;
     fromDate = DateTime.now();
     toDate = DateTime.now().add(Duration(hours: 2));
   }
@@ -99,21 +104,24 @@ class _PedirServicioState extends State<PedirServicio> {
       onStepContinue: () {
         setState(() {
           if (this._currentStep < this._stepper()!.length - 1) {
-            this._currentStep = this._currentStep + 1;
+            if (this._currentStep == 3) {
+              if (fromDate.weekday == DateTime.tuesday ||
+                  fromDate.weekday == DateTime.thursday) {
+                print('aqui');
+                alerta();
+              } else {
+                print('aqui2');
+                setState(() {
+                  this._currentStep = this._currentStep + 1;
+                });
+              }
+            } else {
+              setState(() {
+                this._currentStep = this._currentStep + 1;
+              });
+            }
           }
         });
-
-        if (this._currentStep == 3) {
-          if (fromDate.weekday == 2 || fromDate.weekday == 4) {
-            setState(() {
-              this._currentStep = this._currentStep + 0;
-            });
-          } else {
-            setState(() {
-              this._currentStep = this._currentStep + 1;
-            });
-          }
-        }
       },
       onStepCancel: () {
         setState(() {
@@ -155,19 +163,20 @@ class _PedirServicioState extends State<PedirServicio> {
                 onTap: () {
                   setState(() {
                     eleccion = '30kg';
+                    select = true;
+                    select2 = false;
+                    select3 = false;
                   });
-                  Fluttertoast.showToast(
-                      msg: "Tanque 30kg",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.CENTER,
-                      timeInSecForIosWeb: 1,
-                      backgroundColor: Colors.white,
-                      textColor: Colors.black,
-                      fontSize: 17.0);
                 },
                 child: Container(
                     width: 90,
                     height: 90,
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                            color: select == true
+                                ? Colors.red
+                                : Colors.transparent,
+                            width: 2.0)),
                     child: Image.asset(
                       'assets/images/30kg.png',
                       fit: BoxFit.contain,
@@ -177,44 +186,41 @@ class _PedirServicioState extends State<PedirServicio> {
                 onTap: () {
                   setState(() {
                     eleccion = '45kg';
+                    select = false;
+                    select2 = true;
+                    select3 = false;
                   });
-                  Fluttertoast.showToast(
-                      msg: "Tanque 45kg",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.CENTER,
-                      timeInSecForIosWeb: 1,
-                      backgroundColor: Colors.white,
-                      textColor: Colors.black,
-                      fontSize: 17.0);
                 },
                 child: Container(
                     width: 90,
                     height: 90,
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                            color: select2 == true
+                                ? Colors.red
+                                : Colors.transparent,
+                            width: 2.0)),
                     child: Image.asset('assets/images/45kg.png',
                         fit: BoxFit.contain)),
               ),
               InkWell(
-                onFocusChange: (v) {
-                  print(v);
-                  setState(() {
-                    select = v;
-                  });
-                },
-                onHighlightChanged: (v) {
-                  if (select = true) {
-                    Colors.red;
-                  } else {
-                    Colors.transparent;
-                  }
-                },
                 onTap: () {
                   setState(() {
                     eleccion = 'Estacionario';
+                    select = false;
+                    select2 = false;
+                    select3 = true;
                   });
                 },
                 child: Container(
                     width: 90,
                     height: 90,
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                            color: select3 == true
+                                ? Colors.red
+                                : Colors.transparent,
+                            width: 2.0)),
                     child: Image.asset('assets/images/estacionario.png',
                         fit: BoxFit.contain)),
               )
@@ -320,6 +326,7 @@ class _PedirServicioState extends State<PedirServicio> {
             hintText: 'Nombre Completo'),
       );
 
+  /// construye el los toma tiempo y fecha
   buildDateTimePickers() => Column(
         children: [
           buildForm(),
@@ -378,6 +385,7 @@ class _PedirServicioState extends State<PedirServicio> {
         ],
       );
 
+  /// Fecha inicial
   buildForm() => buildHeader(
         header: 'DE',
         child: Row(
@@ -414,6 +422,7 @@ class _PedirServicioState extends State<PedirServicio> {
     setState(() => fromDate = date);
   }
 
+  ///la fecha destino
   buildTo() => buildHeader(
         header: 'A',
         child: Row(
@@ -441,6 +450,7 @@ class _PedirServicioState extends State<PedirServicio> {
     setState(() => toDate = date);
   }
 
+  /// Toma el tiempo
   Future<DateTime?> pickDateTime(DateTime initialDate,
       {required bool pickDate, DateTime? firstDate}) async {
     if (pickDate) {
@@ -466,5 +476,57 @@ class _PedirServicioState extends State<PedirServicio> {
 
       return date.add(time);
     }
+  }
+
+  ///muestra mensaje para advertir al usuario que ciertos dias no esta tan accesible el gas
+  alerta() {
+    Widget okButton = TextButton(
+        onPressed: () {
+          setState(() {
+            this._currentStep = this._currentStep + 1;
+          });
+          Navigator.of(context).pop();
+        },
+        child: Text(
+          'Si, continuar',
+          style: TextStyle(color: Colors.red[900]),
+        ));
+    Widget backButton = TextButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: Text(
+          'Regresar',
+          style: TextStyle(color: Colors.orange),
+        ));
+    AlertDialog alert = AlertDialog(
+      actions: [okButton, backButton],
+      title: Text(
+        'Atención!',
+        style: TextStyle(
+          fontSize: 25,
+        ),
+      ),
+      content: Container(
+        width: 140,
+        height: 150,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Adcom informa',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Text(
+                'Los dias Martes y Miercoles, el gas no tiene prioridad en este fraccionamiento, esto podria hacer que demore un poco mas, le pedimos que sea paciente.')
+          ],
+        ),
+      ),
+    );
+
+    showDialog(context: context, builder: (_) => alert);
   }
 }

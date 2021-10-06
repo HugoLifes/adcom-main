@@ -23,7 +23,12 @@ class _MultiServiciosState extends State<MultiServicios> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Seleccione su servicio'),
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        title: Text(
+          'Seleccione su servicio',
+          style: TextStyle(color: Colors.black),
+        ),
       ),
       body: ListView.separated(
           separatorBuilder: (context, index) {

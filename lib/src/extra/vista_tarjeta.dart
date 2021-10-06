@@ -515,15 +515,22 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
 
   ///ok
   estadodepagoColor() {
+    int? hoy;
+    int? limite;
+    int? diferencia;
     Color? estado;
     for (int i = 0; i < widget.newList!.length; i++) {
-      if (widget.newList![i].pago == 1) {
+      print(DateTime.now().difference(widget.newList![i].fechaLimite!).inDays);
+      print(widget.newList![i].fechaLimite!.difference(DateTime.now()).inDays);
+      limite = widget.newList![i].fechaLimite!.day;
+      hoy = DateTime.now().day;
+      diferencia = limite - hoy;
+      print(diferencia);
+      if ((widget.newList![i].pago == 1)) {
         estado = Colors.lightGreen[700];
       } else {
-        if (DateTime.now().day <= widget.newList![i].fechaLimite!.day &&
-                DateTime.now().month <= widget.newList![i].fechaLimite!.month &&
-                DateTime.now().year <= widget.newList![i].fechaLimite!.year ||
-            widget.newList![i].fechaLimite!.isAfter(DateTime.now())) {
+        if (DateTime.now().difference(widget.newList![i].fechaLimite!).inDays <=
+            0) {
           return estado = Colors.amber[400];
         } else {
           return estado = Colors.red[700];
