@@ -13,8 +13,9 @@ SharedPreferences? prefs;
 // ignore: must_be_immutable
 class DetallesPago extends StatefulWidget {
   late List<DatosCuenta>? list = [];
+  late List<DatosCuenta>? refp = [];
   bool? hayRefPadre;
-  DetallesPago({Key? key, this.list, this.hayRefPadre}) : super(key: key);
+  DetallesPago({Key? key, this.list, this.refp}) : super(key: key);
 
   @override
   _DetallesPagoState createState() => _DetallesPagoState();
@@ -139,7 +140,7 @@ class _DetallesPagoState extends State<DetallesPago> {
                           });
                         });
                       }
-
+                      pagarTodo();
                       if (contadorTotal != 0.0) {
                         showButton();
                       }
@@ -167,7 +168,7 @@ class _DetallesPagoState extends State<DetallesPago> {
             Divider(
               color: Colors.grey,
             ),
-            Container(
+            /*  Container(
               padding: EdgeInsets.only(left: 10),
               child: Row(
                 children: [
@@ -197,7 +198,7 @@ class _DetallesPagoState extends State<DetallesPago> {
                   usarSaldo == true ? Text('\$ 200 MXN') : Text('')
                 ],
               ),
-            ),
+            ) */
             pa == false
                 ? Row(
                     children: [
@@ -214,7 +215,7 @@ class _DetallesPagoState extends State<DetallesPago> {
                                 width: size.width / 26,
                               ),
                               checkedAll == true
-                                  ? Text('${pagarTodo()} MXN',
+                                  ? Text('${contadorTotal} MXN',
                                       style: TextStyle(fontSize: 19))
                                   : Text(
                                       ///contador
@@ -380,7 +381,9 @@ class _DetallesPagoState extends State<DetallesPago> {
         }
       }
 
-      return contadorTotal;
+      setState(() {
+        contadorTotal;
+      });
     } else {
       print(contadorTotal);
       setState(() {

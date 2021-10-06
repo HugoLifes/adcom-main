@@ -241,12 +241,15 @@ class _OpcionesEdoCuentaState extends State<OpcionesEdoCuenta> {
             ]));
   }
 
+  /// construye la tabla que tiene el concepor y el por que pago
   _buildTable() {
     final headers = ['Concepto', 'Referencia', 'Monto', 'Forma de pago'];
     final users = [
       Users(
           concepto: 'Mantenimiento ${widget.users!.concepto}',
-          referencia: widget.users!.referencia,
+          referencia: widget.users!.referenciaP == 0
+              ? widget.users!.referencia
+              : widget.users!.referenciaP,
           monto: widget.users!.monto,
           tipoPago: widget.users!.tipoPago),
     ];
@@ -268,6 +271,7 @@ class _OpcionesEdoCuentaState extends State<OpcionesEdoCuenta> {
             headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold)));
   }
 
+  ///Datos como el residente, Domicilio, Nombre etc
   _buildDataUser() {
     return pw.Container(
         padding: const pw.EdgeInsets.all(11.0),
@@ -313,17 +317,18 @@ class Users {
   final double? deuda;
   final String? fecha;
   final int? folio;
+  final int? referenciaP;
+
   const Users(
       {this.tipoPago,
       this.referencia,
+      this.referenciaP,
       this.monto,
       this.concepto,
       this.deuda,
       this.folio,
       this.fecha});
 }
-
-class Meses {}
 
 class Comunidad {
   final String? nombreFracc;

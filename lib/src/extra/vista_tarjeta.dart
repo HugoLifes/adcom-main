@@ -146,6 +146,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (_) => DetallesPago(
                               list: widget.newList!,
+                              refp: widget.refP,
                             )));
                   },
                   child: Text('Detalles',

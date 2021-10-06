@@ -31,37 +31,25 @@ class _RefViewState extends State<RefView> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   InkWell(
-                    onTap: () {
-                      Clipboard.setData(new ClipboardData(
-                              text: widget.refP!.isNotEmpty
-                                  ? widget.refP!.last.referenciaP
-                                  : 'referencia no generada'))
-                          .then((_) {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text(
-                          "La referencia se ha copiado exitosamente!",
-                          style: TextStyle(fontSize: 20),
-                        )));
-                      });
-                    },
-                    child: widget.refP!.isNotEmpty
-                        ? Text(
-                            '${widget.refP!.last.referenciaP}',
-                            style: TextStyle(
-                                fontSize: 35,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'Roboto',
-                                decoration: TextDecoration.underline),
-                          )
-                        : Text(
-                            'Genere una referencia',
-                            style: TextStyle(
-                                fontSize: 35,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'Roboto',
-                                decoration: TextDecoration.underline),
-                          ),
-                  ),
+                      onTap: () {
+                        Clipboard.setData(
+                                new ClipboardData(text: referenciaApagar()))
+                            .then((_) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text(
+                            "La referencia se ha copiado exitosamente!",
+                            style: TextStyle(fontSize: 20),
+                          )));
+                        });
+                      },
+                      child: Text(
+                        '${referenciaApagar()}',
+                        style: TextStyle(
+                            fontSize: 35,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Roboto',
+                            decoration: TextDecoration.underline),
+                      )),
                   InkWell(
                       onTap: () {
                         Clipboard.setData(
@@ -108,15 +96,24 @@ class _RefViewState extends State<RefView> {
   referenciaApagar() {
     String? ref;
     for (int i = 0; i < widget.list!.length; i++) {
-      if (widget.refP![i].idConcepto == "PA        ") {
-        // poner return
-        ref = widget.refP![i].referenciaP;
-      } else {
+      if (widget.refP!.isEmpty) {
         if (widget.list![i].referenciaP == "0" ||
             widget.list![i].referenciaP == null) {
-          ref = "referencia no generada";
-        } else {
           ref = widget.list![i].referencia;
+        } else {
+          ref = widget.list![i].referenciaP;
+        }
+      } else {
+        if (widget.refP![i].idConcepto == "PA        ") {
+          // poner return
+          return ref = widget.refP!.last.referenciaP;
+        } else {
+          if (widget.list![i].referenciaP == "0" ||
+              widget.list![i].referenciaP == null) {
+            ref = widget.list![i].referencia;
+          } else {
+            ref = widget.list![i].referenciaP;
+          }
         }
       }
     }

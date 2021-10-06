@@ -1,3 +1,4 @@
+import 'package:adcom/src/extra/multiServ.dart';
 import 'package:adcom/src/extra/pedirServicio.dart';
 import 'package:glyphicon/glyphicon.dart';
 import 'package:grouped_list/grouped_list.dart';
@@ -16,14 +17,17 @@ class Services extends StatefulWidget {
 class _ServicesState extends State<Services> {
   List<ServiceStore> servicios = [
     new ServiceStore(
+        tipoDeServ: 1,
         nombre: 'Gas',
         descripcion: 'Servicios de Gas LP',
         horario: '8:00 am - 6:00 pm',
         icon: Icon(
           Icons.fireplace,
-          size: 50,
+          size: 52,
+          color: Colors.red[700],
         )),
-    new ServiceStore(
+    /*  new ServiceStore(
+        tipoDeServ: 2,
         nombre: 'Plomeria',
         descripcion: 'Servicios para el hogar',
         horario: '8:00 am - 6:00 pm',
@@ -32,6 +36,7 @@ class _ServicesState extends State<Services> {
           size: 50,
         )),
     new ServiceStore(
+        tipoDeServ: 3,
         nombre: 'Agua',
         descripcion: 'Agua a domicilio',
         horario: '8:00 am - 6:00 pm',
@@ -40,13 +45,14 @@ class _ServicesState extends State<Services> {
           size: 50,
         )),
     new ServiceStore(
+        tipoDeServ: 4,
         nombre: 'Otros',
         descripcion: 'Otros servicios',
         horario: '8:00 am - 6:00 pm',
         icon: Icon(
           Icons.work_outline_outlined,
           size: 50,
-        ))
+        )) */
   ];
 
   @override
@@ -67,12 +73,15 @@ class _ServicesState extends State<Services> {
           itemBuilder: (_, int index) {
             return InkWell(
               onTap: () {
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (_) => PedirServicio()));
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => MultiServicios(
+                          service: servicios[index].tipoDeServ,
+                        )));
               },
               child: Container(
-                  padding: EdgeInsets.all(12),
+                  padding: EdgeInsets.only(left: 10, top: 16),
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       Container(
@@ -103,52 +112,6 @@ class _ServicesState extends State<Services> {
       ),
     );
   }
-
-  agrupado() {
-    GroupedListView<dynamic, String>(
-      elements: servicios,
-      groupBy: (element) => element['group'],
-      groupSeparatorBuilder: (String groupByValue) => Text(groupByValue),
-      itemBuilder: (context, dynamic index) {
-        return InkWell(
-          onTap: () {
-            Navigator.of(context)
-                .push(MaterialPageRoute(builder: (_) => PedirServicio()));
-          },
-          child: Container(
-              child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Container(
-                child: Image.asset('assets/images/k19.png', width: 110),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    servicios[index].descripcion!,
-                    style: TextStyle(fontSize: 18),
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    servicios[index].horario!,
-                    style: TextStyle(fontSize: 16),
-                  )
-                ],
-              )
-            ],
-          )),
-        );
-      },
-      itemComparator: (item1, item2) =>
-          item1['name'].compareTo(item2['name']), // optional
-      useStickyGroupSeparators: true, // optional
-      floatingHeader: true, // optional
-      order: GroupedListOrder.ASC, // optional
-    );
-  }
 }
 
 class ServiceStore {
@@ -157,7 +120,13 @@ class ServiceStore {
   String? horario;
   Image? image;
   Icon? icon;
+  int? tipoDeServ;
 
   ServiceStore(
-      {this.descripcion, this.horario, this.image, this.nombre, this.icon});
+      {this.descripcion,
+      this.horario,
+      this.image,
+      this.nombre,
+      this.icon,
+      this.tipoDeServ});
 }

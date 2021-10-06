@@ -189,19 +189,13 @@ class _FinanzasState extends State<Finanzas> {
     }
   }
 
-  //Se usa para atualizar el estado de la tarjeta
+  ///Se usa para atualizar el estado de la tarjeta
   refresh() {
     setState(() {
       if (mounted) {
         mainView();
       }
     });
-  }
-
-  recargos() {
-    for (int i = 0; i < localList.length; i++) {
-      if (localList[i].pagoTardio == 1) {}
-    }
   }
 
   /// esta funcion se usa para crear el pdf
@@ -219,7 +213,7 @@ class _FinanzasState extends State<Finanzas> {
       monto = double.parse(localList[i].montoPago!);
       tardio = double.parse(localList[i].montoTardio!);
       if (localList[i].pago == 1) {
-        mesPagado = localList[i].fechaPago!.month;
+        mesPagado = localList[i].fechaGenerada!.month;
         fecha =
             '${localList[i].fechaPago!.day}/${localList[i].fechaPago!.month}/${localList[i].fechaPago!.year}';
         tipoPago = localList[i].formaDePago!;
@@ -249,6 +243,9 @@ class _FinanzasState extends State<Finanzas> {
                   fecha: fecha,
                   deuda: tardio,
                   folio: folio,
+                  referenciaP: localList[i].referenciaP! == "0"
+                      ? int.parse(localList[i].referenciaP!)
+                      : int.parse(refPadre.last.referenciaP!),
                   tipoPago: tipoPago));
             });
             break;
@@ -263,6 +260,9 @@ class _FinanzasState extends State<Finanzas> {
                   fecha: fecha,
                   deuda: tardio,
                   folio: folio,
+                  referenciaP: localList[i].referenciaP! == "0"
+                      ? int.parse(localList[i].referenciaP!)
+                      : int.parse(refPadre.last.referenciaP!),
                   tipoPago: tipoPago));
             });
             break;
@@ -277,6 +277,9 @@ class _FinanzasState extends State<Finanzas> {
                   ),
                   deuda: tardio,
                   folio: folio,
+                  referenciaP: localList[i].referenciaP! == "0"
+                      ? int.parse(localList[i].referenciaP!)
+                      : int.parse(refPadre.last.referenciaP!),
                   tipoPago: tipoPago));
             });
             break;
@@ -291,6 +294,9 @@ class _FinanzasState extends State<Finanzas> {
                   ),
                   deuda: tardio,
                   folio: folio,
+                  referenciaP: localList[i].referenciaP! == "0"
+                      ? int.parse(localList[i].referenciaP!)
+                      : int.parse(refPadre.last.referenciaP!),
                   tipoPago: tipoPago));
             });
             break;
@@ -305,6 +311,9 @@ class _FinanzasState extends State<Finanzas> {
                   fecha: fecha,
                   deuda: tardio,
                   folio: folio,
+                  referenciaP: localList[i].referenciaP! == "0"
+                      ? int.parse(localList[i].referenciaP!)
+                      : int.parse(refPadre.last.referenciaP!),
                   tipoPago: tipoPago));
             });
             break;
@@ -320,6 +329,9 @@ class _FinanzasState extends State<Finanzas> {
                   ),
                   deuda: tardio,
                   folio: folio,
+                  referenciaP: localList[i].referenciaP! == "0"
+                      ? int.parse(localList[i].referenciaP!)
+                      : int.parse(refPadre.last.referenciaP!),
                   tipoPago: tipoPago));
             });
             break;
@@ -334,6 +346,9 @@ class _FinanzasState extends State<Finanzas> {
                   ),
                   deuda: tardio,
                   folio: folio,
+                  referenciaP: localList[i].referenciaP! == "0"
+                      ? int.parse(localList[i].referenciaP!)
+                      : int.parse(refPadre.last.referenciaP!),
                   tipoPago: tipoPago));
             });
             break;
@@ -347,6 +362,9 @@ class _FinanzasState extends State<Finanzas> {
                     localList[i].referencia!,
                   ),
                   deuda: tardio,
+                  referenciaP: localList[i].referenciaP! == "0"
+                      ? int.parse(localList[i].referenciaP!)
+                      : int.parse(refPadre.last.referenciaP!),
                   folio: folio,
                   tipoPago: tipoPago));
             });
@@ -357,6 +375,9 @@ class _FinanzasState extends State<Finanzas> {
                   concepto: 'Septiembre',
                   monto: monto,
                   fecha: fecha,
+                  referenciaP: localList[i].referenciaP! == "0"
+                      ? int.parse(localList[i].referenciaP!)
+                      : int.parse(refPadre.last.referenciaP!),
                   referencia: int.parse(
                     localList[i].referencia!,
                   ),
@@ -376,6 +397,9 @@ class _FinanzasState extends State<Finanzas> {
                     localList[i].referencia!,
                   ),
                   deuda: tardio,
+                  referenciaP: localList[i].referenciaP! == "0"
+                      ? int.parse(localList[i].referenciaP!)
+                      : int.parse(refPadre.last.referenciaP!),
                   folio: folio,
                   tipoPago: tipoPago));
             });
@@ -390,6 +414,9 @@ class _FinanzasState extends State<Finanzas> {
                     localList[i].referencia!,
                   ),
                   deuda: tardio,
+                  referenciaP: localList[i].referenciaP! == "0"
+                      ? int.parse(localList[i].referenciaP!)
+                      : int.parse(refPadre.last.referenciaP!),
                   folio: folio,
                   tipoPago: tipoPago));
             });
@@ -404,6 +431,9 @@ class _FinanzasState extends State<Finanzas> {
                     localList[i].referencia!,
                   ),
                   deuda: tardio,
+                  referenciaP: localList[i].referenciaP! == "0"
+                      ? int.parse(localList[i].referenciaP!)
+                      : int.parse(refPadre.last.referenciaP!),
                   folio: folio,
                   tipoPago: tipoPago));
             });
@@ -429,6 +459,7 @@ class _FinanzasState extends State<Finanzas> {
           });
 
           refPadre.add(new DatosCuenta(
+              pago: cuentas!.data![i].pago,
               referenciaP: cuentas!.data![i].referencaiP!,
               idConcepto: cuentas!.data![i].idConcepto!));
         } else {
@@ -464,6 +495,8 @@ class _FinanzasState extends State<Finanzas> {
       }
 
       setState(() {
+        prefs!.setString('comunidad', cuentas!.data2!.comunidad!);
+        prefs!.setString('noInterno', cuentas!.data2!.noExterno!);
         datosUsuario = DatosUsuario(
             noExt: cuentas!.data2!.noExterno,
             noInt: cuentas!.data2!.noInterior,
@@ -482,7 +515,7 @@ class _FinanzasState extends State<Finanzas> {
     await ultimoMes();
   }
 
-  // main view representa la vista a la tarjeta, donde salen los adeudos
+  /// main view representa la vista a la tarjeta, donde salen los adeudos
   mainView() {
     return Column(
       children: [
