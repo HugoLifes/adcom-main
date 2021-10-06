@@ -41,6 +41,9 @@ class Datum {
     this.evidencia,
     this.progreso,
     this.idReporte,
+    this.comunidad,
+    this.interior,
+    this.numero,
   });
 
   String? descCorta;
@@ -49,23 +52,27 @@ class Datum {
   List<String>? evidencia;
   List<Progreso>? progreso;
   int? idReporte;
+  String? comunidad;
+  String? numero;
+  String? interior;
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
-        descCorta: json["DESC_CORTA"] == null ? null : json["DESC_CORTA"],
-        descDesperfecto:
-            json["DESC_DESPERFECTO"] == null ? null : json["DESC_DESPERFECTO"],
-        fechaRep: json["FECHA_REP"] == null
-            ? null
-            : DateTime.parse(json["FECHA_REP"]),
-        evidencia: json["EVIDENCIA"] == null
-            ? null
-            : List<String>.from(json["EVIDENCIA"].map((x) => x)),
-        progreso: json["PROGRESO"] == null
-            ? null
-            : List<Progreso>.from(
-                json["PROGRESO"].map((x) => Progreso.fromJson(x))),
-        idReporte: json["ID_REPORTE"] == null ? null : json["ID_REPORTE"],
-      );
+      descCorta: json["DESC_CORTA"] == null ? null : json["DESC_CORTA"],
+      descDesperfecto:
+          json["DESC_DESPERFECTO"] == null ? null : json["DESC_DESPERFECTO"],
+      fechaRep:
+          json["FECHA_REP"] == null ? null : DateTime.parse(json["FECHA_REP"]),
+      evidencia: json["EVIDENCIA"] == null
+          ? null
+          : List<String>.from(json["EVIDENCIA"].map((x) => x)),
+      progreso: json["PROGRESO"] == null
+          ? null
+          : List<Progreso>.from(
+              json["PROGRESO"].map((x) => Progreso.fromJson(x))),
+      idReporte: json["ID_REPORTE"] == null ? null : json["ID_REPORTE"],
+      comunidad: json["COMUNIDAD"] == null ? null : json["COMUNIDAD"],
+      numero: json["NUMERO"] == null ? null : json["NUMERO"],
+      interior: json["INTERIOR"] == null ? null : json["INTERIOR"]);
 
   Map<String, dynamic> toJson() => {
         "DESC_CORTA": descCorta == null ? null : descCorta,
@@ -78,6 +85,9 @@ class Datum {
             ? null
             : List<dynamic>.from(progreso!.map((x) => x.toJson())),
         "ID_REPORTE": idReporte == null ? null : idReporte,
+        "COMUNIDAD": comunidad == null ? null : comunidad,
+        "NUMERO": numero == null ? null : numero,
+        "INTERIOR": interior == null ? null : interior,
       };
 }
 

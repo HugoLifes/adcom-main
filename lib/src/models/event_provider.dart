@@ -61,12 +61,13 @@ class EventProvider extends ChangeNotifier {
   }
 
   var userd;
-  void login(user, pass, ctx) async {
+  void login(user, pass, ctx, TextEditingController tk, TextEditingController tk2) async {
     _loading = false;
     notifyListeners();
 
-    _loading = true;
+    try{
     await loginAcces(user, pass).then((value) {
+      _loading = true;
       var userId;
       var post = value;
       if (post!.value == 1) {
@@ -97,8 +98,30 @@ class EventProvider extends ChangeNotifier {
       pref.setBool('isLoggedIn', true);
       notifyListeners();
     } else {
+      _loading = false;
       _islogged = false;
       notifyListeners();
+    }
+    }catch(e){
+      _loading = false;
+      HapticFeedback.lightImpact();
+      {
+    Widget okButton = TextButton(
+        onPressed: () {
+          Navigator.of(ctx).pushNamedAndRemoveUntil('/', (route) => false);
+          tk.clear();
+          tk2.clear();
+        },
+        child: Text('OK'));
+
+    AlertDialog alert = AlertDialog(
+      title: Text('Atencion!'),
+      content: Text('Usuario o contraseña incorrectos, intente de nuevo'),
+      actions: [okButton],
+    );
+
+    showDialog(context: ctx, builder: (_) => alert);
+  }
     }
   }
 
@@ -113,6 +136,7 @@ class EventProvider extends ChangeNotifier {
       _loading = false;
       notifyListeners();
     }
+  
   }
 
   void addDataRep(DataReporte datarep) {

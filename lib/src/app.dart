@@ -86,12 +86,12 @@ class _MyAppState extends State<MyApp> {
           '/screen17': (BuildContext context) {
             var tru = prefs!.containsKey('UnaVez');
             if(tru == true){
-              return AddReorte();
+              return AddReporte();
             }else{
               return OnBoardReportes();
             }
           },
-          '/screen18': (BuildContext context) => AddReorte()
+          '/screen18': (BuildContext context) => AddReporte()
         },
       ),
     );

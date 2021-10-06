@@ -2,6 +2,7 @@ import 'package:adcom/src/pantallas/finanzas.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+// ignore: must_be_immutable
 class DetallesPago extends StatefulWidget {
   late List<DatosCuenta>? list = [];
   DetallesPago({Key? key, this.list}) : super(key: key);
@@ -51,7 +52,7 @@ class _DetallesPagoState extends State<DetallesPago> {
             Row(
               children: [
                 Container(
-                  padding: EdgeInsets.only(left: size.width/ 4, top: 10),
+                  padding: EdgeInsets.only(left: 150, top: 10),
                   child: Row(
                     children: [
                       Text(
@@ -141,12 +142,18 @@ class _DetallesPagoState extends State<DetallesPago> {
     }
   }
 
-   totalApagars() {
+  totalApagars() {
     late double total;
     double deuda;
 
     for (int i = 0; i < widget.list!.length; i++) {
-      total = double.parse(widget.list![i].montoCuota!);
+
+      if(widget.list![i].montoCuota == null){
+        total = 0.0;
+      }else{
+        total = double.parse(widget.list![i].montoCuota!);
+      }
+      
       deuda = double.parse(widget.list![i].montoTardio!);
 
       if (widget.list![i].pago == 1) {
@@ -171,12 +178,16 @@ class _DetallesPagoState extends State<DetallesPago> {
     }
   }
 
-   saldoDeudor() {
+  saldoDeudor() {
     double contador = 0.0;
     double deuda;
     double tardio;
     for (int i = 0; i < widget.list!.length; i++) {
-      deuda = double.parse(widget.list![i].montoCuota!);
+      if(widget.list![i].montoCuota == null){
+        deuda = 0.0;
+      }else{
+        deuda = double.parse(widget.list![i].montoCuota!);
+      }
       tardio = double.parse(widget.list![i].montoTardio!);
       if (widget.list![i].pago == 1) {
         contador;

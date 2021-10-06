@@ -71,7 +71,7 @@ class _MainMenuState extends State<MainMenu> {
                   ),
                   Container(
                       padding: EdgeInsets.only(
-                          top: size.height * .18, right: size.width / 15,  ),
+                          top: size.height / 4.6, right: size.width / 16,  ),
                       alignment: Alignment.topRight,
                       child: Image.asset(
                         'assets/images/AdCom3.png',
@@ -98,18 +98,22 @@ class _MainMenuState extends State<MainMenu> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                     children: [
-                                      Text('¡${greeting()}!', style: TextStyle(
+                                      user == null || user == '' ? Text('¡${greeting()}!', style: TextStyle(
                                             color: Colors.black,
                                             fontFamily: 'Roboto',
-                                            fontSize:  17,
+                                            fontSize:  30,
+                                            fontWeight: FontWeight.w700),) : Text('¡${greeting()}!', style: TextStyle(
+                                            color: Colors.black,
+                                            fontFamily: 'Roboto',
+                                            fontSize:  18,
                                             fontWeight: FontWeight.w700),),
                                         
                                       Text(
-                                        '${user == null ? '' : user}',
+                                        '${user == null || user == '' ? '' : user}',
                                         style: TextStyle(
                                             color: Colors.black,
                                             fontFamily: 'Roboto',
-                                            fontSize: size.width / 10,
+                                            fontSize: size.width / 11,
                                             fontWeight: FontWeight.w700),
                                       ),
                                     ],
@@ -122,8 +126,6 @@ class _MainMenuState extends State<MainMenu> {
                           ),
 
                           //no mover
-                          
-
                           GridDashboard(
                             userId: userType,
                           )

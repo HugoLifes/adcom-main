@@ -62,7 +62,7 @@ dependencies:
   lint: ^1.0.0
   file_picker: ^4.0.1
   external_path: ^1.0.1
- 
+  printing: ^5.6.0
 
 dev_dependencies:
   flutter_test:

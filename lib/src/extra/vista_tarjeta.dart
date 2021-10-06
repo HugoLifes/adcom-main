@@ -2,7 +2,6 @@ import 'package:adcom/json/jsonFinanzas.dart';
 import 'package:adcom/src/extra/detalle_pago.dart';
 import 'package:adcom/src/extra/more_view_cuota.dart';
 import 'package:adcom/src/extra/referencia_view.dart';
-
 import 'package:adcom/src/models/event_provider.dart';
 import 'package:adcom/src/pantallas/finanzas.dart';
 
@@ -11,8 +10,10 @@ import 'package:intl/intl.dart';
 
 import 'package:provider/provider.dart';
 
+// ignore: must_be_immutable
 class VistaTarjeta extends StatefulWidget {
-  VistaTarjeta({Key? key}) : super(key: key);
+  List<DatosCuenta>? newList = [];
+  VistaTarjeta({Key? key, this.newList}) : super(key: key);
 
   @override
   _VistaTarjetaState createState() => _VistaTarjetaState();
@@ -23,16 +24,16 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
   Accounts? cuentas;
   List<DatosCuenta> mylist = [];
   List<String> mesFormat = [];
+
   @override
   void initState() {
     super.initState();
     _showPersBottomSheetCallBack = _showPersBottomSheetCallBack;
-    data();
-    Future.delayed(Duration(seconds: 1), () {
-      setState(() {
-        ultimaDeuda();
-        estadodepago();
-      });
+    //data();
+
+    setState(() {
+      ultimaDeuda();
+      estadodepago();
     });
   }
 
@@ -45,126 +46,118 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     var size2 = MediaQuery.of(context).size.width;
-    return mylist.isEmpty
-        ? SizedBox()
-        : Container(
-            width: MediaQuery.of(context).size.width,
-            height: 210,
-            decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.grey, blurRadius: 6, offset: Offset(0, 1))
-                ],
-                color: estadodepagoColor(),
-                borderRadius: BorderRadius.circular(10)),
-            child: Padding(
-              padding: const EdgeInsets.only(
-                  left: 13, right: 13, top: 13, bottom: 20),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Monto de cuota',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15),
-                          ),
-                          SizedBox(
-                            height: 2.0,
-                          ),
-                          Text(
-                            '${estadodepago()}',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                            ),
-                          )
-                        ],
-                      ),
-                      Container(
-                        height: 30,
-                        child: OutlinedButton(
-                          onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (_) => RefView(
-                                      list: mylist,
-                                    )));
-                          },
-                          child: Icon(Icons.add, size: 25, color: Colors.white),
-                          style: OutlinedButton.styleFrom(
-                              side: BorderSide(
-                                  width: 1.0, color: Colors.transparent)),
-                        ),
-                      )
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      Text(
-                        '\$ ${saldoDeudor()}',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 28),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Text(
-                        mylist.isEmpty
-                            ? 'Pagar antes del día: '
-                            : 'Pagar antes del día: ${fechadepago()}',
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w400,
-                            fontSize: 14),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      OutlinedButton(
-                        onPressed: () {
-                          _showModalSheet();
-                        },
-                        child: Text(
-                          'Pagar Ahora',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.white, fontSize: 14),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                            side: BorderSide(width: 1.0, color: Colors.white)),
-                      ),
-                      //Text('|', style: TextStyle(color: Colors.white, fontSize: 15)),
 
-                      OutlinedButton(
-                        onPressed: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (_) => DetallesPago(
-                                    list: mylist,
-                                  )));
-                        },
-                        child: Text('Detalles',
-                            textAlign: TextAlign.center,
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 15)),
-                        style: OutlinedButton.styleFrom(
-                            side: BorderSide(width: 1.0, color: Colors.white)),
-                      )
-                    ],
-                  )
-                ],
-              ),
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: 220,
+      decoration: BoxDecoration(boxShadow: [
+        BoxShadow(color: Colors.grey, blurRadius: 6, offset: Offset(0, 1))
+      ], color: estadodepagoColor(), borderRadius: BorderRadius.circular(10)),
+      child: Padding(
+        padding:
+            const EdgeInsets.only(left: 13, right: 13, top: 13, bottom: 20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Monto de cuota',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15),
+                    ),
+                    SizedBox(
+                      height: 2.0,
+                    ),
+                    Text(
+                      '${estadodepago()}',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 14,
+                      ),
+                    )
+                  ],
+                ),
+                Container(
+                  height: 30,
+                  child: OutlinedButton(
+                    onPressed: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (_) => RefView(
+                                list: widget.newList,
+                              )));
+                    },
+                    child: Icon(Icons.add, size: 25, color: Colors.white),
+                    style: OutlinedButton.styleFrom(
+                        side:
+                            BorderSide(width: 1.0, color: Colors.transparent)),
+                  ),
+                )
+              ],
             ),
-          );
+            Column(
+              children: [
+                Text(
+                  '\$ ${saldoDeudor()}',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 28),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  'Pagar antes del día: ${fechadepago()}',
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w400,
+                      fontSize: 14),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                OutlinedButton(
+                  onPressed: () {
+                    _showModalSheet();
+                  },
+                  child: Text(
+                    'Pagar Ahora',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white, fontSize: 14),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                      side: BorderSide(width: 1.0, color: Colors.white)),
+                ),
+                //Text('|', style: TextStyle(color: Colors.white, fontSize: 15)),
+
+                OutlinedButton(
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (_) => DetallesPago(
+                              list: widget.newList!,
+                            )));
+                  },
+                  child: Text('Detalles',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white, fontSize: 15)),
+                  style: OutlinedButton.styleFrom(
+                      side: BorderSide(width: 1.0, color: Colors.white)),
+                )
+              ],
+            )
+          ],
+        ),
+      ),
+    );
   }
 
   void _showModalSheet() {
@@ -184,7 +177,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(
-                    'Seleccione su método de pago',
+                    'Seleccioné su método de pago',
                     style: TextStyle(fontSize: 21),
                   ),
                   SizedBox(
@@ -268,55 +261,37 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
       content: Container(
         width: size / 20,
         height: 150,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Column(
               children: [
-                Text('Mantenimiento',
+                Text('Cuota',
                     style: TextStyle(
                       fontSize: size / 20,
                       fontWeight: FontWeight.w400,
                       textBaseline: TextBaseline.alphabetic,
                     )),
-                Text('\$${ultimaDeuda2()}',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      textBaseline: TextBaseline.alphabetic,
-                    ))
               ],
             ),
             SizedBox(
               height: 12,
             ),
-            Row(
+            /*  Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Atraso',
-                  style: TextStyle(
-                      fontSize: 19,
-                      fontWeight: FontWeight.w400,
-                      textBaseline: TextBaseline.alphabetic),
-                ),
-                Text('\$${atraso()}',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      textBaseline: TextBaseline.alphabetic,
-                    ))
+                Column(
+                  children: [Text('${mesesDeAtraso()}')],
+                )
               ],
-            ),
+            ), */
             SizedBox(
               height: 15,
               child: Divider(
                 color: Colors.black,
               ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Column(
               children: [
                 Text(
                   'Total',
@@ -325,7 +300,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
                       fontWeight: FontWeight.w400,
                       textBaseline: TextBaseline.alphabetic),
                 ),
-                totalApagars() == null
+                saldoDeudor() == null
                     ? Text('\$0.0',
                         style: TextStyle(
                           fontSize: 20,
@@ -361,8 +336,8 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
           fechaPago: cuentas!.data![i].fechaPago,
           pago: cuentas!.data![i].pago!,
           totalApagar: cuentas!.data![i].totalApagar,
-          pagoTardio: cuentas!.data![i].pagoTardio,
           referencia: cuentas!.data![i].referencia,
+          pagoTardio: cuentas!.data![i].pagoTardio,
           montoTardio: cuentas!.data![i].montoPagoTardio));
     }
   }
@@ -370,11 +345,11 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
   mesesDeAtraso() {
     DateTime? mesesAtrazo;
 
-    for (int i = 0; i < mylist.length; i++) {
-      if (mylist[i].pago == 1) {
+    for (int i = 0; i < widget.newList!.length; i++) {
+      if (widget.newList![i].pago == 1) {
       } else {
         setState(() {
-          mesesAtrazo = mylist[i].fechaGenerada;
+          mesesAtrazo = widget.newList![i].fechaGenerada;
           mesFormat
               .add((DateFormat('MMM').format(DateTime(0, mesesAtrazo!.month))));
         });
@@ -385,45 +360,24 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
     return DateFormat('MMM').format(DateTime(0, mesesAtrazo!.month));
   }
 
-  saldoDeudor() {
-    double contador = 0.0;
-    double deuda;
-    double tardio;
-    for (int i = 0; i < mylist.length; i++) {
-      deuda = double.parse(mylist[i].montoCuota!);
-      tardio = double.parse(mylist[i].montoTardio!);
-      if (mylist[i].pago == 1 && mylist[i].pagoTardio == 0) {
-      } else {
-        if (DateTime.now().day <= mylist[i].fechaLimite!.day &&
-            DateTime.now().month <= mylist[i].fechaLimite!.month &&
-            DateTime.now().year <= mylist[i].fechaLimite!.year) {
-        } else {
-          setState(() {
-            contador += deuda + tardio;
-          });
-        }
-      }
-    }
-    return contador;
-  }
-
   ultimaDeuda() {
     double debe = 0.0;
     double? monto;
     int? total;
-    for (int i = 0; i < mylist.length; i++) {
-      monto = double.parse(mylist[i].montoCuota!);
-      if (mylist[i].pago == 1 && mylist[i].pagoTardio == 0) {
+    for (int i = 0; i < widget.newList!.length; i++) {
+      monto = double.parse(widget.newList![i].montoCuota!);
+      if (widget.newList![i].pago == 1 && widget.newList![i].pagoTardio == 0) {
       } else {
-        if (DateTime.now().day <= mylist[i].fechaLimite!.day &&
-            DateTime.now().month <= mylist[i].fechaLimite!.month &&
-            DateTime.now().year <= mylist[i].fechaLimite!.year) {
+        if (DateTime.now().day <= widget.newList![i].fechaLimite!.day &&
+            DateTime.now().month <= widget.newList![i].fechaLimite!.month &&
+            DateTime.now().year <= widget.newList![i].fechaLimite!.year) {
           return debe = monto;
         } else {
-          if (mylist[i].pagoTardio == 0 || mylist[i].pagoTardio == null) {
+          if (widget.newList![i].pagoTardio == 0 ||
+              widget.newList![i].pagoTardio == null) {
             return debe = monto;
           } else {
-            total = int.parse(mylist[i].montoTardio!);
+            total = int.parse(widget.newList![i].montoTardio!);
             return debe = monto + total;
           }
         }
@@ -436,16 +390,16 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
     double debe = 0.0;
     double? monto;
 
-    for (int i = 0; i < mylist.length; i++) {
-      monto = double.parse(mylist[i].montoCuota!);
-      if (mylist[i].pago == 1 && mylist[i].pagoTardio == 0) {
+    for (int i = 0; i < widget.newList!.length; i++) {
+      monto = double.parse(widget.newList![i].montoCuota!);
+      if (widget.newList![i].pago == 1 && widget.newList![i].pagoTardio == 0) {
       } else {
-        if (DateTime.now().day <= mylist[i].fechaLimite!.day &&
-            DateTime.now().month <= mylist[i].fechaLimite!.month &&
-            DateTime.now().year <= mylist[i].fechaLimite!.year) {
+        if (DateTime.now().day <= widget.newList![i].fechaLimite!.day &&
+            DateTime.now().month <= widget.newList![i].fechaLimite!.month &&
+            DateTime.now().year <= widget.newList![i].fechaLimite!.year) {
           return debe = monto;
         } else {
-          if (mylist[i].pagoTardio == 0) {
+          if (widget.newList![i].pagoTardio == 0) {
             return debe = monto;
           } else {
             return debe = monto;
@@ -460,14 +414,14 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
     int? dia;
     int? mes;
     int? year;
-    for (int i = 0; i < mylist.length; i++) {
-      if (mylist[i].pago == 1) {
+    for (int i = 0; i < widget.newList!.length; i++) {
+      if (widget.newList![i].pago == 1) {
         print('no debe');
       } else {
         setState(() {
-          dia = mylist[i].fechaLimite!.day;
-          mes = mylist[i].fechaLimite!.month;
-          year = mylist[i].fechaLimite!.year;
+          dia = widget.newList![i].fechaLimite!.day;
+          mes = widget.newList![i].fechaLimite!.month;
+          year = widget.newList![i].fechaLimite!.year;
         });
         return dia == null ? '' : '$dia/$mes/$year';
       }
@@ -476,16 +430,52 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
     return dia == null ? '' : '$dia/$mes/$year';
   }
 
+  saldoDeudor() {
+    double contador = 0.0;
+    double deuda;
+    double tardio;
+    for (int i = 0; i < widget.newList!.length; i++) {
+      if(widget.newList![i].montoCuota == null){
+        deuda = 0.0;
+      }else{
+        deuda = double.parse(widget.newList![i].montoCuota!);
+      }
+      tardio = double.parse(widget.newList![i].montoTardio!);
+      if (widget.newList![i].pago == 1) {
+        contador;
+      } else {
+        if (widget.newList![i].pagoTardio == 0) {
+          if (DateTime.now().day <= widget.newList![i].fechaLimite!.day &&
+              DateTime.now().month <= widget.newList![i].fechaLimite!.month &&
+              DateTime.now().year <= widget.newList![i].fechaLimite!.year) {
+            setState(() {
+              contador += deuda;
+            });
+          } else {
+            setState(() {
+              contador += deuda + tardio;
+            });
+          }
+        } else {
+          setState(() {
+            contador += deuda + tardio;
+          });
+        }
+      }
+    }
+    return contador;
+  }
+
   estadodepago() {
     String? estado;
-    for (int i = 0; i < mylist.length; i++) {
-      if (mylist[i].pago == 1) {
+    for (int i = 0; i < widget.newList!.length; i++) {
+      if (widget.newList![i].pago == 1) {
         estado = 'No deudas';
       } else {
-        if (DateTime.now().day <= mylist[i].fechaLimite!.day &&
-                DateTime.now().month <= mylist[i].fechaLimite!.month &&
-                DateTime.now().year <= mylist[i].fechaLimite!.year ||
-            mylist[i].fechaLimite!.isAfter(DateTime.now())) {
+        if (DateTime.now().day <= widget.newList![i].fechaLimite!.day &&
+                DateTime.now().month <= widget.newList![i].fechaLimite!.month &&
+                DateTime.now().year <= widget.newList![i].fechaLimite!.year ||
+            widget.newList![i].fechaLimite!.isAfter(DateTime.now())) {
           setState(() {
             estado = 'Pendiente';
           });
@@ -503,13 +493,13 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
 
   cuotaExtra() {
     bool? estado;
-    for (int i = 0; i < mylist.length; i++) {
-      if (mylist[i].pago == 1) {
+    for (int i = 0; i < widget.newList!.length; i++) {
+      if (widget.newList![i].pago == 1) {
         estado = true;
       } else {
-        if (DateTime.now().day <= mylist[i].fechaLimite!.day &&
-            DateTime.now().month <= mylist[i].fechaLimite!.month &&
-            DateTime.now().year <= mylist[i].fechaLimite!.year) {
+        if (DateTime.now().day <= widget.newList![i].fechaLimite!.day &&
+            DateTime.now().month <= widget.newList![i].fechaLimite!.month &&
+            DateTime.now().year <= widget.newList![i].fechaLimite!.year) {
           return estado = true;
         } else {
           return estado = false;
@@ -519,16 +509,17 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
     return estado;
   }
 
+  ///ok
   estadodepagoColor() {
     Color? estado;
-    for (int i = 0; i < mylist.length; i++) {
-      if (mylist[i].pago == 1) {
+    for (int i = 0; i < widget.newList!.length; i++) {
+      if (widget.newList![i].pago == 1) {
         estado = Colors.lightGreen[700];
       } else {
-        if (DateTime.now().day <= mylist[i].fechaLimite!.day &&
-                DateTime.now().month <= mylist[i].fechaLimite!.month &&
-                DateTime.now().year <= mylist[i].fechaLimite!.year ||
-            mylist[i].fechaLimite!.isAfter(DateTime.now())) {
+        if (DateTime.now().day <= widget.newList![i].fechaLimite!.day &&
+                DateTime.now().month <= widget.newList![i].fechaLimite!.month &&
+                DateTime.now().year <= widget.newList![i].fechaLimite!.year ||
+            widget.newList![i].fechaLimite!.isAfter(DateTime.now())) {
           return estado = Colors.amber[400];
         } else {
           return estado = Colors.red[700];
@@ -538,25 +529,27 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
     return estado == null ? estado = Colors.lightGreen[700] : estado;
   }
 
+  ///ok
   atraso() {
     int? atraso = 0;
 
-    for (int i = 0; i < mylist.length; i++) {
-      if (mylist[i].pago == 1 && mylist[i].pagoTardio == 0) {
+    for (int i = 0; i < widget.newList!.length; i++) {
+      if (widget.newList![i].pago == 1 && widget.newList![i].pagoTardio == 0) {
         return atraso = 0;
       } else {
-        return atraso = int.parse(mylist[i].montoTardio!);
+        return atraso = int.parse(widget.newList![i].montoTardio!);
       }
     }
     return atraso;
   }
 
+  ///ok
   totalApagars() {
     late int total;
 
-    for (int i = 0; i < mylist.length; i++) {
-      total = mylist[i].totalApagar!;
-      if (mylist[i].pagoTardio == 1) {
+    for (int i = 0; i < widget.newList!.length; i++) {
+      total = widget.newList![i].totalApagar!;
+      if (widget.newList![i].pagoTardio == 1) {
         return total;
       } else {
         total = 0;
@@ -564,13 +557,14 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
     }
   }
 
+  ///ok
   referenciaApagar() {
     String? ref;
-    for (int i = 0; i < mylist.length; i++) {
-      if (mylist[i].pago == 1 && mylist[i].pagoTardio == 0) {
+    for (int i = 0; i < widget.newList!.length; i++) {
+      if (widget.newList![i].pago == 1 && widget.newList![i].pagoTardio == 0) {
       } else {
         setState(() {
-          ref = mylist[i].referencia!;
+          ref = widget.newList![i].referencia!;
         });
 
         return ref;

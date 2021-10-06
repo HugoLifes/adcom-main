@@ -1,16 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:adcom/json/jsonFinanzas.dart';
-import 'package:adcom/src/extra/referencia_view.dart';
+import 'package:adcom/src/extra/opciones_edoCuenta.dart';
 import 'package:adcom/src/extra/vista_tarjeta.dart';
-import 'package:adcom/src/models/event_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:stripe_payment/stripe_payment.dart';
+
 
 SharedPreferences? prefs;
 
@@ -34,8 +30,7 @@ dataOff3(id) async {
 Future<Accounts?> getAdeudos() async {
   prefs = await SharedPreferences.getInstance();
   var id = prefs!.getInt('userId');
-  print('$id');
-
+  print(id);
   final Uri url = Uri.parse(
       'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-adeudos');
   final response = await http.post(url, body: {
@@ -54,52 +49,34 @@ class _FinanzasState extends State<Finanzas> {
   Accounts? cuentas;
   List<DatosCuenta> mylist = [];
   List<DatosCuenta>? mylist2 = [];
-  List localList = [];
+  List<DatosCuenta> localList = [];
   int? idComu;
   var montoCuota;
   Timer? timer;
   VoidCallback? _showPersBottomSheetCallBack;
   bool itsTrue = true;
+  String? mes;
+  String? ref;
+  List<Users> users = [];
+  String? userName;
+  DatosUsuario? datosUsuario;
 
-  data() async {
-    cuentas = await getAdeudos();
-
-    if (cuentas!.data!.isNotEmpty) {
-      for (int i = 0; i < cuentas!.data!.length; i++) {
-        localList.add(new DatosCuenta(
-            idComu: cuentas!.data![i].idComu,
-            montoCuota: cuentas!.data![i].montoCuota,
-            fechaGenerada: cuentas!.data![i].fechaGeneracion!,
-            fechaLimite: cuentas!.data![i].fechaLimite,
-            fechaPago: cuentas!.data![i].fechaPago,
-            pago: cuentas!.data![i].pago));
-      }
-    } else {
-      setState(() {
-        if (mounted) {
-          itsTrue = false;
-        }
-      });
-    }
-  }
-
+  /// El init state inicializa funciones cuando abre el boton mis pagos
   @override
   void initState() {
     super.initState();
+
+    /// no tocar, muestra la vista para pagar con tarjeta
     _showPersBottomSheetCallBack = _showPersBottomSheetCallBack;
+
+    /// funcion que obtiene datos del service
     data();
+
+    ///refresqueo cuando hay datos
     if (itsTrue == false) {
     } else {
       Future.delayed(Duration(seconds: 1), () => {refresh()});
     }
-  }
-
-  refresh() {
-    setState(() {
-      if (mounted) {
-        mainView();
-      }
-    });
   }
 
   @override
@@ -107,6 +84,14 @@ class _FinanzasState extends State<Finanzas> {
     var size = MediaQuery.of(context).size;
     return Scaffold(
         appBar: AppBar(
+          title: Text(
+            'Mis Pagos',
+            style: TextStyle(
+                color: Colors.white,
+                fontSize: 30,
+                fontFamily: 'Roboto',
+                fontWeight: FontWeight.w700),
+          ),
           elevation: 7,
           backgroundColor: Colors.lightGreen[700],
         ),
@@ -114,11 +99,11 @@ class _FinanzasState extends State<Finanzas> {
         body: Stack(
           children: [
             Container(
-              height: size.height * .32,
+              height: size.height * .25,
               decoration: BoxDecoration(color: Colors.lightGreen[700]),
             ),
             Container(
-              padding: EdgeInsets.only(top: size.height / 10),
+              padding: EdgeInsets.only(top: size.height / 20),
               alignment: Alignment.topRight,
               child: Icon(
                 Icons.show_chart_rounded,
@@ -134,18 +119,7 @@ class _FinanzasState extends State<Finanzas> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(
-                        height: size.width / 26,
-                      ),
-                      Text(
-                        'Mis Pagos',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 30,
-                            fontFamily: 'Roboto',
-                            fontWeight: FontWeight.w700),
-                      ),
-                      SizedBox(
-                        height: size.width / 19,
+                        height: size.width / 20,
                       ),
                       Text(
                         'Toma el control de tus gastos',
@@ -167,15 +141,14 @@ class _FinanzasState extends State<Finanzas> {
                       ),
                       Container(
                           padding: EdgeInsets.only(
-                              top: size.width / 6,
-                              left: size.width / 300,
-                              right: size.width / 300),
+                            top: size.width / 5,
+                          ),
                           child: localList.isEmpty
                               ? Center(
                                   child: itsTrue == false
                                       ? Container(
-                                          padding: EdgeInsets.only(
-                                              top: size.width / 10),
+                                          padding:
+                                              const EdgeInsets.only(top: 90),
                                           child: Column(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.center,
@@ -186,7 +159,7 @@ class _FinanzasState extends State<Finanzas> {
                                                 height: 200,
                                               ),
                                               Text(
-                                                'Si ha llegado hasta aqui, felicidades! no cuenta con adeudos',
+                                                'Lo sentimos, por el momento no cuenta con adeudos',
                                                 style: TextStyle(
                                                   fontSize: size.width / 20,
                                                   color: Colors.lightGreen[700],
@@ -197,16 +170,7 @@ class _FinanzasState extends State<Finanzas> {
                                           ))
                                       : CircularProgressIndicator(),
                                 )
-                              : ListView(
-                                  shrinkWrap: true,
-                                  children: [
-                                    InkWell(
-                                        onTap: () {
-                                          HapticFeedback.mediumImpact();
-                                        },
-                                        child: VistaTarjeta()),
-                                  ],
-                                ))
+                              : mainView())
                     ],
                   ),
                 ]),
@@ -216,275 +180,332 @@ class _FinanzasState extends State<Finanzas> {
         ));
   }
 
+  SharedPreferences? prefs;
+  getNameUser() async {
+    prefs = await SharedPreferences.getInstance();
+    if(mounted){
+      setState(() {
+      userName = prefs!.getString('user');
+    });
+    }
+    
+  }
+
+  //Se usa para atualizar el estado de la tarjeta
+  refresh() {
+    setState(() {
+      if (mounted) {
+        mainView();
+      }
+    });
+  }
+
+  recargos() {
+    for (int i = 0; i < localList.length; i++) {
+      if (localList[i].pagoTardio == 1) {}
+    }
+  }
+
+  /// esta funcion se usa para crear el pdf
+  /// pasa el ultimo mes pagado,
+  /// no retrona valor
+  ultimoMes() async {
+    int? mesPagado;
+    double monto;
+    double tardio;
+    String tipoPago;
+    int folio;
+    var fecha;
+    print(' ${localList.length}');
+    for (int i = 0; i < localList.length; i++) {
+      monto = double.parse(localList[i].montoPago!);
+      tardio = double.parse(localList[i].montoTardio!);
+      if (localList[i].pago == 1) {
+        mesPagado = localList[i].fechaPago!.month;
+        fecha =
+            '${localList[i].fechaPago!.day}/${localList[i].fechaPago!.month}/${localList[i].fechaPago!.year}';
+        tipoPago = localList[i].formaDePago!;
+        folio = localList[i].folio!;
+
+        if (localList[i].pagoTardio == 1) {
+          setState(() {
+            monto += tardio;
+          });
+        } else {
+          setState(() {
+            monto;
+          });
+        }
+
+        print(fecha);
+
+        switch (mesPagado) {
+          case 1:
+            setState(() {
+              users.add(new Users(
+                  concepto: 'Enero',
+                  monto: monto,
+                  referencia: int.parse(
+                    localList[i].referencia!,
+                  ),
+                  fecha: fecha,
+                  deuda: tardio,
+                  folio: folio,
+                  tipoPago: tipoPago));
+            });
+            break;
+          case 2:
+            setState(() {
+              users.add(new Users(
+                  concepto: 'Febrero',
+                  monto: monto,
+                  referencia: int.parse(
+                    localList[i].referencia!,
+                  ),
+                  fecha: fecha,
+                  deuda: tardio,
+                  folio: folio,
+                  tipoPago: tipoPago));
+            });
+            break;
+          case 3:
+            setState(() {
+              users.add(new Users(
+                  concepto: 'Marzo',
+                  monto: monto,
+                  fecha: fecha,
+                  referencia: int.parse(
+                    localList[i].referencia!,
+                  ),
+                  deuda: tardio,
+                  folio: folio,
+                  tipoPago: tipoPago));
+            });
+            break;
+          case 4:
+            setState(() {
+              users.add(new Users(
+                  concepto: 'Abril',
+                  monto: monto,
+                  fecha: fecha,
+                  referencia: int.parse(
+                    localList[i].referencia!,
+                  ),
+                  deuda: tardio,
+                  folio: folio,
+                  tipoPago: tipoPago));
+            });
+            break;
+          case 5:
+            setState(() {
+              users.add(new Users(
+                  concepto: 'Mayo',
+                  monto: monto,
+                  referencia: int.parse(
+                    localList[i].referencia!,
+                  ),
+                  fecha: fecha,
+                  deuda: tardio,
+                  folio: folio,
+                  tipoPago: tipoPago));
+            });
+            break;
+
+          case 6:
+            setState(() {
+              users.add(new Users(
+                  concepto: 'Junio',
+                  monto: monto,
+                  fecha: fecha,
+                  referencia: int.parse(
+                    localList[i].referencia!,
+                  ),
+                  deuda: tardio,
+                  folio: folio,
+                  tipoPago: tipoPago));
+            });
+            break;
+          case 7:
+            setState(() {
+              users.add(new Users(
+                  concepto: 'Julio',
+                  monto: monto,
+                  fecha: fecha,
+                  referencia: int.parse(
+                    localList[i].referencia!,
+                  ),
+                  deuda: tardio,
+                  folio: folio,
+                  tipoPago: tipoPago));
+            });
+            break;
+          case 8:
+            setState(() {
+              users.add(new Users(
+                  concepto: 'Agosto',
+                  monto: monto,
+                  fecha: fecha,
+                  referencia: int.parse(
+                    localList[i].referencia!,
+                  ),
+                  deuda: tardio,
+                  folio: folio,
+                  tipoPago: tipoPago));
+            });
+            break;
+          case 9:
+            setState(() {
+              users.add(new Users(
+                  concepto: 'Septiembre',
+                  monto: monto,
+                  fecha: fecha,
+                  referencia: int.parse(
+                    localList[i].referencia!,
+                  ),
+                  deuda: tardio,
+                  folio: folio,
+                  tipoPago: tipoPago));
+            });
+
+            break;
+          case 10:
+            setState(() {
+              users.add(new Users(
+                  concepto: 'Octubre',
+                  monto: monto,
+                  fecha: fecha,
+                  referencia: int.parse(
+                    localList[i].referencia!,
+                  ),
+                  deuda: tardio,
+                  folio: folio,
+                  tipoPago: tipoPago));
+            });
+            break;
+          case 11:
+            setState(() {
+              users.add(new Users(
+                  concepto: 'Noviembre',
+                  monto: monto,
+                  fecha: fecha,
+                  referencia: int.parse(
+                    localList[i].referencia!,
+                  ),
+                  deuda: tardio,
+                  folio: folio,
+                  tipoPago: tipoPago));
+            });
+            break;
+          case 12:
+            setState(() {
+              users.add(new Users(
+                  concepto: 'Diciembre',
+                  monto: monto,
+                  fecha: fecha,
+                  referencia: int.parse(
+                    localList[i].referencia!,
+                  ),
+                  deuda: tardio,
+                  folio: folio,
+                  tipoPago: tipoPago));
+            });
+            break;
+        }
+
+        print(users[i].concepto);
+      } else {
+        return;
+      }
+    }
+  }
+
+   data() async {
+    cuentas = await getAdeudos();
+    await getNameUser();
+    prefs = await SharedPreferences.getInstance();
+    if (cuentas!.data!.isNotEmpty) {
+      for (int i = 0; i < cuentas!.data!.length; i++) {
+        if (cuentas!.data![i].idConcepto == "PA        ") {
+          
+        } else {
+          if (cuentas!.data![i].idConcepto == "ACCTEL    ") {
+          } else {
+            localList.add(new DatosCuenta(
+                idComu: cuentas!.data![i].idComu,
+                montoCuota: cuentas!.data![i].montoCuota,
+                
+                idConcepto: cuentas!.data![i].idConcepto,
+                fechaGenerada: cuentas!.data![i].fechaGeneracion!,
+                fechaLimite: cuentas!.data![i].fechaLimite == null
+                    ? DateTime.now()
+                    : cuentas!.data![i].fechaLimite,
+                fechaPago: cuentas!.data![i].fechaPago,
+                pago: cuentas!.data![i].pago!,
+                montoPago: cuentas!.data![i].montoPago,
+                totalApagar: cuentas!.data![i].totalApagar,
+                referencia: cuentas!.data![i].referencia,
+                pagoTardio: cuentas!.data![i].pagoTardio,
+                montoTardio: cuentas!.data![i].montoPagoTardio,
+                folio: cuentas!.data![i].folio!,
+                formaDePago: cuentas!.data![i].formaPago,
+                ));
+          }
+        }
+      }
+
+      
+
+      setState(() {
+        datosUsuario = DatosUsuario(
+            noExt: cuentas!.data2!.noExterno,
+            noInt: cuentas!.data2!.noInterior,
+            calle: cuentas!.data2!.calle,
+            comunidad: cuentas!.data2!.comunidad,
+            cp: cuentas!.data2!.cp,
+            tipoLote: cuentas!.data2!.tipoLote);
+      });
+    } else {
+      setState(() {
+        if (mounted) {
+          itsTrue = false;
+        }
+      });
+    }
+    await ultimoMes();
+  }
+
   mainView() {
-    return ListView(
-      shrinkWrap: true,
+    return Column(
       children: [
-        InkWell(
-            onTap: () {
-              HapticFeedback.mediumImpact();
-            },
-            child: VistaTarjeta()),
+        VistaTarjeta(
+          newList: localList,
+        ),
+        SizedBox(
+          height: 15,
+        ),
+    /*     users.isEmpty
+            ? SizedBox()
+            : OpcionesEdoCuenta(
+                newList: localList,
+                users: users.length >= 2 ? users[users.length - 2] : users.last,
+                userName: userName,
+                datosUsuario: datosUsuario,
+              ),
+        SizedBox(
+          height: 15,
+        ),
+        users.length >= 2
+            ? OpcionesEdoCuenta(
+                newList: localList,
+                users: users.last,
+                userName: userName,
+                datosUsuario: datosUsuario,
+              )
+            : SizedBox() */
       ],
     );
   }
 }
-
-// ignore: must_be_immutable
-class EstadoCuenta extends StatefulWidget {
-  late dynamic? d;
-  late int? m;
-  late int? yy;
-
-  EstadoCuenta({Key? key, this.d, this.m, this.yy}) : super(key: key);
-
-  @override
-  _EstadoCuentaState createState() => _EstadoCuentaState();
-}
-
-class _EstadoCuentaState extends State<EstadoCuenta> {
-  Accounts? cuentas;
-
-  List<DatosCuenta> mylist = [];
-  data() async {
-    cuentas = await getAdeudos();
-
-    final provider = Provider.of<EventProvider>(context, listen: false);
-    for (int i = 0; i < cuentas!.data!.length; i++) {
-      provider.addDeudas(DatosCuenta(
-        referencia: cuentas!.data![i].referencia,
-      ));
-      mylist.add(new DatosCuenta(
-          idComu: cuentas!.data![i].idComu,
-          montoCuota: cuentas!.data![i].montoCuota,
-          fechaGenerada: cuentas!.data![i].fechaGeneracion!,
-          fechaLimite: cuentas!.data![i].fechaLimite!,
-          fechaPago: cuentas!.data![i].fechaPago,
-          referencia: cuentas!.data![i].referencia,
-          pago: cuentas!.data![i].pago!));
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    data();
-    Future.delayed(Duration(seconds: 1), () {
-      setState(() {
-        saldoDeudor();
-        cuantoDebe();
-      });
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height / 4,
-      decoration: BoxDecoration(boxShadow: [
-        BoxShadow(color: Colors.grey, blurRadius: 6, offset: Offset(0, 1))
-      ], color: Colors.white, borderRadius: BorderRadius.circular(10)),
-      child: Padding(
-        padding:
-            const EdgeInsets.only(left: 11, right: 11, top: 10, bottom: 20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Estado de cuenta',
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13),
-                    ),
-                    SizedBox(
-                      height: 5,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Text(
-                          'Información Actualizada:',
-                          style: TextStyle(
-                              fontSize: size.width / 28,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(
-                          width: size.width * .12,
-                        ),
-                        Text(
-                          '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        )
-                      ],
-                    )
-                  ],
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Expanded(
-                    child: InkWell(
-                  child: Text(
-                    '¿Cuánto debo?',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.black),
-                  ),
-                )),
-                Text('|', style: TextStyle(color: Colors.black)),
-                Expanded(
-                    child: InkWell(
-                  onTap: () {
-                    HapticFeedback.mediumImpact();
-                  },
-                  child: Text('Cuotas de atraso',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.black)),
-                ))
-              ],
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: Center(
-                    child: Text(
-                      '\$${saldoDeudor()}MXN',
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: size.width / 17),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  width: 20,
-                ),
-                Expanded(
-                    child: Center(
-                  child: Text(
-                    '${cuantoDebe()}',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                ))
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  fechadepago() {
-    int? dia;
-    int? mes;
-    int? year;
-    for (int i = 0; i < mylist.length; i++) {
-      if (mylist[i].pago == 1) {
-        print('no debe');
-      } else {
-        setState(() {
-          dia = mylist[i].fechaLimite!.day;
-          mes = mylist[i].fechaLimite!.month;
-          year = mylist[i].fechaLimite!.year;
-        });
-        return dia == null ? '' : '$dia/$mes/$year';
-      }
-    }
-
-    return dia == null ? '' : '$dia/$mes/$year';
-  }
-
-  ultimaDeuda() {
-    double debe = 0.0;
-    double? monto;
-    int? total;
-    for (int i = 0; i < mylist.length; i++) {
-      monto = double.parse(mylist[i].montoCuota!);
-      if (mylist[i].pago == 1 && mylist[i].pagoTardio == 0) {
-      } else {
-        if (DateTime.now().day <= mylist[i].fechaLimite!.day &&
-            DateTime.now().month <= mylist[i].fechaLimite!.month &&
-            DateTime.now().year <= mylist[i].fechaLimite!.year) {
-          return debe = monto;
-        } else {
-          if (mylist[i].pagoTardio == 0 || mylist[i].pagoTardio == null) {
-            return debe = monto;
-          } else {
-            total = int.parse(mylist[i].montoTardio!);
-            print('${total}');
-            return debe = monto + total;
-          }
-        }
-      }
-    }
-    return debe == 0.0 ? '0.0' : debe;
-  }
-
-  referenciaApagar() {
-    String? ref;
-    for (int i = 0; i < mylist.length; i++) {
-      if (mylist[i].pago == 1 && mylist[i].pagoTardio == 0) {
-        print('no debe');
-      } else {
-        setState(() {
-          ref = mylist[i].referencia!;
-        });
-        return ref == null ? " " : ref;
-      }
-    }
-    return ref == null ? " " : ref;
-  }
-
-  //te dice cuanto dinero debe
-  saldoDeudor() {
-    double contador = 0.0;
-    double deuda;
-    for (int i = 0; i < mylist.length; i++) {
-      deuda = double.parse(mylist[i].montoCuota!);
-      if (mylist[i].pago == 1) {
-      } else {
-        if (DateTime.now().day <= mylist[i].fechaLimite!.day &&
-            DateTime.now().month <= mylist[i].fechaLimite!.month &&
-            DateTime.now().year <= mylist[i].fechaLimite!.year) {
-        } else {
-          setState(() {
-            contador += deuda;
-          });
-        }
-      }
-    }
-    return contador;
-  }
-
-  //te dice cuantos meses debe
-  cuantoDebe() {
-    int contador = 0;
-    for (int i = 0; i < mylist.length; i++) {
-      if (mylist[i].pago == 1) {
-      } else {
-        if (DateTime.now().day <= mylist[i].fechaLimite!.day &&
-            DateTime.now().month <= mylist[i].fechaLimite!.month &&
-            DateTime.now().year <= mylist[i].fechaLimite!.year) {
-        } else {
-          setState(() {
-            contador++;
-          });
-        }
-      }
-    }
-    return contador.toString();
-  }
-}
-// ignore: must_be_immutable
 
 class DatosCuenta {
   int? idComu;
@@ -501,6 +522,8 @@ class DatosCuenta {
   DateTime? fechaPago;
   int? pago;
   int? totalApagar;
+  String? formaDePago;
+  int? folio;
 
   DatosCuenta(
       {this.idComu,
@@ -516,5 +539,24 @@ class DatosCuenta {
       this.pagoTardio,
       this.referencia,
       this.pago,
-      this.totalApagar});
+      this.totalApagar,
+      this.folio,
+      this.formaDePago});
+}
+
+class DatosUsuario {
+  String? noInt;
+  String? noExt;
+  String? tipoLote;
+  String? cp;
+  String? comunidad;
+  String? calle;
+
+  DatosUsuario(
+      {this.noExt,
+      this.calle,
+      this.comunidad,
+      this.cp,
+      this.noInt,
+      this.tipoLote});
 }

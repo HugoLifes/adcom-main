@@ -1,6 +1,4 @@
-import 'dart:convert';
-import 'dart:io';
-import 'package:adcom/src/extra/add_reporte.dart';
+
 import 'package:adcom/src/extra/reporte.dart';
 import 'package:flutter/material.dart';
 import 'package:im_stepper/stepper.dart';
@@ -13,7 +11,10 @@ class ReportEditPage extends StatefulWidget {
   Map<dynamic, Map>? progreso;
   Map<dynamic, Map>?datos;
   Map? superMap = <dynamic, Map>{};
-  ReportEditPage({Key? key, required this.report, required this.data, this.progreso, this.datos, this.superMap, this.id}) : super(key: key);
+  Map<dynamic, Map>? fechas;
+  
+  
+  ReportEditPage({Key? key, required this.report, required this.data, this.progreso, this.fechas, this.datos, this.superMap, this.id}) : super(key: key);
 
   @override
   _ReportEditPageState createState() => _ReportEditPageState();
@@ -26,12 +27,11 @@ class _ReportEditPageState extends State<ReportEditPage> {
   var data;
   List<ProgressIndicator> progres = [];
   List<DatosProgreso> datosp = [];
+  bool finalizado = false;
+  List<FechaReporte> f = [];
+  int ? estatusP;
 
-  List<int> progresFromJson(String str) =>
-      List<int>.from(json.decode(str).map((x) => x));
 
-  String progresToJson(List<dynamic> data) =>
-      json.encode(List<dynamic>.from(data.map((x) => x)));
   estatus() {
     widget.progreso!.forEach((key, value) {
       if (widget.id == key) {
@@ -39,6 +39,8 @@ class _ReportEditPageState extends State<ReportEditPage> {
           if (key == 'Progreso') {
             setState(() {
               for (int i = 0; i < value.length; i++) {
+                print('progreso: ${value}');
+                value.sort();
                 progres.add(new ProgressIndicator(id: value[i]));
               }
             });
@@ -57,6 +59,7 @@ class _ReportEditPageState extends State<ReportEditPage> {
           if (key == 'Datos') {
             setState(() {
               for (int i = 0; i < value.length; i++) {
+                print('progreso: ${value}');
                 datosp.add(new DatosProgreso(coment: value[i]));
               }
             });
@@ -67,17 +70,41 @@ class _ReportEditPageState extends State<ReportEditPage> {
       }
     });
   }
+  
+  fechasR(){
+    widget.fechas!.forEach((key, value) {
+      if(widget.id == key){
+        value.forEach((key, value) {
+          if(key == 'Fechas'){
+            setState(() {
+              for(int i = 0; i< value.length; i++){
+                f.add(new FechaReporte(
+                  f: value[i]
+                ));
+              }
+            });
+          }
+        });
+      }else{
+        return ;
+      }
+     });
+  }
+  
   @override
   void initState() {
     estatus();
     datos();
+    fechasR();
     super.initState();
   }
+
+  
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size.width;
-    var size2 = MediaQuery.of(context).size.width;
+    //var size2 = MediaQuery.of(context).size.width;
     return Scaffold(
         appBar: AppBar(
           title: Text('Seguimiento de reporte'),
@@ -89,6 +116,7 @@ class _ReportEditPageState extends State<ReportEditPage> {
           child: Column(
             children: [
               IconStepper(
+                enableStepTapping: isFinalizado(),
                 icons: [
                   Icon(Icons.supervised_user_circle),
                   Icon(Icons.check),
@@ -103,6 +131,7 @@ class _ReportEditPageState extends State<ReportEditPage> {
                       _activeStep = index;
                     }else{
                       progres.last.id = index;
+                      
                     }
                   });
                 },
@@ -112,9 +141,7 @@ class _ReportEditPageState extends State<ReportEditPage> {
                 height: 10,
               ),
               help(),
-              SizedBox(
-                height: 5,
-              ),
+              
               plainText(size)
             ],
           ),
@@ -143,6 +170,7 @@ class _ReportEditPageState extends State<ReportEditPage> {
  Widget plainText(size) {
     switch (progres.isEmpty ? 0 : progres.last.id) {
       case 1:
+     
         return datosp.isEmpty? Container( child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -163,53 +191,23 @@ class _ReportEditPageState extends State<ReportEditPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-           Row(
-             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-             children: [
-               Text('Asesor:',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        )),
-             
-            SizedBox(
-              width: size/1.9,
-              child: Text(
-                'Tu reporte se encuentra en revision',
-                style: TextStyle(fontWeight: FontWeight.w300, fontSize: 18),
-              ),
-            ),
-             ],
-           ),
+           
 
-            SizedBox(
-              height: size/20,
+            Container(
+              padding: EdgeInsets.only(left: size/15),
+              child: Text('Comentarios:', 
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          )),
             ),
-
-            Text('Comentarios:', 
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        )),
-            ListView.builder(
-              padding: EdgeInsets.only(left: 30, top:10),
-              shrinkWrap: true,
-              itemCount: datosp.length,
-              itemBuilder: (_,int index){
-              return Row(
-                children: [
-                  Text('${index+1}:' , style: TextStyle(fontSize: 17) ,),
-                  SizedBox(
-                    height: size/14,
-                  ),
-                  Text(datosp[index].coment, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-                ],
-              );
-            }),
+            respuestaView(size),
           ],
-        );
+        );  
       case 2:
-        return datosp.isEmpty? Container( child: Column(
+    
+        return datosp.isEmpty? Container( 
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Asesor:',
@@ -229,52 +227,22 @@ class _ReportEditPageState extends State<ReportEditPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-           Row(
-             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-             children: [
-               Text('Asesor:',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        )),
-             
-            SizedBox(
-              width: size/1.9,
-              child: Text(
-                'Tu reporte se encuentra en revision',
-                style: TextStyle(fontWeight: FontWeight.w300, fontSize: 18),
-              ),
-            ),
-             ],
-           ),
+           
 
-            SizedBox(
-              height: size/20,
+          
+            Container(
+              padding: EdgeInsets.only(left: size/15),
+              child: Text('Seguimiento:', 
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          )),
             ),
-
-            Text('Comentarios:', 
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        )),
-            ListView.builder(
-              padding: EdgeInsets.only(left: 30, top:10),
-              shrinkWrap: true,
-              itemCount: datosp.length,
-              itemBuilder: (_,int index){
-              return Row(
-                children: [
-                  Text('${index+1}:' , style: TextStyle(fontSize: 17) ,),
-                  SizedBox(
-                    height: size/14,
-                  ),
-                  Text(datosp[index].coment, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-                ],
-              );
-            }),
+            respuestaView(size),
           ],
         );
       case 3:
+  
         return datosp.isEmpty? Container( child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -295,35 +263,27 @@ class _ReportEditPageState extends State<ReportEditPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-           Text('Respuesta de Asesor:',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    )),
+           Container(
+             padding: EdgeInsets.only(left: size/15),
+             child: Text('Seguimiento:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      )),
+           ),
 
             
 
-            ListView.builder(
-              padding: EdgeInsets.only(left: 50, top:10),
-              shrinkWrap: true,
-              itemCount: datosp.length,
-              itemBuilder: (_,int index){
-              return Row(
-                children: [
-                  Text('${index+1}: ' , style: TextStyle(fontSize: 17) ,),
-                  SizedBox(
-                    height: size/15,
-                  ),
-                  Text(datosp[index].coment, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-                ],
-              );
-            }),
+            respuestaView(size),
           ],
         );
       case 4:
+        
+       
         return datosp.isEmpty? Container( child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            
             Text('Asesor:',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -340,36 +300,44 @@ class _ReportEditPageState extends State<ReportEditPage> {
         ),) :Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
-           Text('Comentarios Asesor:',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    )),
-
-            
-
-            ListView.builder(
-              padding: EdgeInsets.only(left: 40, top:10),
-              shrinkWrap: true,
-              itemCount: datosp.length,
-              itemBuilder: (_,int index){
-              return Row(
-                children: [
-                  Text('${index+1}: ' , style: TextStyle(fontSize: 17) ,),
-                  SizedBox(
-                    height: size/15,
-                  ),
-                  Text(datosp[index].coment, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-                ],
-              );
-            }),
+           Container(
+             padding: EdgeInsets.only(left: size/15),
+             child: Text('Seguimiento:',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      )),
+           ),
+            respuestaView(size),
           ],
         );
       default:
         return Container();
     }
   }
+
+ ListView respuestaView(size) {
+   return ListView.builder(
+            padding: EdgeInsets.only(left: size/ 4.3, top:10),
+            shrinkWrap: true,
+            itemCount: datosp.length,
+            itemBuilder: (_,int index){
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 5,
+                ),
+                Text('${f[index].f!.day}/${f[index].f!.month}/${f[index].f!.year}'),
+                SizedBox(
+                  height: 5,
+                ),
+                SizedBox(width: size/2, child: Text(datosp[index].coment, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold))),
+
+              ],
+            );
+          });
+ }
   Color? stepColor() {
     switch (progres.isEmpty ? 0 : progres.last.id) {
       case 1:
@@ -386,6 +354,20 @@ class _ReportEditPageState extends State<ReportEditPage> {
     }
   }
 
+  bool isFinalizado(){
+    if(progres.isNotEmpty){
+      if(progres.last.id == 4){
+        setState(() {
+          finalizado = true;
+        });
+          
+      }else{
+        finalizado = false;
+      }
+    }
+    return finalizado;
+  }
+
   String? headerText() {
     switch (progres.isEmpty ? 0 : progres.last.id) {
       case 1:
@@ -400,6 +382,7 @@ class _ReportEditPageState extends State<ReportEditPage> {
         return 'Enviado';
     }
   }
+  
 
   buildImage() => GridView.builder(
         shrinkWrap: true,
@@ -423,18 +406,12 @@ class _ReportEditPageState extends State<ReportEditPage> {
           child: Column(
             //crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Container(
-                    alignment: Alignment.topLeft,
-                    child: Text(
-                      widget.report.descripCorta!,
-                      style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  Text('${widget.report.fechaRep!.day}/${widget.report.fechaRep!.month}/${widget.report.fechaRep!.year}'),
-                ],
+              Container(
+                alignment: Alignment.topLeft,
+                child: Text(
+                  widget.report.descripCorta!,
+                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                ),
               ),
               SizedBox(
                 height: 15,
@@ -466,4 +443,9 @@ class DatosProgreso{
   var coment;
 
   DatosProgreso({this.coment});
+}
+class FechaReporte{
+  DateTime? f;
+
+  FechaReporte({this.f});
 }

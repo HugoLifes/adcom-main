@@ -14,7 +14,7 @@ void main() async {
 
   OneSignal.shared.addTrigger("prompt_ios", "true");
 
-  await SharedPreferences.getInstance();
+  
 
   /*  OneSignal.shared
       .getDeviceState()

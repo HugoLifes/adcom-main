@@ -108,10 +108,7 @@ class _GridDashboardState extends State<GridDashboard> {
           item4,
           item5,
           item2,
-          item3,
-          item6,
-          item7,
-          item8,
+          
         ];
 
         break;

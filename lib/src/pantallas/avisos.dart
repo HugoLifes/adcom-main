@@ -210,10 +210,10 @@ class _AvisosState extends State<Avisos> {
                                                 height: 200,
                                               ),
                                               Text(
-                                                'Lo sentimos nuestra magia no funciona en este lugar',
+                                                'Lo sentimos por el momento no cuenta con avisos',
                                                 style: TextStyle(
                                                   fontSize: size.width / 20,
-                                                  color: Colors.lightGreen[700],
+                                                  color: Colors.blueGrey[700],
                                                 ),
                                                 textAlign: TextAlign.justify,
                                               )

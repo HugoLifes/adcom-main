@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:external_path/external_path.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:glyphicon/glyphicon.dart';
+import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 
 // ignore: must_be_immutable
@@ -114,7 +115,7 @@ class _AvisosDashboardState extends State<AvisosDashboard2> {
           ),
 
           SizedBox(
-            height: size/6,
+            height: size/13,
           ),
           
           InkWell(
@@ -287,6 +288,8 @@ class _AvisosDashboardState extends State<AvisosDashboard2> {
     } catch (e) {
       print(e);
     }
+
+    await OpenFile.open(savePath);
   }
 
   void showDownloadProgress(received, total) {

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:camera/camera.dart';
 import 'package:dio/dio.dart';
 import 'dart:io';
 import 'package:adcom/src/methods/slide.dart';
@@ -11,32 +12,33 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-SharedPreferences? prefs;
 
-class AddReorte extends StatefulWidget {
+SharedPreferences? prefs;
+var cameras;
+var firstCamera;
+
+class AddReporte extends StatefulWidget {
   final Report? report;
 
   static init() async {
-    prefs = await SharedPreferences.getInstance();
+    cameras = await availableCameras();
+    firstCamera = cameras.first;
   }
 
-  AddReorte({
-    Key? key,
-    this.report,
-  }) : super(key: key);
+  AddReporte({Key? key, this.report}) : super(key: key);
 
   @override
-  _AddReorteState createState() => _AddReorteState();
+  _AddReporteState createState() => _AddReporteState();
 }
 
 someData(comId, userId) async {
-  await AddReorte.init();
+  await AddReporte.init();
 
   prefs!.setInt('idCom', comId);
   prefs!.setInt('idUser', userId);
 }
 
-class _AddReorteState extends State<AddReorte> {
+class _AddReporteState extends State<AddReporte> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<FormState> _formKey2 = GlobalKey<FormState>();
   final titleController = TextEditingController();
@@ -45,10 +47,14 @@ class _AddReorteState extends State<AddReorte> {
   List<File> images = [];
   int? pages = 0;
   List<Slide>? _slides = [];
-
+  bool isLoading = false;
   int _currentStep = 0;
   int? idCom;
   int? idUser;
+  late CameraController _controller;
+  late Future<void> _initializeControllerFuture;
+
+  
 
   addata() async {
     prefs = await SharedPreferences.getInstance();
@@ -61,7 +67,8 @@ class _AddReorteState extends State<AddReorte> {
   @override
   void initState() {
     super.initState();
-    addata();
+
+    
   }
 
   @override
@@ -82,60 +89,67 @@ class _AddReorteState extends State<AddReorte> {
             Navigator.of(context).pop();
           },
         ),
-        actions: buildEditingActions(),
       ),
       resizeToAvoidBottomInset: true,
       //stepper, propiedades y acciones
-      body: Stepper(
-        steps: _stepper()!,
-        physics: ClampingScrollPhysics(),
-        currentStep: this._currentStep,
-        onStepTapped: (step) {
-          setState(() {
-            this._currentStep = step;
-          });
-        },
-        onStepContinue: () {
-          setState(() {
-            if (this._currentStep < this._stepper()!.length - 1) {
-              this._currentStep = this._currentStep + 1;
-            } else {
-              if (images.isEmpty) {
-                Fluttertoast.showToast(
-                    msg: "Seccion de fotos vacia",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.CENTER,
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: Colors.white,
-                    textColor: Colors.black,
-                    fontSize: 17.0);
-              } else {
-                alerta();
-              }
-            }
-          });
-        },
-        onStepCancel: () {
-          setState(() {
-            if (this._currentStep > 0) {
-              this._currentStep = this._currentStep - 1;
-            } else {
-              this._currentStep = 0;
-            }
-          });
-        },
-      ),
+      body: stepper(),
 
       //
       // Boton que abre la camara
 
       floatingActionButton: FloatingActionButton(
           backgroundColor: Colors.blue,
-          child: Icon(Icons.camera),
+          child: isLoading == true
+              ? CircularProgressIndicator(
+                  backgroundColor: Colors.white,
+                )
+              : Icon(Icons.camera),
           onPressed: () => {
                 HapticFeedback.lightImpact(),
                 images.length == 3 ? mensaje() : _optionsCamera(),
               }),
+    );
+  }
+
+  Stepper stepper() {
+    return Stepper(
+      steps: _stepper()!,
+      physics: ClampingScrollPhysics(),
+      currentStep: this._currentStep,
+      onStepTapped: (step) {
+        setState(() {
+          this._currentStep = step;
+        });
+      },
+      onStepContinue: () {
+        setState(() {
+          if (this._currentStep < this._stepper()!.length - 1) {
+            this._currentStep = this._currentStep + 1;
+          } else {
+            if (images.isEmpty) {
+              Fluttertoast.showToast(
+                  msg: "Seccion de fotos vacia",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.CENTER,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.white,
+                  textColor: Colors.black,
+                  fontSize: 17.0);
+            } else {
+              alerta();
+            }
+          }
+        });
+      },
+      onStepCancel: () {
+        setState(() {
+          if (this._currentStep > 0) {
+            this._currentStep = this._currentStep - 1;
+          } else {
+            this._currentStep = 0;
+          }
+        });
+      },
     );
   }
 
@@ -242,7 +256,8 @@ class _AddReorteState extends State<AddReorte> {
 
   //funcion que abre la camara y muestra
   void openCamera() async {
-    var image = await _picker.pickImage(source: ImageSource.camera, imageQuality: 30);
+    var image =
+        await _picker.pickImage(source: ImageSource.camera, imageQuality: 30);
 
     setState(() {
       if (image != null) {
@@ -260,6 +275,24 @@ class _AddReorteState extends State<AddReorte> {
     });
   }
 
+  void openCamera2() async {
+    var image =
+        await _picker.pickImage(source: ImageSource.camera, imageQuality: 50);
+
+    if (image != null) {
+      if (images.length == 3) {
+        // muestra el mensaje de archivo excedido
+        mensaje();
+        Navigator.of(context).pop();
+      } else {
+        images.add(File(image.path));
+        print(images[0].path);
+      }
+    } else {
+      print('No se ha seleccionado una imagen');
+    }
+  }
+
   mensaje() => Fluttertoast.showToast(
       msg: "Maximo excedido",
       toastLength: Toast.LENGTH_SHORT,
@@ -270,7 +303,8 @@ class _AddReorteState extends State<AddReorte> {
       fontSize: 17.0);
   // funcion que abre la galeria para las fotos
   void openGallery() async {
-    var image = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 70 );
+    var image =
+        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 50);
     setState(() {
       if (image != null) {
         images.add(File(image.path));
@@ -334,12 +368,21 @@ class _AddReorteState extends State<AddReorte> {
   // envia las fotos al serv mas toda su informacion que reqiere como los params
   sendingData(String titulo, String descrip, List<File> file) async {
     await addata();
+
+    setState(() {
+      isLoading = true;
+    });
+
     try {
       List<String> filesArr = [];
       Dio dio = Dio();
 
+      print(idCom.toString());
+      print(idUser.toString());
+
       for (var item in file) {
         filesArr.add(item.path.split('/').last);
+        print(filesArr[0]);
       }
 
       var formdata2 = FormData.fromMap({
@@ -422,6 +465,12 @@ class _AddReorteState extends State<AddReorte> {
         },
       );
 
+  cargando() {
+    return isLoading == true
+        ? Center(child: CircularProgressIndicator())
+        : null;
+  }
+
   Future saveForm() async {
     final isValid = _formKey.currentState!.validate();
     final isValid2 = _formKey2.currentState!.validate();
@@ -432,19 +481,22 @@ class _AddReorteState extends State<AddReorte> {
           description: descriptionController.text,
           image: images,
           time: DateTime.now());
-      final provider = Provider.of<EventProvider>(context, listen: false);
+
       final Response? response = await sendingData(
               titleController.text, descriptionController.text, images)
           .then((value) {
-        provider.addReport(report);
+        setState(() {
+          isLoading = false;
+        });
         Navigator.of(context).pop();
+
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(
           'Su reporte se ha realizado con exito!',
           style: TextStyle(fontSize: 19),
         )));
       });
-      print('aqui $response');
+
       return response;
     }
   }
