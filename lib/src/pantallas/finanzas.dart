@@ -58,6 +58,7 @@ class _FinanzasState extends State<Finanzas> {
   String? userName;
   DatosUsuario? datosUsuario;
   List<DatosCuenta> refPadre = [];
+  String? bandera;
 
   /// El init state inicializa funciones cuando abre el boton mis pagos
   @override
@@ -474,6 +475,12 @@ class _FinanzasState extends State<Finanzas> {
     await getNameUser();
     prefs = await SharedPreferences.getInstance();
     if (cuentas!.data!.isNotEmpty) {
+      if (mounted) {
+        setState(() {
+          bandera = cuentas!.bandera;
+        });
+      }
+
       for (int i = 0; i < cuentas!.data!.length; i++) {
         if (cuentas!.data![i].idConcepto == "PA        ") {
           setState(() {
@@ -542,7 +549,11 @@ class _FinanzasState extends State<Finanzas> {
     return Column(
       children: [
         //vista tarejeta es la tarjeta en si
-        VistaTarjeta(newList: localList, refP: refPadre),
+        VistaTarjeta(
+          newList: localList,
+          refP: refPadre,
+          bandera: bandera,
+        ),
         SizedBox(
           height: 15,
         ),

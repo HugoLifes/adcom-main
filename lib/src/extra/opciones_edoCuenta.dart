@@ -10,6 +10,7 @@ import 'package:printing/printing.dart';
 import 'dart:typed_data';
 import 'package:flutter/services.dart';
 
+// ignore: must_be_immutable
 class OpcionesEdoCuenta extends StatefulWidget {
   List<DatosCuenta>? newList = [];
   Users? users;

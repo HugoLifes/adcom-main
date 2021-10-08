@@ -9,26 +9,22 @@ Accounts accountsFromJson(String str) => Accounts.fromJson(json.decode(str));
 String accountsToJson(Accounts data) => json.encode(data.toJson());
 
 class Accounts {
-  Accounts({
-    this.value,
-    this.message,
-    this.data,
-    this.data2,
-  });
+  Accounts({this.value, this.message, this.data, this.data2, this.bandera});
 
   int? value;
   String? message;
   List<Datum>? data;
   Data2? data2;
+  String? bandera;
 
   factory Accounts.fromJson(Map<String, dynamic> json) => Accounts(
-        value: json["value"] == null ? null : json["value"],
-        message: json["message"] == null ? null : json["message"],
-        data: json["data"] == null
-            ? null
-            : List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
-        data2: json["data2"] == null ? null : Data2.fromJson(json["data2"]),
-      );
+      value: json["value"] == null ? null : json["value"],
+      message: json["message"] == null ? null : json["message"],
+      data: json["data"] == null
+          ? null
+          : List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
+      data2: json["data2"] == null ? null : Data2.fromJson(json["data2"]),
+      bandera: json["bandera"] == null ? null : json["bandera"]);
 
   Map<String, dynamic> toJson() => {
         "value": value == null ? null : value,
@@ -37,6 +33,7 @@ class Accounts {
             ? null
             : List<dynamic>.from(data!.map((x) => x.toJson())),
         "data2": data2 == null ? null : data2!.toJson(),
+        "bandera": bandera == null ? null : bandera
       };
 }
 

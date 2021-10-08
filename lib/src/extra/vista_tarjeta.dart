@@ -11,10 +11,13 @@ import 'package:intl/intl.dart';
 
 import 'package:provider/provider.dart';
 
+// ignore: must_be_immutable
 class VistaTarjeta extends StatefulWidget {
   List<DatosCuenta>? newList = [];
   List<DatosCuenta>? refP = [];
-  VistaTarjeta({Key? key, this.newList, this.refP}) : super(key: key);
+  String? bandera;
+  VistaTarjeta({Key? key, this.newList, this.refP, this.bandera})
+      : super(key: key);
 
   @override
   _VistaTarjetaState createState() => _VistaTarjetaState();
@@ -515,29 +518,17 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
 
   ///ok
   estadodepagoColor() {
-    int? hoy;
-    int? limite;
-    int? diferencia;
     Color? estado;
-    for (int i = 0; i < widget.newList!.length; i++) {
-      print(DateTime.now().difference(widget.newList![i].fechaLimite!).inDays);
-      print(widget.newList![i].fechaLimite!.difference(DateTime.now()).inDays);
-      limite = widget.newList![i].fechaLimite!.day;
-      hoy = DateTime.now().day;
-      diferencia = limite - hoy;
-      print(diferencia);
-      if ((widget.newList![i].pago == 1)) {
-        estado = Colors.lightGreen[700];
+
+    if (widget.bandera == "Verde") {
+      return estado = Colors.lightGreen[700];
+    } else {
+      if (widget.bandera == "Amarillo") {
+        return estado = Colors.amber[400];
       } else {
-        if (DateTime.now().difference(widget.newList![i].fechaLimite!).inDays <=
-            0) {
-          return estado = Colors.amber[400];
-        } else {
-          return estado = Colors.red[700];
-        }
+        return estado = Colors.red[700];
       }
     }
-    return estado == null ? estado = Colors.lightGreen[700] : estado;
   }
 
   ///ok

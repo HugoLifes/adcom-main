@@ -329,13 +329,12 @@ class _AvisosDashboardState extends State<AvisosDashboard> {
   }
 
   Future<String> getPath(names) async {
-    String path = await ExternalPath.getExternalStoragePublicDirectory(
-        ExternalPath.DIRECTORY_DOWNLOADS);
+    Directory path = await getApplicationDocumentsDirectory();
 
-    print(path);
+    print(path.path);
 
     setState(() {
-      filePath = path + '/$names';
+      filePath = path.path + '/$names';
     });
 
     return filePath;

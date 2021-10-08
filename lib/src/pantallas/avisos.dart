@@ -127,8 +127,6 @@ class _AvisosState extends State<Avisos> {
     super.initState();
   }
 
-  refresh() {}
-
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;

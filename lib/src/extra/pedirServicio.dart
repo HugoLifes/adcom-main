@@ -1,16 +1,24 @@
+import 'dart:convert';
+
+import 'package:adcom/json/jsonCheck.dart';
+import 'package:adcom/src/extra/multiServ.dart';
 import 'package:adcom/src/methods/event_editing_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:glyphicon/glyphicon.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 SharedPreferences? prefs;
 
+// ignore: must_be_immutable
 class PedirServicio extends StatefulWidget {
   final int? service;
-  const PedirServicio({Key? key, this.service}) : super(key: key);
+  Servicios? servicio;
+  PedirServicio({Key? key, this.service, this.servicio}) : super(key: key);
 
   @override
   _PedirServicioState createState() => _PedirServicioState();
@@ -91,6 +99,7 @@ class _PedirServicioState extends State<PedirServicio> {
     );
   }
 
+  /// Funcion que muestra y carga el stepper
   Stepper stepper() {
     return Stepper(
       steps: _stepper()!,
@@ -107,8 +116,21 @@ class _PedirServicioState extends State<PedirServicio> {
             if (this._currentStep == 3) {
               if (fromDate.weekday == DateTime.tuesday ||
                   fromDate.weekday == DateTime.thursday) {
+                var currenTime =
+                    DateTime(fromDate.year, fromDate.month, fromDate.day);
+                DateFormat format = DateFormat('yyy-MM-dd');
+
+                var newTime = format.format(currenTime);
                 print('aqui');
-                alerta();
+
+                Checkeo()
+                    .check(newTime, widget.servicio!.idproveedor!)
+                    .then((value) => {
+                          if (value!.data!.disp != "0")
+                            {alerta2()}
+                          else
+                            {alerta()}
+                        });
               } else {
                 print('aqui2');
                 setState(() {
@@ -281,18 +303,11 @@ class _PedirServicioState extends State<PedirServicio> {
     return _steps;
   }
 
-  bool selection() {
-    if (eleccion != eleccion) {
-      return false;
-    } else {
-      return true;
-    }
-  }
-
   /// inserta la cantindad de dinero que quiere el usuario
   buildCantidad() => Container(
         width: 200,
         child: TextFormField(
+          keyboardType: TextInputType.number,
           cursorColor: Colors.black,
 
           onFieldSubmitted: (_) => {},
@@ -356,7 +371,6 @@ class _PedirServicioState extends State<PedirServicio> {
       );
   buildComents2() => TextFormField(
         cursorColor: Colors.black,
-        readOnly: true,
         onFieldSubmitted: (_) => {},
         controller: descpController,
         style: TextStyle(fontSize: 20),
@@ -521,12 +535,83 @@ class _PedirServicioState extends State<PedirServicio> {
               height: 15,
             ),
             Text(
-                'Los dias Martes y Miercoles, el gas no tiene prioridad en este fraccionamiento, esto podria hacer que demore un poco mas, le pedimos que sea paciente.')
+                'Los dias Martes y Jueves, el gas no tiene prioridad en este fraccionamiento, esto podria hacer que demore un poco mas, le pedimos que sea paciente.')
           ],
         ),
       ),
     );
 
     showDialog(context: context, builder: (_) => alert);
+  }
+
+  alerta2() {
+    Widget okButton = TextButton(
+        onPressed: () {
+          setState(() {
+            this._currentStep = this._currentStep + 1;
+          });
+          Navigator.of(context).pop();
+        },
+        child: Text(
+          'Si, continuar',
+          style: TextStyle(color: Colors.red[900]),
+        ));
+    Widget backButton = TextButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: Text(
+          'Regresar',
+          style: TextStyle(color: Colors.orange),
+        ));
+    AlertDialog alert = AlertDialog(
+      actions: [okButton, backButton],
+      title: Text(
+        'Atención!',
+        style: TextStyle(
+          fontSize: 25,
+        ),
+      ),
+      content: Container(
+        width: 140,
+        height: 150,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Adcom informa',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Text('El servicio esta disponible')
+          ],
+        ),
+      ),
+    );
+
+    showDialog(context: context, builder: (_) => alert);
+  }
+}
+
+class Checkeo {
+  Future<Check?> check(String tiempo, int id) async {
+    print(tiempo);
+    print(id);
+
+    Uri url = Uri.parse(
+        "http://187.189.53.8:8080/AdcomBackend/backend/web/index.php?r=adcom/validar-fecha-porveedor");
+    final response = await http.post(url, body: {
+      'params': json.encode({"fecha": "'${tiempo}'", "idProveedor": id})
+    });
+
+    if (response.statusCode == 200) {
+      var data = response.body;
+      print(data);
+      return checkFromJson(data);
+    } else {
+      print(response.body);
+    }
   }
 }
