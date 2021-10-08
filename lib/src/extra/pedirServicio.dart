@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:adcom/json/jsonCheck.dart';
+import 'package:adcom/json/jsonCorreo.dart';
 import 'package:adcom/src/extra/multiServ.dart';
 import 'package:adcom/src/methods/event_editing_page.dart';
 import 'package:flutter/material.dart';
@@ -43,6 +44,8 @@ class _PedirServicioState extends State<PedirServicio> {
   String? chosenValue2;
   late DateTime fromDate;
   late DateTime toDate;
+  int? idRe;
+  String tipoDePago = "Efectivo";
 
   getDt() async {
     prefs = await SharedPreferences.getInstance();
@@ -55,6 +58,7 @@ class _PedirServicioState extends State<PedirServicio> {
         userName = prefs!.getString('user');
         comu = prefs!.getString('comunidad');
         noInt = prefs!.getString('noInterno');
+        idRe = prefs!.getInt('userId');
       });
     }
 
@@ -114,34 +118,41 @@ class _PedirServicioState extends State<PedirServicio> {
         setState(() {
           if (this._currentStep < this._stepper()!.length - 1) {
             if (this._currentStep == 3) {
-              if (fromDate.weekday == DateTime.tuesday ||
-                  fromDate.weekday == DateTime.thursday) {
-                var currenTime =
-                    DateTime(fromDate.year, fromDate.month, fromDate.day);
-                DateFormat format = DateFormat('yyy-MM-dd');
+              var currenTime =
+                  DateTime(fromDate.year, fromDate.month, fromDate.day);
+              DateFormat format = DateFormat('yyy-MM-dd');
 
-                var newTime = format.format(currenTime);
-                print('aqui');
+              var newTime = format.format(currenTime);
+              print('aqui');
 
-                Checkeo()
-                    .check(newTime, widget.servicio!.idproveedor!)
-                    .then((value) => {
-                          if (value!.data!.disp != "0")
-                            {alerta2()}
-                          else
-                            {alerta()}
-                        });
-              } else {
-                print('aqui2');
-                setState(() {
-                  this._currentStep = this._currentStep + 1;
-                });
-              }
+              Checkeo()
+                  .check(newTime, widget.servicio!.idproveedor!)
+                  .then((value) => {
+                        if (value!.data!.disp != "0")
+                          {alerta2()}
+                        else
+                          {alerta()}
+                      });
             } else {
               setState(() {
                 this._currentStep = this._currentStep + 1;
               });
             }
+          } else {
+            print('aqui3');
+            EnviarCorreo()
+                .sendCorreo(
+                    idRe!,
+                    widget.servicio!.idproveedor!,
+                    eleccion!,
+                    tipoDePago,
+                    cantidadController.text,
+                    fromDate,
+                    toDate,
+                    descpController.text)
+                .then((value) => {
+                      if (value!.value == 1) {alerta3()}
+                    });
           }
         });
       },
@@ -161,7 +172,7 @@ class _PedirServicioState extends State<PedirServicio> {
   List<Step>? _stepper() {
     List<Step> _steps = [
       Step(
-          title: Text('Nombre del residente y Dirección'),
+          title: Text('Nombre del residente y dirección'),
           isActive: _currentStep >= 0,
           state: StepState.complete,
           content: Column(
@@ -265,6 +276,11 @@ class _PedirServicioState extends State<PedirServicio> {
                       setState(() {
                         _lights = !_lights;
                       });
+                      if (_lights == false) {
+                        setState(() {
+                          tipoDePago = "Efectivo";
+                        });
+                      }
                     },
                     child: CupertinoSwitch(
                       value: _lights,
@@ -272,6 +288,12 @@ class _PedirServicioState extends State<PedirServicio> {
                         setState(() {
                           _lights = value;
                         });
+                        print(_lights);
+                        if (_lights == true) {
+                          setState(() {
+                            tipoDePago = "Tarjeta";
+                          });
+                        }
                       },
                     ),
                   ),
@@ -535,7 +557,7 @@ class _PedirServicioState extends State<PedirServicio> {
               height: 15,
             ),
             Text(
-                'Los dias Martes y Jueves, el gas no tiene prioridad en este fraccionamiento, esto podria hacer que demore un poco mas, le pedimos que sea paciente.')
+                'Este dia, el gas no tiene prioridad en este fraccionamiento, esto podría hacer que demore un poco mas, le pedimos que sea paciente.')
           ],
         ),
       ),
@@ -593,6 +615,53 @@ class _PedirServicioState extends State<PedirServicio> {
 
     showDialog(context: context, builder: (_) => alert);
   }
+
+  alerta3() {
+    Widget okButton = TextButton(
+        onPressed: () {
+          Navigator.of(context)..pop()..pop();
+        },
+        child: Text(
+          'Si, continuar',
+          style: TextStyle(color: Colors.red[900]),
+        ));
+    Widget backButton = TextButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: Text(
+          'Regresar',
+          style: TextStyle(color: Colors.orange),
+        ));
+    AlertDialog alert = AlertDialog(
+      actions: [okButton, backButton],
+      title: Text(
+        'Atención!',
+        style: TextStyle(
+          fontSize: 25,
+        ),
+      ),
+      content: Container(
+        width: 140,
+        height: 150,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Adcom informa',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Text('Su solicitud se ha mandado con extio')
+          ],
+        ),
+      ),
+    );
+
+    showDialog(context: context, builder: (_) => alert);
+  }
 }
 
 class Checkeo {
@@ -612,6 +681,60 @@ class Checkeo {
       return checkFromJson(data);
     } else {
       print(response.body);
+    }
+  }
+}
+
+class EnviarCorreo {
+  Future<Correo?> sendCorreo(
+      int idRe,
+      int id,
+      String eleccion,
+      String tipoPago,
+      String cantidad,
+      DateTime fromDate,
+      DateTime toDate,
+      String coments) async {
+    print(idRe);
+    print(id);
+    print(eleccion);
+    print(tipoPago);
+    print(cantidad);
+    print(fromDate);
+    print(coments);
+
+    var dateFormat = DateFormat("yyy-MM-dd");
+    var formarhr = DateFormat("hh:mma"); // you can change the format here
+    var newDate = dateFormat.format(fromDate);
+    var goDate = formarhr.format(toDate);
+    var fromhr = formarhr.format(fromDate);
+
+    // pass the UTC time here
+
+    print(goDate);
+    print(newDate);
+    Uri url = Uri.parse(
+        "http://187.189.53.8:8080/AdcomBackend/backend/web/index.php?r=adcom/envio-correo-servicio");
+
+    final response = await http.post(url, body: {
+      "params": json.encode({
+        "idResidente": idRe,
+        "idProveedor": id,
+        "medidasTanque": eleccion,
+        "formaPago": tipoPago,
+        "cantidadARecargar": "\$ ${cantidad}",
+        "horarioDePreferencia":
+            "Fecha:${newDate}  Hora: ${fromhr} a ${goDate} ",
+        "comentarios": coments
+      })
+    });
+    if (response.statusCode == 200) {
+      var data = response.body;
+      print(data);
+
+      return correoFromJson(data);
+    } else {
+      print(response);
     }
   }
 }

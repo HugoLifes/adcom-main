@@ -259,7 +259,7 @@ class _AddReporteState extends State<AddReporte> {
   //funcion que abre la camara y muestra
   void openCamera() async {
     var image =
-        await _picker.pickImage(source: ImageSource.camera, imageQuality: 50);
+        await _picker.pickImage(source: ImageSource.camera, imageQuality: 30);
 
     setState(() {
       if (image != null) {
@@ -279,7 +279,7 @@ class _AddReporteState extends State<AddReporte> {
 
   void openCamera2() async {
     var image =
-        await _picker.pickImage(source: ImageSource.camera, imageQuality: 50);
+        await _picker.pickImage(source: ImageSource.camera, imageQuality: 40);
 
     if (image != null) {
       if (images.length == 3) {
@@ -306,7 +306,7 @@ class _AddReporteState extends State<AddReporte> {
   // funcion que abre la galeria para las fotos
   void openGallery() async {
     var image =
-        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 50);
+        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 30);
     setState(() {
       if (image != null) {
         images.add(File(image.path));
