@@ -27,7 +27,7 @@ class MainMenu extends StatefulWidget {
   _MainMenuState createState() => _MainMenuState();
 }
 
-somData(user, userType, idCom, idPrimario, userId) async {
+somData(user, userType, idCom, idPrimario, userId, comunidad, noInterno) async {
   await MainMenu.init();
 
   prefs!.setString('user', user);
@@ -35,6 +35,8 @@ somData(user, userType, idCom, idPrimario, userId) async {
   prefs!.setInt('idCom', idCom);
   prefs!.setInt('idPrimario', idPrimario);
   prefs!.setInt('userId', userId);
+  prefs!.setString('comunidad', comunidad);
+  prefs!.setString('noInterno', noInterno);
 }
 
 class _MainMenuState extends State<MainMenu> {

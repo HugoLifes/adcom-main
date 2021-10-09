@@ -32,6 +32,7 @@ class _MultiServiciosState extends State<MultiServicios> {
   List<ServiceStore> servicios = [];
   List<Servicios> serv = [];
   Proveedores? prov;
+  bool loading = true;
 
   data() async {
     prov = await getProv();
@@ -50,6 +51,10 @@ class _MultiServiciosState extends State<MultiServicios> {
             compania: prov!.data![i].compaia));
       }
     }
+
+    setState(() {
+      loading = false;
+    });
   }
 
   @override
@@ -73,47 +78,48 @@ class _MultiServiciosState extends State<MultiServicios> {
           style: TextStyle(color: Colors.black),
         ),
       ),
-      body: ListView.separated(
-          separatorBuilder: (context, index) {
-            return Divider(
-              thickness: 3,
-              color: Colors.grey[350],
-            );
-          },
-          itemCount: servicios.length,
-          itemBuilder: (_, int index) {
-            return InkWell(
-              onTap: () {
-                if (serv.isEmpty) {
-                } else {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => PedirServicio(
-                                servicio: serv[index],
-                                service: index,
-                              )));
-                }
+      body: loading == true
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : ListView.separated(
+              separatorBuilder: (context, index) {
+                return Divider(
+                  thickness: 3,
+                  color: Colors.grey[350],
+                );
               },
-              child: Container(
-                padding: EdgeInsets.only(top: 15, left: 10),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+              itemCount: servicios.length,
+              itemBuilder: (_, int index) {
+                return InkWell(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => PedirServicio(
+                                  servicio: serv[index],
+                                  service: index,
+                                )));
+                  },
+                  child: Container(
+                    padding: EdgeInsets.only(top: 15, left: 10),
+                    child: Column(
                       children: [
-                        Container(
-                          height: 100,
-                          width: 100,
-                          child: servicios[index].image!,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              height: 100,
+                              width: 100,
+                              child: servicios[index].image!,
+                            )
+                          ],
                         )
                       ],
-                    )
-                  ],
-                ),
-              ),
-            );
-          }),
+                    ),
+                  ),
+                );
+              }),
     );
   }
 
