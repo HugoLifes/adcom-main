@@ -197,7 +197,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
                     alignment: Alignment.centerLeft,
                     child: Column(
                       children: [
-                        Row(
+                        /* Row(
                           children: [
                             Image.asset(
                               'assets/images/money.gif',
@@ -212,7 +212,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
                               style: TextStyle(fontSize: 30),
                             ),
                           ],
-                        ),
+                        ), */
                         /* Container(
                           padding: EdgeInsets.only(right: 110),
                           child: Row(
