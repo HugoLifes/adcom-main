@@ -6,7 +6,7 @@ import 'package:adcom/src/extra/multiServ.dart';
 import 'package:adcom/src/methods/event_editing_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:glyphicon/glyphicon.dart';
 import 'package:intl/intl.dart';
@@ -93,13 +93,15 @@ class _PedirServicioState extends State<PedirServicio> {
         ),
         backgroundColor: Colors.white,
       ),
-      body: Theme(
-          data: ThemeData(
-              primaryColor:
-                  widget.service == 1 ? Colors.blue[800] : Colors.red[900],
-              primarySwatch:
-                  widget.service == 1 ? Colors.lightGreen : Colors.orange),
-          child: stepper()),
+      body: LoaderOverlay(
+        child: Theme(
+            data: ThemeData(
+                primaryColor:
+                    widget.service == 1 ? Colors.blue[800] : Colors.red[900],
+                primarySwatch:
+                    widget.service == 1 ? Colors.lightGreen : Colors.orange),
+            child: stepper()),
+      ),
     );
   }
 
@@ -124,14 +126,14 @@ class _PedirServicioState extends State<PedirServicio> {
 
               var newTime = format.format(currenTime);
               print('aqui');
-
+              context.loaderOverlay.show();
               Checkeo()
                   .check(newTime, widget.servicio!.idproveedor!)
                   .then((value) => {
                         if (value!.data!.disp != "0")
-                          {alerta2()}
+                          {context.loaderOverlay.hide(), alerta2()}
                         else
-                          {alerta()}
+                          {context.loaderOverlay.hide(), alerta()}
                       });
             } else {
               setState(() {
@@ -139,7 +141,7 @@ class _PedirServicioState extends State<PedirServicio> {
               });
             }
           } else {
-            print('aqui3');
+            context.loaderOverlay.show();
             EnviarCorreo()
                 .sendCorreo(
                     idRe!,
@@ -149,9 +151,11 @@ class _PedirServicioState extends State<PedirServicio> {
                     cantidadController.text,
                     fromDate,
                     toDate,
-                    descpController.text)
+                    descpController.text,
+                    context)
                 .then((value) => {
-                      if (value!.value == 1) {alerta3()}
+                      if (value!.value == 1)
+                        {context.loaderOverlay.hide(), alerta3()}
                     });
           }
         });
@@ -694,15 +698,8 @@ class EnviarCorreo {
       String cantidad,
       DateTime fromDate,
       DateTime toDate,
-      String coments) async {
-    print(idRe);
-    print(id);
-    print(eleccion);
-    print(tipoPago);
-    print(cantidad);
-    print(fromDate);
-    print(coments);
-
+      String coments,
+      BuildContext contex) async {
     var dateFormat = DateFormat("yyy-MM-dd");
     var formarhr = DateFormat("hh:mma"); // you can change the format here
     var newDate = dateFormat.format(fromDate);

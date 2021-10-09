@@ -7,6 +7,7 @@ import 'package:adcom/src/models/event_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http_parser/http_parser.dart';
@@ -98,7 +99,7 @@ class _AddReporteState extends State<AddReporte> {
       ),
       resizeToAvoidBottomInset: true,
       //stepper, propiedades y acciones
-      body: stepper(),
+      body: LoaderOverlay(child: stepper()),
 
       //
       // Boton que abre la camara
@@ -322,7 +323,8 @@ class _AddReporteState extends State<AddReporte> {
     Widget okButton = TextButton(
         onPressed: () {
           Navigator.of(context).pop();
-          saveForm();
+          context.loaderOverlay.show();
+          saveForm().then((value) => {context.loaderOverlay.hide()});
         },
         child: Text(
           'Si, continuar',

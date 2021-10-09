@@ -197,22 +197,14 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
                     alignment: Alignment.centerLeft,
                     child: Column(
                       children: [
-                        /* Row(
+                        Row(
                           children: [
-                            Image.asset(
-                              'assets/images/money.gif',
-                              height: 40,
-                              width: 50,
-                            ),
-                            SizedBox(
-                              width: 5,
-                            ),
                             Text(
-                              '\$ 200.0 MXN',
+                              'Proximamente',
                               style: TextStyle(fontSize: 30),
                             ),
                           ],
-                        ), */
+                        ),
                         /* Container(
                           padding: EdgeInsets.only(right: 110),
                           child: Row(
