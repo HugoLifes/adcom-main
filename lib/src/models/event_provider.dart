@@ -63,6 +63,7 @@ class EventProvider extends ChangeNotifier {
   var userd;
   void login(user, pass, ctx, TextEditingController tk,
       TextEditingController tk2) async {
+    _loading = false;
     notifyListeners();
 
     try {
@@ -76,10 +77,10 @@ class EventProvider extends ChangeNotifier {
           var comId = post.idCom;
           userd = post.nombreResidente;
           var userType = post.idPerfil;
-          var comunidad = post.infoUusario!.comunidad;
-          var noInterno = post.infoUusario!.noInterior;
-          somData(
-              userd, userType, comId, idPrimario, userId, comunidad, noInterno);
+          var comunidad = post.infoUsuario!.comunidad;
+          var noInterior = post.infoUsuario!.noInterior;
+          somData(userd, userType, comId, idPrimario, userId, comunidad,
+              noInterior);
 
           Navigator.pushReplacementNamed(ctx, '/');
         }

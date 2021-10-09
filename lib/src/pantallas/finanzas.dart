@@ -524,8 +524,6 @@ class _FinanzasState extends State<Finanzas> {
       }
 
       setState(() {
-        prefs!.setString('comunidad', cuentas!.data2!.comunidad!);
-        prefs!.setString('noInterno', cuentas!.data2!.noExterno!);
         datosUsuario = DatosUsuario(
             noExt: cuentas!.data2!.noExterno,
             noInt: cuentas!.data2!.noInterior,

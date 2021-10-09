@@ -17,10 +17,8 @@ class Posting {
     this.id,
     this.idResidente,
     this.usuario,
-    this.comunidad,
     this.nombreResidente,
-    this.tiempoSecion,
-    this.infoUusario,
+    this.infoUsuario,
   });
 
   int? value;
@@ -30,50 +28,38 @@ class Posting {
   int? id;
   int? idResidente;
   String? usuario;
-  List<dynamic>? comunidad;
   String? nombreResidente;
-  int? tiempoSecion;
-  InfoUusario? infoUusario;
+  InfoUsuario? infoUsuario;
 
   factory Posting.fromJson(Map<String, dynamic> json) => Posting(
-        value: json["value"] == null ? null : json["value"],
-        message: json["message"] == null ? null : json["message"],
-        idCom: json["ID_COM"] == null ? null : json["ID_COM"],
-        idPerfil: json["ID_PERFIL"] == null ? null : json["ID_PERFIL"],
-        id: json["ID"] == null ? null : json["ID"],
-        idResidente: json["ID_RESIDENTE"] == null ? null : json["ID_RESIDENTE"],
-        usuario: json["USUARIO"] == null ? null : json["USUARIO"],
-        comunidad: json["COMUNIDAD"] == null
+        value: json["value"],
+        message: json["message"],
+        idCom: json["ID_COM"],
+        idPerfil: json["ID_PERFIL"],
+        id: json["ID"],
+        idResidente: json["ID_RESIDENTE"],
+        usuario: json["USUARIO"],
+        nombreResidente: json["NombreResidente"],
+        infoUsuario: json["infoUsuario"] == null
             ? null
-            : List<dynamic>.from(json["COMUNIDAD"].map((x) => x)),
-        nombreResidente:
-            json["NombreResidente"] == null ? null : json["NombreResidente"],
-        tiempoSecion:
-            json["tiempoSecion"] == null ? null : json["tiempoSecion"],
-        infoUusario: json["infoUusario"] == null
-            ? null
-            : InfoUusario.fromJson(json["infoUusario"]),
+            : InfoUsuario.fromJson(json["infoUsuario"]),
       );
 
   Map<String, dynamic> toJson() => {
-        "value": value == null ? null : value,
-        "message": message == null ? null : message,
-        "ID_COM": idCom == null ? null : idCom,
-        "ID_PERFIL": idPerfil == null ? null : idPerfil,
-        "ID": id == null ? null : id,
-        "ID_RESIDENTE": idResidente == null ? null : idResidente,
-        "USUARIO": usuario == null ? null : usuario,
-        "COMUNIDAD": comunidad == null
-            ? null
-            : List<dynamic>.from(comunidad!.map((x) => x)),
-        "NombreResidente": nombreResidente == null ? null : nombreResidente,
-        "tiempoSecion": tiempoSecion == null ? null : tiempoSecion,
-        "infoUusario": infoUusario == null ? null : infoUusario!.toJson(),
+        "value": value,
+        "message": message,
+        "ID_COM": idCom,
+        "ID_PERFIL": idPerfil,
+        "ID": id,
+        "ID_RESIDENTE": idResidente,
+        "USUARIO": usuario,
+        "NombreResidente": nombreResidente,
+        "infoUsuario": infoUsuario == null ? null : infoUsuario!.toJson(),
       };
 }
 
-class InfoUusario {
-  InfoUusario({
+class InfoUsuario {
+  InfoUsuario({
     this.noInterior,
     this.noExterno,
     this.tipoLote,
@@ -89,7 +75,7 @@ class InfoUusario {
   String? comunidad;
   String? calle;
 
-  factory InfoUusario.fromJson(Map<String, dynamic> json) => InfoUusario(
+  factory InfoUsuario.fromJson(Map<String, dynamic> json) => InfoUsuario(
         noInterior: json["NO_INTERIOR"] == null ? null : json["NO_INTERIOR"],
         noExterno: json["NO_EXTERNO"] == null ? null : json["NO_EXTERNO"],
         tipoLote: json["TIPO_LOTE"] == null ? null : json["TIPO_LOTE"],
