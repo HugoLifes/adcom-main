@@ -225,6 +225,7 @@ class _FinanzasState extends State<Finanzas> {
   /// no retrona valor
   ultimoMes() async {
     int? mesPagado;
+    double cuota;
     double monto;
     double tardio;
     String tipoPago;
@@ -232,6 +233,7 @@ class _FinanzasState extends State<Finanzas> {
     var fecha;
     print(' ${localList.length}');
     for (int i = 0; i < localList.length; i++) {
+      cuota = double.parse(localList[i].montoCuota!);
       monto = double.parse(localList[i].montoPago!);
       tardio = double.parse(localList[i].montoTardio!);
       if (localList[i].pago == 1) {
@@ -257,6 +259,7 @@ class _FinanzasState extends State<Finanzas> {
           case 1:
             setState(() {
               users.add(new Users(
+                  cuota: cuota,
                   concepto: 'Enero',
                   monto: monto,
                   referencia: int.parse(
@@ -274,6 +277,7 @@ class _FinanzasState extends State<Finanzas> {
           case 2:
             setState(() {
               users.add(new Users(
+                  cuota: cuota,
                   concepto: 'Febrero',
                   monto: monto,
                   referencia: int.parse(
@@ -291,6 +295,7 @@ class _FinanzasState extends State<Finanzas> {
           case 3:
             setState(() {
               users.add(new Users(
+                  cuota: cuota,
                   concepto: 'Marzo',
                   monto: monto,
                   fecha: fecha,
@@ -308,6 +313,7 @@ class _FinanzasState extends State<Finanzas> {
           case 4:
             setState(() {
               users.add(new Users(
+                  cuota: cuota,
                   concepto: 'Abril',
                   monto: monto,
                   fecha: fecha,
@@ -325,6 +331,7 @@ class _FinanzasState extends State<Finanzas> {
           case 5:
             setState(() {
               users.add(new Users(
+                  cuota: cuota,
                   concepto: 'Mayo',
                   monto: monto,
                   referencia: int.parse(
@@ -343,6 +350,7 @@ class _FinanzasState extends State<Finanzas> {
           case 6:
             setState(() {
               users.add(new Users(
+                  cuota: cuota,
                   concepto: 'Junio',
                   monto: monto,
                   fecha: fecha,
@@ -360,6 +368,7 @@ class _FinanzasState extends State<Finanzas> {
           case 7:
             setState(() {
               users.add(new Users(
+                  cuota: cuota,
                   concepto: 'Julio',
                   monto: monto,
                   fecha: fecha,
@@ -377,6 +386,7 @@ class _FinanzasState extends State<Finanzas> {
           case 8:
             setState(() {
               users.add(new Users(
+                  cuota: cuota,
                   concepto: 'Agosto',
                   monto: monto,
                   fecha: fecha,
@@ -395,6 +405,7 @@ class _FinanzasState extends State<Finanzas> {
           case 9:
             setState(() {
               users.add(new Users(
+                  cuota: cuota,
                   concepto: 'Septiembre',
                   monto: monto,
                   fecha: fecha,
@@ -413,6 +424,7 @@ class _FinanzasState extends State<Finanzas> {
           case 10:
             setState(() {
               users.add(new Users(
+                  cuota: cuota,
                   concepto: 'Octubre',
                   monto: monto,
                   fecha: fecha,
@@ -430,6 +442,7 @@ class _FinanzasState extends State<Finanzas> {
           case 11:
             setState(() {
               users.add(new Users(
+                  cuota: cuota,
                   concepto: 'Noviembre',
                   monto: monto,
                   fecha: fecha,
@@ -447,6 +460,7 @@ class _FinanzasState extends State<Finanzas> {
           case 12:
             setState(() {
               users.add(new Users(
+                  cuota: cuota,
                   concepto: 'Diciembre',
                   monto: monto,
                   fecha: fecha,

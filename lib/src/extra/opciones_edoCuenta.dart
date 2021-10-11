@@ -311,7 +311,7 @@ class _OpcionesEdoCuentaState extends State<OpcionesEdoCuenta> {
 
 class Users {
   final String? tipoPago;
-
+  final double? cuota;
   final int? referencia;
   final double? monto;
   final String? concepto;
@@ -328,7 +328,8 @@ class Users {
       this.concepto,
       this.deuda,
       this.folio,
-      this.fecha});
+      this.fecha,
+      this.cuota});
 }
 
 class Comunidad {
