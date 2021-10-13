@@ -1,16 +1,43 @@
+import 'dart:convert';
+
 import 'package:adcom/json/json.dart';
 import 'package:adcom/src/extra/filter_section.dart';
+import 'package:adcom/src/extra/vistaContactos.dart';
 import 'package:adcom/src/methods/emailDashboard.dart';
 import 'package:adcom/src/models/event_provider.dart';
 import 'package:filter_list/filter_list.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Contactos extends StatefulWidget {
   Contactos({Key? key}) : super(key: key);
 
   @override
   _ContactosState createState() => _ContactosState();
+}
+
+Future<Welcome?> getData() async {
+  print('Se esta ejecutando');
+
+  prefs = await SharedPreferences.getInstance();
+  var id = prefs!.getInt('id');
+
+  print(id.toString());
+
+  Uri uri = Uri.parse(
+      'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-directorio');
+  final response = await http.post(uri, body: {
+    "params": json.encode({"usuarioId": id})
+  });
+
+  if (response.statusCode == 200) {
+    var data = response.body;
+
+    return welcomeFromJson(data);
+  }
 }
 
 class _ContactosState extends State<Contactos> {
@@ -22,6 +49,7 @@ class _ContactosState extends State<Contactos> {
   @override
   void initState() {
     super.initState();
+    holi();
   }
 
   @override
@@ -34,7 +62,6 @@ class _ContactosState extends State<Contactos> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     var size2 = MediaQuery.of(context).size.width;
-    final residentes = Provider.of<EventProvider>(context).items;
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -121,16 +148,26 @@ class _ContactosState extends State<Contactos> {
                 ),
                 SizedBox(
                   width: size.width / 2,
-                  child: searchBar(residentes),
+                  child: searchBar(myList),
                 ),
                 itemSeleccion == null || itemSeleccion!.length == 0
-                    ? ContactDashboard()
+                    ? myList.isEmpty
+                        ? Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        : contactsView()
                     : filterView(size2),
               ],
             ),
           )),
         ],
       ),
+    );
+  }
+
+  ContactDashboard contactsView() {
+    return ContactDashboard(
+      contactos: myList,
     );
   }
 
@@ -170,121 +207,103 @@ class _ContactosState extends State<Contactos> {
   }
 
   filterView(size2) => Flexible(
-      child: GridView.builder(
-          shrinkWrap: false,
-          itemCount: itemSeleccion!.length,
-          padding: EdgeInsets.only(left: 4, right: 4, top: 17),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 1,
-            childAspectRatio: 2.5,
-            crossAxisSpacing: 15,
-            mainAxisSpacing: 15,
-          ),
-          itemBuilder: (context, int index) {
-            return InkWell(
-              onTap: () {},
+          child: GridView.builder(
+        shrinkWrap: false,
+        itemCount: itemSeleccion!.length,
+        padding: EdgeInsets.only(left: 4, right: 4, top: 17),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 1,
+          childAspectRatio: 2.0,
+          crossAxisSpacing: 15,
+          mainAxisSpacing: 15,
+        ),
+        itemBuilder: (context, int index) {
+          return InkWell(
+            onTap: () {
+              ///navigator a vista contactos
+              HapticFeedback.mediumImpact();
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => VistaContactos(
+                            contactos: itemSeleccion![index],
+                          )));
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.grey, blurRadius: 6, offset: Offset(0, 1))
+                  ]),
               child: Container(
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.grey,
-                          blurRadius: 6,
-                          offset: Offset(0, 1))
-                    ]),
-                child: Container(
-                  padding: const EdgeInsets.all(18),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        height: 50,
-                        width: 50,
-                        decoration: BoxDecoration(
-                            color: Colors.grey[300], shape: BoxShape.circle),
-                        child: Icon(
-                          Icons.person,
-                          size: 30,
-                          color: Colors.lightGreen,
-                        ),
-                      ),
-                      SizedBox(
-                        width: 14,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          itemSeleccion![index].title == null
-                              ? Container()
-                              : SizedBox(
-                                  width: size2 / 2.1,
-                                  child: Text(
-                                      itemSeleccion![index]
-                                          .title!
-                                          .toUpperCase(),
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: size2 / 33,
-                                          fontWeight: FontWeight.bold)),
+                //margin: EdgeInsets.symmetric(vertical: 20),
+                padding: const EdgeInsets.all(18),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      height: 50,
+                      width: 50,
+                      decoration: BoxDecoration(
+                          color: Colors.grey[300], shape: BoxShape.circle),
+                      child: itemSeleccion![index].icon == null
+                          ? SizedBox()
+                          : itemSeleccion![index].icon!,
+                    ),
+                    SizedBox(
+                      width: 15,
+                    ),
+                    Column(
+                      children: [
+                        itemSeleccion![index].title == null
+                            ? Container()
+                            : SizedBox(
+                                width: size2 / 2,
+                                child: Text(
+                                  itemSeleccion![index].title!.toUpperCase(),
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: size2 / 29,
+                                      fontWeight: FontWeight.bold),
                                 ),
-                          SizedBox(
-                            height: size2 / 20,
-                          ),
-                          Row(
-                            children: [
-                              itemSeleccion![index].comNombre == null
-                                  ? Container()
-                                  : SizedBox(
-                                      width: size2 / 2,
-                                      child:
-                                          Text(itemSeleccion![index].comNombre!,
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 16,
-                                              )),
-                                    )
-                            ],
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
+                              ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            );
-          }));
+            ),
+          );
+        },
+      ));
 
-  void _openFilterDialog(res) async {
-    await FilterListDialog.display<Items>(context,
-        listData: res,
-        selectedListData: itemSeleccion,
-        height: 480,
-        headlineText: "Que comunidad buscas?",
-        searchFieldHintText: "Buscar...", choiceChipLabel: (item) {
-      return item.toString();
-    }, validateSelectedItem: (list, val) {
-      return list!.contains(val.idComunidad);
-    }, onItemSearch: (list, text) {
-      if (list!.any((element) => element.idComunidad
-          .toString()
-          .toLowerCase()
-          .contains(text.toLowerCase()))) {
-        return list
-            .where((element) => element.comNombre
-                .toString()
-                .toLowerCase()
-                .contains(text.toLowerCase()))
-            .toList();
-      }
-      return [];
-    }, onApplyButtonClick: (list) {
-      if (list != null) {
-        setState(() {
-          itemSeleccion = List.from(list);
-        });
-      }
-      Navigator.pop(context);
+  holi() async {
+    dt = await getData();
+
+    for (int i = 0; i < dt!.residente!.length; i++) {
+      myList.add(new Items(
+          idResidente: dt!.residente![i].idResidente,
+          title: dt!.residente![i].nombreResidente,
+          numero: dt!.residente![i].numero,
+          idComunidad: dt!.residente![i].idCom,
+          calle: dt!.residente![i].calle,
+          cp: dt!.residente![i].cp,
+          email: dt!.residente![i].email,
+          interior: dt!.residente![i].interior,
+          telCel: dt!.residente![i].telefonoCel,
+          telEme: dt!.residente![i].telefonoEmergencia,
+          telFijo: dt!.residente![i].telefonoFijo,
+          comNombre: dt!.residente![i].comNombre,
+          icon: Icon(
+            Icons.person,
+            size: 30,
+            color: Colors.lightGreen,
+          )));
+    }
+    setState(() {
+      myList;
     });
   }
 }

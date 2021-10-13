@@ -27,8 +27,8 @@ class MainMenu extends StatefulWidget {
   _MainMenuState createState() => _MainMenuState();
 }
 
-somData(
-    user, userType, idCom, idPrimario, userId, comunidad, noInterior) async {
+somData(user, userType, idCom, idPrimario, userId,
+    {comunidad, noInterior}) async {
   await MainMenu.init();
 
   prefs!.setString('user', user);
@@ -36,8 +36,11 @@ somData(
   prefs!.setInt('idCom', idCom);
   prefs!.setInt('idPrimario', idPrimario);
   prefs!.setInt('userId', userId);
-  prefs!.setString('comunidad', comunidad);
-  prefs!.setString('noInterno', noInterior);
+  if (comunidad == null && noInterior == null) {
+  } else {
+    prefs!.setString('comunidad', comunidad);
+    prefs!.setString('noInterno', noInterior);
+  }
 }
 
 class _MainMenuState extends State<MainMenu> {
@@ -207,7 +210,7 @@ class _MainMenuState extends State<MainMenu> {
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontFamily: 'Roboto',
-                                      fontSize: size.width / 10,
+                                      fontSize: size.width / 11.3,
                                       fontWeight: FontWeight.w700),
                                 ),
                               ],
@@ -240,8 +243,8 @@ class _MainMenuState extends State<MainMenu> {
       return 'Buenos Dias';
     }
     if (hour < 19) {
-      return 'Buenas tardes';
+      return 'Buenas Tardes';
     }
-    return 'Buenas noches';
+    return 'Buenas Noches';
   }
 }

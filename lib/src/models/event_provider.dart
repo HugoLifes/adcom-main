@@ -77,10 +77,15 @@ class EventProvider extends ChangeNotifier {
           var comId = post.idCom;
           userd = post.nombreResidente;
           var userType = post.idPerfil;
-          var comunidad = post.infoUsuario!.comunidad;
-          var noInterior = post.infoUsuario!.noInterior;
-          somData(userd, userType, comId, idPrimario, userId, comunidad,
-              noInterior);
+
+          if (post.infoUsuario != []) {
+            var comunidad =
+                post.infoUsuario == null ? '' : post.infoUsuario!.comunidad;
+            var noInterior =
+                post.infoUsuario == null ? '' : post.infoUsuario!.noInterior;
+            somData(userd, userType, comId, idPrimario, userId,
+                comunidad: comunidad, noInterior: noInterior);
+          } else {}
 
           Navigator.pushReplacementNamed(ctx, '/');
         }
@@ -97,6 +102,7 @@ class EventProvider extends ChangeNotifier {
       }
     } catch (e) {
       {
+        print(e);
         _loading = false;
         HapticFeedback.lightImpact();
         Widget okButton = TextButton(

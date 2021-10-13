@@ -9,17 +9,17 @@ Posting postingFromJson(String str) => Posting.fromJson(json.decode(str));
 String postingToJson(Posting data) => json.encode(data.toJson());
 
 class Posting {
-  Posting({
-    this.value,
-    this.message,
-    this.idCom,
-    this.idPerfil,
-    this.id,
-    this.idResidente,
-    this.usuario,
-    this.nombreResidente,
-    this.infoUsuario,
-  });
+  Posting(
+      {this.value,
+      this.message,
+      this.idCom,
+      this.idPerfil,
+      this.id,
+      this.idResidente,
+      this.usuario,
+      this.nombreResidente,
+      this.infoUsuario,
+      this.empty});
 
   int? value;
   String? message;
@@ -30,6 +30,7 @@ class Posting {
   String? usuario;
   String? nombreResidente;
   InfoUsuario? infoUsuario;
+  List<dynamic>? empty;
 
   factory Posting.fromJson(Map<String, dynamic> json) => Posting(
         value: json["value"],
@@ -40,7 +41,7 @@ class Posting {
         idResidente: json["ID_RESIDENTE"],
         usuario: json["USUARIO"],
         nombreResidente: json["NombreResidente"],
-        infoUsuario: json["infoUsuario"] == null
+        infoUsuario: json["infoUsuario"].isEmpty
             ? null
             : InfoUsuario.fromJson(json["infoUsuario"]),
       );
@@ -54,7 +55,7 @@ class Posting {
         "ID_RESIDENTE": idResidente,
         "USUARIO": usuario,
         "NombreResidente": nombreResidente,
-        "infoUsuario": infoUsuario == null ? null : infoUsuario!.toJson(),
+        "infoUsuario": infoUsuario == [].isEmpty ? null : infoUsuario!.toJson(),
       };
 }
 

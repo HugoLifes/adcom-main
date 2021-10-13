@@ -512,7 +512,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
   estadodepagoColor() {
     Color? estado;
 
-    if (widget.bandera == "verde") {
+    if (widget.bandera == "verde" || widget.newList!.last.pago == 1) {
       return estado = Colors.lightGreen[700];
     } else {
       if (widget.bandera == "Amarillo") {
