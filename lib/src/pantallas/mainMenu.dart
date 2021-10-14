@@ -28,7 +28,7 @@ class MainMenu extends StatefulWidget {
 }
 
 somData(user, userType, idCom, idPrimario, userId,
-    {comunidad, noInterior}) async {
+    {comunidad, noInterior, calle}) async {
   await MainMenu.init();
 
   prefs!.setString('user', user);
@@ -40,6 +40,7 @@ somData(user, userType, idCom, idPrimario, userId,
   } else {
     prefs!.setString('comunidad', comunidad);
     prefs!.setString('noInterno', noInterior);
+    prefs!.setString('calle', calle);
   }
 }
 

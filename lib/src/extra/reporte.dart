@@ -5,6 +5,7 @@ import 'package:adcom/src/extra/add_reporte.dart';
 import 'package:adcom/src/extra/report_edit_page.dart';
 import 'package:adcom/src/models/event_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -255,6 +256,7 @@ class _LevantarReporteState extends State<LevantarReporte> {
                     ),
                   ),
                   Column(children: [
+                    Text('${transform12Hrs(index)}'),
                     Text(
                       '${reversedList[index].fechaRep!.day}/${reversedList[index].fechaRep!.month}/${reversedList[index].fechaRep!.year}',
                       style: TextStyle(fontSize: 18),
@@ -266,7 +268,10 @@ class _LevantarReporteState extends State<LevantarReporte> {
                         ? Text('')
                         : SizedBox(
                             width: 100,
-                            child: Text(reversedList[index].comunidad!)),
+                            child: Text(
+                              reversedList[index].comunidad!,
+                              textAlign: TextAlign.center,
+                            )),
                     reversedList[index].numero == null
                         ? Text('')
                         : Row(
@@ -284,6 +289,13 @@ class _LevantarReporteState extends State<LevantarReporte> {
         },
       ),
     );
+  }
+
+  transform12Hrs(int index) {
+    var formarhr = DateFormat("hh:mma");
+    var newTime = formarhr.format(reversedList[index].fechaRep!);
+
+    return newTime;
   }
 }
 

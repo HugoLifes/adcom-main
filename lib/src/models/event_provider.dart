@@ -78,14 +78,13 @@ class EventProvider extends ChangeNotifier {
           userd = post.nombreResidente;
           var userType = post.idPerfil;
 
-          if (post.infoUsuario != []) {
-            var comunidad =
-                post.infoUsuario == null ? '' : post.infoUsuario!.comunidad;
-            var noInterior =
-                post.infoUsuario == null ? '' : post.infoUsuario!.noInterior;
-            somData(userd, userType, comId, idPrimario, userId,
-                comunidad: comunidad, noInterior: noInterior);
-          } else {}
+          var comunidad =
+              post.infoUsuario == null ? '' : post.infoUsuario!.comunidad;
+          var noInterior =
+              post.infoUsuario == null ? '' : post.infoUsuario!.noInterior;
+          var calle = post.infoUsuario == null ? '' : post.infoUsuario!.calle;
+          somData(userd, userType, comId, idPrimario, userId,
+              comunidad: comunidad, noInterior: noInterior, calle: calle);
 
           Navigator.pushReplacementNamed(ctx, '/');
         }

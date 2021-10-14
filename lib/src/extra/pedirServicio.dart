@@ -46,6 +46,9 @@ class _PedirServicioState extends State<PedirServicio> {
   late DateTime toDate;
   int? idRe;
   String tipoDePago = "Efectivo";
+  var calle;
+  bool isChecked = false;
+  bool isChecked2 = false;
 
   getDt() async {
     prefs = await SharedPreferences.getInstance();
@@ -59,13 +62,18 @@ class _PedirServicioState extends State<PedirServicio> {
         comu = prefs!.getString('comunidad');
         noInt = prefs!.getString('noInterno');
         idRe = prefs!.getInt('userId');
+        calle = prefs!.getString('calle');
       });
+      print('comu:${comu}');
+      print('idResidente:${idRe}');
+      print('${widget.servicio!.idproveedor!}');
+      print(calle);
     }
 
     if (userName != null) {
       descriptionController.text = comu == null
           ? ''
-          : userName! + '\n' + comu! + '\n' + 'noInterior: $noInt';
+          : userName! + '\n' + comu! + '\n' + '$calle' + ' $noInt';
     } else {}
   }
 
@@ -119,6 +127,7 @@ class _PedirServicioState extends State<PedirServicio> {
       onStepContinue: () {
         setState(() {
           if (this._currentStep < this._stepper()!.length - 1) {
+            /// chequea la posicion del dateTime para hacer la llamada de disponibilidad
             if (this._currentStep == 3) {
               var currenTime =
                   DateTime(fromDate.year, fromDate.month, fromDate.day);
@@ -136,9 +145,31 @@ class _PedirServicioState extends State<PedirServicio> {
                           {context.loaderOverlay.hide(), alerta()}
                       });
             } else {
-              setState(() {
-                this._currentStep = this._currentStep + 1;
-              });
+              /// chequea si hay un metodo de pago
+              if (this._currentStep == 2) {
+                if ((isChecked || isChecked2) == false) {
+                  alerta4();
+                } else {
+                  setState(() {
+                    this._currentStep = this._currentStep + 1;
+                  });
+                }
+              } else {
+                /// chequea si hay imagenes seleccionadas
+                if (this._currentStep == 1) {
+                  if ((select! || select2! || select3!) == false) {
+                    alerta5();
+                  } else {
+                    setState(() {
+                      this._currentStep = this._currentStep + 1;
+                    });
+                  }
+                } else {
+                  setState(() {
+                    this._currentStep = this._currentStep + 1;
+                  });
+                }
+              }
             }
           } else {
             context.loaderOverlay.show();
@@ -273,33 +304,49 @@ class _PedirServicioState extends State<PedirServicio> {
                 child: buildCantidad(),
               ),
               Column(
+                ///tipoDePago = "Efectivo";
                 children: [
-                  _lights == true ? Text('Terminal') : Text('Efectivo'),
-                  InkWell(
-                    onTap: () {
-                      setState(() {
-                        _lights = !_lights;
-                      });
-                      if (_lights == false) {
-                        setState(() {
-                          tipoDePago = "Efectivo";
-                        });
-                      }
-                    },
-                    child: CupertinoSwitch(
-                      value: _lights,
-                      onChanged: (bool value) {
-                        setState(() {
-                          _lights = value;
-                        });
-                        print(_lights);
-                        if (_lights == true) {
+                  Row(
+                    children: [
+                      Text('Efectivo'),
+                      Checkbox(
+                        checkColor: Colors.white,
+                        value: isChecked,
+                        onChanged: (bool? value) {
                           setState(() {
-                            tipoDePago = "Tarjeta";
+                            isChecked = value!;
                           });
-                        }
-                      },
-                    ),
+                          if (isChecked2 == true) {
+                            setState(() {
+                              isChecked2 = false;
+                              isChecked = value!;
+                              tipoDePago = "Efectivo";
+                            });
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Text('Tarjeta  '),
+                      Checkbox(
+                        checkColor: Colors.white,
+                        value: isChecked2,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            isChecked2 = value!;
+                          });
+                          if (isChecked == true) {
+                            setState(() {
+                              isChecked = false;
+                              isChecked2 = value!;
+                              tipoDePago = "Tarjeta";
+                            });
+                          }
+                        },
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -393,7 +440,7 @@ class _PedirServicioState extends State<PedirServicio> {
             hintText: 'Nombre y Dirección'),
         maxLines: 3,
         keyboardType: TextInputType.multiline,
-        inputFormatters: [new LengthLimitingTextInputFormatter(200)],
+        inputFormatters: [new LengthLimitingTextInputFormatter(500)],
       );
   buildComents2() => TextFormField(
         cursorColor: Colors.black,
@@ -659,6 +706,106 @@ class _PedirServicioState extends State<PedirServicio> {
               height: 15,
             ),
             Text('Su solicitud se ha mandado con extio')
+          ],
+        ),
+      ),
+    );
+
+    showDialog(context: context, builder: (_) => alert);
+  }
+
+  alerta4() {
+    Widget okButton = TextButton(
+        onPressed: () {
+          setState(() {
+            this._currentStep = this._currentStep + 1;
+          });
+          Navigator.of(context).pop();
+        },
+        child: Text(
+          'Si, continuar',
+          style: TextStyle(color: Colors.red[900]),
+        ));
+    Widget backButton = TextButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: Text(
+          'Regresar',
+          style: TextStyle(color: Colors.orange),
+        ));
+    AlertDialog alert = AlertDialog(
+      actions: [backButton],
+      title: Text(
+        'Atención!',
+        style: TextStyle(
+          fontSize: 25,
+        ),
+      ),
+      content: Container(
+        width: 140,
+        height: 150,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Adcom informa',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Text('Seleccione un metodo de pago')
+          ],
+        ),
+      ),
+    );
+
+    showDialog(context: context, builder: (_) => alert);
+  }
+
+  alerta5() {
+    Widget okButton = TextButton(
+        onPressed: () {
+          setState(() {
+            this._currentStep = this._currentStep + 1;
+          });
+          Navigator.of(context).pop();
+        },
+        child: Text(
+          'Si, continuar',
+          style: TextStyle(color: Colors.red[900]),
+        ));
+    Widget backButton = TextButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: Text(
+          'Regresar',
+          style: TextStyle(color: Colors.orange),
+        ));
+    AlertDialog alert = AlertDialog(
+      actions: [backButton],
+      title: Text(
+        'Atención!',
+        style: TextStyle(
+          fontSize: 25,
+        ),
+      ),
+      content: Container(
+        width: 140,
+        height: 150,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Adcom informa',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Text('Seleccione el tipo de tanque')
           ],
         ),
       ),

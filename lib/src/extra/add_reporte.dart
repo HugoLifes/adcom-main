@@ -13,6 +13,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:path/path.dart' as path;
 
 SharedPreferences? prefs;
 var cameras;
@@ -48,12 +49,11 @@ class _AddReporteState extends State<AddReporte> {
   List<File> images = [];
   int? pages = 0;
   List<Slide>? _slides = [];
+  List<String> newsPath = [];
 
   int _currentStep = 0;
   int? idCom;
   int? idUser;
-  late CameraController _controller;
-  late Future<void> _initializeControllerFuture;
 
   getCameras() async {
     await Permission.camera.request();
@@ -269,8 +269,11 @@ class _AddReporteState extends State<AddReporte> {
           mensaje();
           Navigator.of(context).pop();
         } else {
+          String dir = path.dirname(image.path);
+          String newPath = path.join(dir, 'reportesAdcom.jpg');
+          print(newPath);
+          newsPath.add(newPath);
           images.add(File(image.path));
-          print(images[0].path);
         }
       } else {
         print('No se ha seleccionado una imagen');
@@ -281,13 +284,18 @@ class _AddReporteState extends State<AddReporte> {
   void openCamera2() async {
     var image =
         await _picker.pickImage(source: ImageSource.camera, imageQuality: 40);
-
+    var i = 0;
     if (image != null) {
       if (images.length == 3) {
         // muestra el mensaje de archivo excedido
         mensaje();
         Navigator.of(context).pop();
       } else {
+        i++;
+        String dir = path.dirname(image.path);
+        String newPath = path.join(dir, 'reportesAdcom$i.jpg');
+        print(newPath);
+        newsPath.add(newPath);
         images.add(File(image.path));
         print(images[0].path);
       }
@@ -308,10 +316,14 @@ class _AddReporteState extends State<AddReporte> {
   void openGallery() async {
     var image =
         await _picker.pickImage(source: ImageSource.gallery, imageQuality: 30);
+    var i = 0;
     setState(() {
       if (image != null) {
-        images.add(File(image.path));
-        print('${images[0].path}');
+        i++;
+        String dir = path.dirname(image.path);
+        String newPath = path.join(dir, 'reportesAdcom$i.jpg');
+        print(newPath);
+        newsPath.add(newPath);
       } else {
         print('No se ha seleccionado una imagen');
       }
@@ -370,7 +382,8 @@ class _AddReporteState extends State<AddReporte> {
   }
 
   // envia las fotos al serv mas toda su informacion que reqiere como los params
-  sendingData(String titulo, String descrip, List<File> file) async {
+  sendingData(String titulo, String descrip, List<File> file,
+      List<String> newpath) async {
     await addata();
     try {
       List<String> filesArr = [];
@@ -379,9 +392,8 @@ class _AddReporteState extends State<AddReporte> {
       print(idCom.toString());
       print(idUser.toString());
 
-      for (var item in file) {
-        filesArr.add(item.path.split('/').last);
-        print(filesArr[0]);
+      for (var item in newsPath) {
+        filesArr.add(item.split('/').last);
       }
 
       var formdata2 = FormData.fromMap({
@@ -394,7 +406,7 @@ class _AddReporteState extends State<AddReporte> {
         'img[]': [
           for (int i = 0; i < file.length; i++)
             MultipartFile.fromFileSync(file[i].path,
-                filename: filesArr[i], contentType: MediaType('media', '*'))
+                filename: filesArr[i], contentType: MediaType('*', '*'))
         ]
       });
 
@@ -475,8 +487,8 @@ class _AddReporteState extends State<AddReporte> {
           image: images,
           time: DateTime.now());
       final provider = Provider.of<EventProvider>(context, listen: false);
-      final Response? response = await sendingData(
-              titleController.text, descriptionController.text, images)
+      final Response? response = await sendingData(titleController.text,
+              descriptionController.text, images, newsPath)
           .then((value) {
         provider.addReport(report);
         Navigator.of(context).pop();

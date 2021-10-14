@@ -28,6 +28,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
   Accounts? cuentas;
   List<DatosCuenta> mylist = [];
   List<String> mesFormat = [];
+  NumberFormat numberFormat = NumberFormat.decimalPattern('hi');
 
   @override
   void initState() {
@@ -109,7 +110,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
             Column(
               children: [
                 Text(
-                  '\$ ${saldoDeudor()}',
+                  '\$ ${saldoDeudor()}.00',
                   style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -462,7 +463,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
         }
       }
     }
-    return contador;
+    return numberFormat.format(contador);
   }
 
   estadodepago() {

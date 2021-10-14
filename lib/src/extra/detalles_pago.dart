@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:adcom/src/pantallas/finanzas.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:glyphicon/glyphicon.dart';
 import 'package:gradient_widgets/gradient_widgets.dart';
 import 'package:intl/intl.dart';
@@ -35,6 +36,7 @@ class _DetallesPagoState extends State<DetallesPago> {
   bool pa = false;
   List<String> conceptos = [];
   bool usarSaldo = false;
+  NumberFormat numberFormat = NumberFormat.decimalPattern('hi');
   @override
   void initState() {
     super.initState();
@@ -215,11 +217,12 @@ class _DetallesPagoState extends State<DetallesPago> {
                                 width: size.width / 26,
                               ),
                               checkedAll == true
-                                  ? Text('${contadorTotal} MXN',
+                                  ? Text(
+                                      '${numberFormat.format(contadorTotal)}.00 MXN',
                                       style: TextStyle(fontSize: 19))
                                   : Text(
                                       ///contador
-                                      '\$ ${contador} MXN',
+                                      '\$ ${numberFormat.format(contador)}.00 MXN',
                                       style: TextStyle(fontSize: 19),
                                     ),
                               SizedBox(
@@ -321,7 +324,16 @@ class _DetallesPagoState extends State<DetallesPago> {
             padding: EdgeInsets.only(bottom: 25, left: 10, right: 10),
             child: GradientButton(
                 child: Text('Pagar ahora'),
-                callback: () {},
+                callback: () {
+                  Fluttertoast.showToast(
+                      msg: "Proximamente...",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.CENTER,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.white,
+                      textColor: Colors.black,
+                      fontSize: 20.0);
+                },
                 gradient: LinearGradient(colors: [
                   Colors.lightGreen[500]!,
                   Colors.lightGreen[600]!,
@@ -504,7 +516,7 @@ class _DetallesPagoState extends State<DetallesPago> {
                                     style: TextStyle(
                                         color: Colors.grey[800],
                                         fontSize: 14.0)),
-                                Text('${debt[data]}',
+                                Text('${numberFormat.format(debt[data])}.00',
                                     style: TextStyle(
                                         color: Colors.grey[800],
                                         fontSize: 14.0))
@@ -617,7 +629,7 @@ class _DetallesPagoState extends State<DetallesPago> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Su referencia ha sido generada con exito! Favor de presentarse al banco con esta referencia',
+              'Su referencia ha sido generada con exito!, Actualice y revise el apartado de referencias',
               style: TextStyle(fontSize: 18),
             )
           ],

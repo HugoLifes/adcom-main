@@ -213,7 +213,7 @@ class _ContactosState extends State<Contactos> {
         padding: EdgeInsets.only(left: 4, right: 4, top: 17),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 1,
-          childAspectRatio: 2.0,
+          childAspectRatio: 4.0,
           crossAxisSpacing: 15,
           mainAxisSpacing: 15,
         ),
@@ -257,16 +257,22 @@ class _ContactosState extends State<Contactos> {
                     ),
                     Column(
                       children: [
+                        SizedBox(
+                          height: size2 / 2,
+                        ),
                         itemSeleccion![index].title == null
                             ? Container()
-                            : SizedBox(
-                                width: size2 / 2,
-                                child: Text(
-                                  itemSeleccion![index].title!.toUpperCase(),
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: size2 / 29,
-                                      fontWeight: FontWeight.bold),
+                            : Container(
+                                padding: EdgeInsets.only(top: size2 / 50),
+                                child: SizedBox(
+                                  width: size2 / 2,
+                                  child: Text(
+                                    itemSeleccion![index].title!.toUpperCase(),
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: size2 / 29,
+                                        fontWeight: FontWeight.bold),
+                                  ),
                                 ),
                               ),
                       ],
