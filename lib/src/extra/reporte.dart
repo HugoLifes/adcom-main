@@ -5,6 +5,7 @@ import 'package:adcom/src/extra/add_reporte.dart';
 import 'package:adcom/src/extra/report_edit_page.dart';
 import 'package:adcom/src/models/event_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -256,6 +257,7 @@ class _LevantarReporteState extends State<LevantarReporte> {
                   ),
                   Column(
                     children: [
+                      Text('${transform12hrs(index)}'),
                       Text(
                         '${reversedList[index].fechaRep!.day}/${reversedList[index].fechaRep!.month}/${reversedList[index].fechaRep!.year}',
                         style: TextStyle(fontSize: 18),
@@ -287,6 +289,14 @@ class _LevantarReporteState extends State<LevantarReporte> {
       ),
     );
   }
+
+  transform12hrs(int index){
+    var fromhr = DateFormat("hh:mma");
+    var newTime = fromhr.format(reversedList[index].fechaRep!);
+
+    return newTime;
+  }
+
 }
 
 class Progreso {

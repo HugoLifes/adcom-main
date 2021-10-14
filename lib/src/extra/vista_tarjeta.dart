@@ -8,12 +8,12 @@ import 'package:adcom/src/pantallas/finanzas.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-import 'package:provider/provider.dart';
-
 // ignore: must_be_immutable
 class VistaTarjeta extends StatefulWidget {
   List<DatosCuenta>? newList = [];
-  VistaTarjeta({Key? key, this.newList}) : super(key: key);
+  List<DatosCuenta>? refP = [];
+  String? bandera;
+  VistaTarjeta({Key? key, this.newList, this.refP, this.bandera}) : super(key: key);
 
   @override
   _VistaTarjetaState createState() => _VistaTarjetaState();
@@ -24,6 +24,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
   Accounts? cuentas;
   List<DatosCuenta> mylist = [];
   List<String> mesFormat = [];
+  NumberFormat numberFormat = NumberFormat.decimalPattern('hi');
 
   @override
   void initState() {
@@ -91,6 +92,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (_) => RefView(
                                 list: widget.newList,
+                                refP: widget.refP
                               )));
                     },
                     child: Icon(Icons.add, size: 25, color: Colors.white),
@@ -104,7 +106,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
             Column(
               children: [
                 Text(
-                  '\$ ${saldoDeudor()}',
+                  '\$ ${saldoDeudor()}.00',
                   style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -130,7 +132,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
                     _showModalSheet();
                   },
                   child: Text(
-                    'Pagar Ahora',
+                    'Saldo a favor',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.white, fontSize: 14),
                   ),
@@ -160,7 +162,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
     );
   }
 
-  void _showModalSheet() {
+ void _showModalSheet() {
     showModalBottomSheet(
         elevation: 5,
         clipBehavior: Clip.antiAliasWithSaveLayer,
@@ -177,7 +179,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(
-                    'Seleccioné su método de pago',
+                    'Saldo a favor',
                     style: TextStyle(fontSize: 21),
                   ),
                   SizedBox(
@@ -193,21 +195,14 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
                       children: [
                         Row(
                           children: [
-                            Image.asset(
-                              'assets/images/debit-card.gif',
-                              height: 40,
-                              width: 50,
-                            ),
-                            SizedBox(
-                              width: 10,
-                            ),
+                            
                             Text(
-                              'Pago con tarjeta',
-                              style: TextStyle(fontSize: 20),
+                              'Proximamente',
+                              style: TextStyle(fontSize: 30),
                             ),
                           ],
                         ),
-                        Container(
+                        /* Container(
                           padding: EdgeInsets.only(right: 110),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -235,7 +230,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
                               )
                             ],
                           ),
-                        )
+                        ) */
                       ],
                     ),
                   )
@@ -463,7 +458,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
         }
       }
     }
-    return contador;
+    return numberFormat.format(contador) ;
   }
 
   estadodepago() {
@@ -512,21 +507,18 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
   ///ok
   estadodepagoColor() {
     Color? estado;
-    for (int i = 0; i < widget.newList!.length; i++) {
-      if (widget.newList![i].pago == 1) {
-        estado = Colors.lightGreen[700];
-      } else {
-        if (DateTime.now().day <= widget.newList![i].fechaLimite!.day &&
-                DateTime.now().month <= widget.newList![i].fechaLimite!.month &&
-                DateTime.now().year <= widget.newList![i].fechaLimite!.year ||
-            widget.newList![i].fechaLimite!.isAfter(DateTime.now())) {
-          return estado = Colors.amber[400];
-        } else {
-          return estado = Colors.red[700];
+    if(widget.bandera == "verde" || widget.newList!.last.pago == 1){
+      return estado = Colors.lightGreen[700];
+    }else{
+      if(widget.bandera == "Amarillo"){
+        return estado= Colors.amber[400];
+      }else{
+        if(widget.bandera == "Rojo"){
+          return estado= Colors.red[700];
         }
+        
       }
     }
-    return estado == null ? estado = Colors.lightGreen[700] : estado;
   }
 
   ///ok

@@ -320,6 +320,7 @@ class Users {
   final double? deuda;
   final String? fecha;
   final int? folio;
+  final int? referenciaP;
   const Users(
       {this.tipoPago,
       this.referencia,
@@ -327,6 +328,7 @@ class Users {
       this.concepto,
       this.deuda,
       this.folio,
+      this.referenciaP,
       this.fecha});
 }
 

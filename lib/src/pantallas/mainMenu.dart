@@ -1,7 +1,14 @@
+import 'dart:async';
+
+import 'package:adcom/json/jsonAmenidades.dart';
+import 'package:adcom/src/extra/servicios.dart';
+
 import 'package:adcom/src/methods/gridDashboard.dart';
-import 'package:adcom/src/models/event_provider.dart';
+
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
+import 'package:glyphicon/glyphicon.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 SharedPreferences? prefs;
@@ -19,7 +26,7 @@ class MainMenu extends StatefulWidget {
   _MainMenuState createState() => _MainMenuState();
 }
 
-somData(user, userType, idCom, idPrimario, userId) async {
+somData(user, userType, idCom, idPrimario, userId, comunidad, noInt, calle) async {
   await MainMenu.init();
 
   prefs!.setString('user', user);
@@ -27,12 +34,28 @@ somData(user, userType, idCom, idPrimario, userId) async {
   prefs!.setInt('idCom', idCom);
   prefs!.setInt('idPrimario', idPrimario);
   prefs!.setInt('userId', userId);
+
+  if(comunidad == null && noInt == null){
+
+  }else{
+    prefs!.setString('comunidad', comunidad);
+    prefs!.setString('noInterno', noInt);
+    prefs!.setString('calle', calle);
+  }
+  
 }
 
 class _MainMenuState extends State<MainMenu> {
   var user;
   int? userType;
+  int? idCom;
+  bool entrada = true;
+  Places? acceso;
+  var size;
+  int _selectedIndex = 0;
 
+ 
+  
   userName() async {
     prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -41,100 +64,146 @@ class _MainMenuState extends State<MainMenu> {
     });
   }
 
+  void onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    
     userName();
+  }
+
+  @override
+  void dispose() {
+   
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     //final args = ModalRoute.of(context)!.settings.arguments as LoginPage;
-    var size = MediaQuery.of(context).size;
+    Size size = MediaQuery.of(context).size;
+    List<Widget> _widgetOptions = [mainMenuView(size), Services()];
     return Scaffold(
-        body: Stack(
-                children: [
-                  Container(
-                    height: size.height * .36,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(20),
-                          bottomRight: Radius.circular(20)),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.grey,
-                            blurRadius: 10,
-                            offset: Offset(1, 0))
-                      ],
-                    ),
-                  ),
-                  Container(
-                      padding: EdgeInsets.only(
-                          top: size.height / 4.6, right: size.width / 16,  ),
-                      alignment: Alignment.topRight,
-                      child: Image.asset(
-                        'assets/images/AdCom3.png',
-                        width: size.width * .38,
-                      )),
-                  SafeArea(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+      body: _widgetOptions.elementAt(_selectedIndex),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+              icon: Icon(
+                Icons.home,
+                size: 30,
+              ),
+              label: 'Menu',
+              backgroundColor: Colors.red),
+          BottomNavigationBarItem(
+              icon: Icon(
+                Glyphicon.list,
+                size: 30,
+              ),
+              label: 'Servicios',
+              backgroundColor: Colors.blue)
+        ],
+        elevation: 10,
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.red[900],
+        onTap: onItemTapped,
+      ),
+    );
+  }
+
+  Stack mainMenuView(Size size) {
+    return Stack(
+      children: [
+        Container(
+          height: size.height * .35,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(20),
+                bottomRight: Radius.circular(20)),
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.grey, blurRadius: 10, offset: Offset(1, 0))
+            ],
+          ),
+        ),
+        Container(
+            padding:
+                EdgeInsets.only(top: size.height * .18, right: size.width / 18),
+            alignment: Alignment.topRight,
+            child: Image.asset(
+              'assets/images/AdCom3.png',
+              width: size.width * .38,
+            )),
+        SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 12, top: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Column(
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.only(
-                              left: 12,
-                              top:10
-                            ),
+                          SizedBox(
+                            width: size.height / 3.5,
+                            height: size.width / 2.0,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                SizedBox(
-                                  width: size.height/3.5,
-                                  height: size.width/2.0,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      user == null || user == '' ? Text('¡${greeting()}!', style: TextStyle(
-                                            color: Colors.black,
-                                            fontFamily: 'Roboto',
-                                            fontSize:  30,
-                                            fontWeight: FontWeight.w700),) : Text('¡${greeting()}!', style: TextStyle(
-                                            color: Colors.black,
-                                            fontFamily: 'Roboto',
-                                            fontSize:  18,
-                                            fontWeight: FontWeight.w700),),
-                                        
-                                      Text(
-                                        '${user == null || user == '' ? '' : user}',
+                                user == null || user == ''
+                                    ? Text('¡${greeting()}! ',
                                         style: TextStyle(
                                             color: Colors.black,
                                             fontFamily: 'Roboto',
-                                            fontSize: size.width / 11,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w700))
+                                    : Text(
+                                        '¡${greeting()}!',
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontFamily: 'Roboto',
+                                            fontSize: size.width/ 18,
                                             fontWeight: FontWeight.w700),
                                       ),
-                                    ],
-                                  ),
+                                Text(
+                                  '${user == null || user == '' ? '' : user}',
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontFamily: 'Roboto',
+                                      fontSize: size.width / 11,
+                                      fontWeight: FontWeight.w700),
                                 ),
-                                //no mover
-                              
                               ],
                             ),
                           ),
-
-                          //no mover
-                          GridDashboard(
-                            userId: userType,
-                          )
                         ],
                       ),
-                    ),
-                  )
-                ],
-              ));
+                      SizedBox(
+                        width: size.width / 70,
+                      ), //no mover
+                    ],
+                  ),
+                ),
+
+                //no mover
+              ],
+            ),
+          ),
+        ),
+        GridDashboard(
+          userId: userType,
+        )
+      ],
+    );
   }
 
   String greeting() {
@@ -143,8 +212,8 @@ class _MainMenuState extends State<MainMenu> {
       return 'Buenos Dias';
     }
     if (hour < 19) {
-      return 'Buenas tardes';
+      return 'Buenas Tardes';
     }
-    return 'Buenas noches';
+    return 'Buenas Noches';
   }
 }

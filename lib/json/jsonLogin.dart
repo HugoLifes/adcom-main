@@ -1,7 +1,3 @@
-// To parse this JSON data, do
-//
-//     final posting = postingFromJson(jsonString);
-
 import 'dart:convert';
 
 Posting postingFromJson(String str) => Posting.fromJson(json.decode(str));
@@ -18,6 +14,7 @@ class Posting {
     this.idResidente,
     this.usuario,
     this.nombreResidente,
+    this.infoUsuario,
   });
 
   int? value;
@@ -28,6 +25,7 @@ class Posting {
   int? idResidente;
   String? usuario;
   String? nombreResidente;
+  InfoUsuario? infoUsuario;
 
   factory Posting.fromJson(Map<String, dynamic> json) => Posting(
         value: json["value"],
@@ -38,6 +36,9 @@ class Posting {
         idResidente: json["ID_RESIDENTE"],
         usuario: json["USUARIO"],
         nombreResidente: json["NombreResidente"],
+        infoUsuario: json["infoUsuario"].isEmpty
+            ? null
+            : InfoUsuario.fromJson(json["infoUsuario"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -49,5 +50,42 @@ class Posting {
         "ID_RESIDENTE": idResidente,
         "USUARIO": usuario,
         "NombreResidente": nombreResidente,
+        "infoUsuario": infoUsuario == [].isEmpty ? null : infoUsuario!.toJson(),
+      };
+}
+
+class InfoUsuario {
+  InfoUsuario({
+    this.noInterior,
+    this.noExterno,
+    this.tipoLote,
+    this.cp,
+    this.comunidad,
+    this.calle,
+  });
+
+  String? noInterior;
+  String? noExterno;
+  String? tipoLote;
+  String? cp;
+  String? comunidad;
+  String? calle;
+
+  factory InfoUsuario.fromJson(Map<String, dynamic> json) => InfoUsuario(
+        noInterior: json["NO_INTERIOR"] == null ? null : json["NO_INTERIOR"],
+        noExterno: json["NO_EXTERNO"] == null ? null : json["NO_EXTERNO"],
+        tipoLote: json["TIPO_LOTE"] == null ? null : json["TIPO_LOTE"],
+        cp: json["CP"] == null ? null : json["CP"],
+        comunidad: json["COMUNIDAD"] == null ? null : json["COMUNIDAD"],
+        calle: json["CALLE"] == null ? null : json["CALLE"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "NO_INTERIOR": noInterior == null ? null : noInterior,
+        "NO_EXTERNO": noExterno == null ? null : noExterno,
+        "TIPO_LOTE": tipoLote == null ? null : tipoLote,
+        "CP": cp == null ? null : cp,
+        "COMUNIDAD": comunidad == null ? null : comunidad,
+        "CALLE": calle == null ? null : calle,
       };
 }

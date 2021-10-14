@@ -7,11 +7,12 @@ import 'package:adcom/src/models/event_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:path/path.dart' as path;
 
 SharedPreferences? prefs;
 var cameras;
@@ -47,12 +48,11 @@ class _AddReporteState extends State<AddReporte> {
   List<File> images = [];
   int? pages = 0;
   List<Slide>? _slides = [];
-  bool isLoading = false;
+  List<String> newsPath = [];
+
   int _currentStep = 0;
   int? idCom;
   int? idUser;
-  late CameraController _controller;
-  late Future<void> _initializeControllerFuture;
 
   
 
@@ -68,7 +68,7 @@ class _AddReporteState extends State<AddReporte> {
   void initState() {
     super.initState();
 
-    
+  
   }
 
   @override
@@ -81,33 +81,36 @@ class _AddReporteState extends State<AddReporte> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue,
-        leading: CloseButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-      ),
-      resizeToAvoidBottomInset: true,
-      //stepper, propiedades y acciones
-      body: stepper(),
-
-      //
-      // Boton que abre la camara
-
-      floatingActionButton: FloatingActionButton(
+    return GestureDetector(
+      onTap: (){
+        HapticFeedback.selectionClick();
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        appBar: AppBar(
           backgroundColor: Colors.blue,
-          child: isLoading == true
-              ? CircularProgressIndicator(
-                  backgroundColor: Colors.white,
-                )
-              : Icon(Icons.camera),
-          onPressed: () => {
-                HapticFeedback.lightImpact(),
-                images.length == 3 ? mensaje() : _optionsCamera(),
-              }),
+          leading: CloseButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          actions: buildEditingActions(),
+        ),
+        resizeToAvoidBottomInset: true,
+        //stepper, propiedades y acciones
+        body: LoaderOverlay(child: stepper()),
+    
+        //
+        // Boton que abre la camara
+    
+        floatingActionButton: FloatingActionButton(
+            backgroundColor: Colors.blue,
+            child: Icon(Icons.camera),
+            onPressed: () => {
+                  HapticFeedback.lightImpact(),
+                  images.length == 3 ? mensaje() : _optionsCamera(),
+                }),
+      ),
     );
   }
 
@@ -266,8 +269,11 @@ class _AddReporteState extends State<AddReporte> {
           mensaje();
           Navigator.of(context).pop();
         } else {
+          String dir = path.dirname(image.path);
+          String newPath = path.join(dir, 'reportesAdcom.jpg');
+          print(newPath);
+          newsPath.add(newPath);
           images.add(File(image.path));
-          print(images[0].path);
         }
       } else {
         print('No se ha seleccionado una imagen');
@@ -277,14 +283,19 @@ class _AddReporteState extends State<AddReporte> {
 
   void openCamera2() async {
     var image =
-        await _picker.pickImage(source: ImageSource.camera, imageQuality: 50);
-
+        await _picker.pickImage(source: ImageSource.camera, imageQuality: 40);
+    var i = 0;
     if (image != null) {
       if (images.length == 3) {
         // muestra el mensaje de archivo excedido
         mensaje();
         Navigator.of(context).pop();
       } else {
+        i++;
+        String dir = path.dirname(image.path);
+        String newPath = path.join(dir, 'reportesAdcom$i.jpg');
+        print(newPath);
+        newsPath.add(newPath);
         images.add(File(image.path));
         print(images[0].path);
       }
@@ -304,11 +315,15 @@ class _AddReporteState extends State<AddReporte> {
   // funcion que abre la galeria para las fotos
   void openGallery() async {
     var image =
-        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 50);
+        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 30);
+    var i = 0;
     setState(() {
       if (image != null) {
-        images.add(File(image.path));
-        print('${images[0].path}');
+        i++;
+        String dir = path.dirname(image.path);
+        String newPath = path.join(dir, 'reportesAdcom$i.jpg');
+        print(newPath);
+        newsPath.add(newPath);
       } else {
         print('No se ha seleccionado una imagen');
       }
@@ -320,7 +335,8 @@ class _AddReporteState extends State<AddReporte> {
     Widget okButton = TextButton(
         onPressed: () {
           Navigator.of(context).pop();
-          saveForm();
+          context.loaderOverlay.show();
+          saveForm().then((value) => {context.loaderOverlay.hide()});
         },
         child: Text(
           'Si, continuar',
@@ -366,13 +382,9 @@ class _AddReporteState extends State<AddReporte> {
   }
 
   // envia las fotos al serv mas toda su informacion que reqiere como los params
-  sendingData(String titulo, String descrip, List<File> file) async {
+  sendingData(String titulo, String descrip, List<File> file,
+      List<String> newpath) async {
     await addata();
-
-    setState(() {
-      isLoading = true;
-    });
-
     try {
       List<String> filesArr = [];
       Dio dio = Dio();
@@ -380,9 +392,8 @@ class _AddReporteState extends State<AddReporte> {
       print(idCom.toString());
       print(idUser.toString());
 
-      for (var item in file) {
-        filesArr.add(item.path.split('/').last);
-        print(filesArr[0]);
+      for (var item in newsPath) {
+        filesArr.add(item.split('/').last);
       }
 
       var formdata2 = FormData.fromMap({
@@ -395,7 +406,7 @@ class _AddReporteState extends State<AddReporte> {
         'img[]': [
           for (int i = 0; i < file.length; i++)
             MultipartFile.fromFileSync(file[i].path,
-                filename: filesArr[i], contentType: MediaType('media', '*'))
+                filename: filesArr[i], contentType: MediaType('*', '*'))
         ]
       });
 
@@ -465,12 +476,6 @@ class _AddReporteState extends State<AddReporte> {
         },
       );
 
-  cargando() {
-    return isLoading == true
-        ? Center(child: CircularProgressIndicator())
-        : null;
-  }
-
   Future saveForm() async {
     final isValid = _formKey.currentState!.validate();
     final isValid2 = _formKey2.currentState!.validate();
@@ -481,13 +486,11 @@ class _AddReporteState extends State<AddReporte> {
           description: descriptionController.text,
           image: images,
           time: DateTime.now());
-
-      final Response? response = await sendingData(
-              titleController.text, descriptionController.text, images)
+      final provider = Provider.of<EventProvider>(context, listen: false);
+      final Response? response = await sendingData(titleController.text,
+              descriptionController.text, images, newsPath)
           .then((value) {
-        setState(() {
-          isLoading = false;
-        });
+        provider.addReport(report);
         Navigator.of(context).pop();
 
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(

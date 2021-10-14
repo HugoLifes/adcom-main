@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:adcom/src/extra/filter_section.dart';
+import 'package:adcom/src/extra/vistaContactos.dart';
 import 'package:adcom/src/models/event_provider.dart';
 import 'package:flutter/services.dart';
 import 'package:adcom/json/json.dart';
@@ -12,20 +13,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 SharedPreferences? prefs;
 
+// ignore: must_be_immutable
 class ContactDashboard extends StatefulWidget {
+  List<Items>? contactos = [];
   final bool filtrar;
   static init() async {
     prefs = await SharedPreferences.getInstance();
   }
 
-  ContactDashboard({this.filtrar = false});
+  ContactDashboard({this.filtrar = false, this.contactos});
   @override
   _ContactDashboardState createState() => _ContactDashboardState();
-}
-
-obtainId(id) async {
-  await ContactDashboard.init();
-  prefs!.setInt('id', id);
 }
 
 Future<Welcome?> getData() async {
@@ -33,6 +31,8 @@ Future<Welcome?> getData() async {
 
   prefs = await SharedPreferences.getInstance();
   var id = prefs!.getInt('id');
+
+  print(id.toString());
 
   Uri uri = Uri.parse(
       'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-directorio');
@@ -55,88 +55,42 @@ class _ContactDashboardState extends State<ContactDashboard> {
   List<Items> filtroComu = [];
   var items;
   var com;
-  holi() async {
-    dt = await getData();
-    final provider = Provider.of<EventProvider>(context, listen: false);
-    for (int i = 0; i < dt!.residente!.length; i++) {
-      myList.add(new Items(
-          idResidente: dt!.residente![i].idResidente,
-          title: dt!.residente![i].nombreResidente,
-          numero: dt!.residente![i].numero,
-          idComunidad: dt!.residente![i].idCom,
-          calle: dt!.residente![i].calle,
-          cp: dt!.residente![i].cp,
-          email: dt!.residente![i].email,
-          interior: dt!.residente![i].interior,
-          telCel: dt!.residente![i].telefonoCel,
-          telEme: dt!.residente![i].telefonoEmergencia,
-          telFijo: dt!.residente![i].telefonoFijo,
-          comNombre: dt!.residente![i].comNombre,
-          icon: Icon(
-            Icons.person,
-            size: 30,
-            color: Colors.lightGreen,
-          )));
-
-      //Arreglar el valor nulo entrante
-      //
-      provider.addContacts(new Items(
-          idResidente: dt!.residente![i].idResidente,
-          title: dt!.residente![i].nombreResidente,
-          numero: dt!.residente![i].numero,
-          idComunidad: dt!.residente![i].idCom,
-          calle: dt!.residente![i].calle,
-          cp: dt!.residente![i].cp,
-          email: dt!.residente![i].email,
-          interior: dt!.residente![i].interior,
-          telCel: dt!.residente![i].telefonoCel,
-          telEme: dt!.residente![i].telefonoEmergencia,
-          telFijo: dt!.residente![i].telefonoFijo,
-          comNombre: dt!.residente![i].comNombre));
-    }
-  }
 
   @override
   void initState() {
     super.initState();
-    holi();
-
-    Future.delayed(Duration(seconds: 1), () => {refresh()});
   }
 
-  refresh() {
-    setState(() {
-      var size = MediaQuery.of(context).size.width;
-      vistaContactos(size: size);
-    });
-  }
+  refresh() {}
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size.width;
-    return myList.isEmpty
-        ? Center(
-            child: CircularProgressIndicator(),
-          )
-        : vistaContactos(size: size);
+    return vistaContactos(size);
   }
 
-  vistaContactos({size}) => Flexible(
+  vistaContactos(size) => Flexible(
         child: GridView.builder(
           shrinkWrap: false,
-          padding: EdgeInsets.only(left: 3, right: 3, top: 18),
-          itemCount: myList.length,
+          padding: EdgeInsets.only(left: 5, right: 5, top: 17),
+          itemCount: widget.contactos!.length,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 1,
-            childAspectRatio: 2.5,
+            childAspectRatio: 4.0,
             crossAxisSpacing: 16,
             mainAxisSpacing: 16,
           ),
           itemBuilder: (context, int index) {
             return InkWell(
               onTap: () {
+                ///navigator a vista contactos
                 HapticFeedback.mediumImpact();
-                //Navigator.pushNamed(context, data.route);
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => VistaContactos(
+                              contactos: widget.contactos![index],
+                            )));
               },
               child: Container(
                 decoration: BoxDecoration(
@@ -159,70 +113,31 @@ class _ContactDashboardState extends State<ContactDashboard> {
                         width: 50,
                         decoration: BoxDecoration(
                             color: Colors.grey[300], shape: BoxShape.circle),
-                        child: myList[index].icon == null
+                        child: widget.contactos![index].icon == null
                             ? SizedBox()
-                            : myList[index].icon,
+                            : widget.contactos![index].icon,
                       ),
                       SizedBox(
-                        width: 12,
+                        width: 15,
                       ),
                       Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          myList[index].title == null
+                          widget.contactos![index].title == null
                               ? Container()
-                              : SizedBox(
-                                width: size *.40,
-                                child: Text(
-                                    myList[index].title!.toUpperCase(),
-                                    style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 14.5,
-                                        fontWeight: FontWeight.w600),
+                              : Container(
+                                  padding: EdgeInsets.only(top: size / 50),
+                                  child: SizedBox(
+                                    width: size / 2,
+                                    child: Text(
+                                      widget.contactos![index].title!
+                                          .toUpperCase(),
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: size / 29,
+                                          fontWeight: FontWeight.bold),
+                                    ),
                                   ),
-                              ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Row(
-                            children: [
-                             
-                              myList[index].comNombre == null
-                                  ? Container()
-                                  : Text("${myList[index].comNombre}",
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                      )),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                         /*  Row(
-                            children: [
-                              Text(
-                                'Email:',
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(
-                                width: 3,
-                              ),
-                              myList[index].email == null
-                                  ? Text('No tiene disponible', style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 15,
-                                      ))
-                                  : Text(myList[index].email!,
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 15,
-                                      )),
-                            ],
-                          ), */
+                                ),
                         ],
                       ),
                     ],

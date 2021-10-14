@@ -1,4 +1,5 @@
-import 'dart:async';
+
+  import 'dart:async';
 import 'dart:convert';
 import 'package:adcom/json/jsonFinanzas.dart';
 import 'package:adcom/src/extra/opciones_edoCuenta.dart';
@@ -13,18 +14,9 @@ SharedPreferences? prefs;
 class Finanzas extends StatefulWidget {
   final id;
   Finanzas({Key? key, this.id}) : super(key: key);
-  static init() async {
-    prefs = await SharedPreferences.getInstance();
-  }
 
   @override
   _FinanzasState createState() => _FinanzasState();
-}
-
-dataOff3(id) async {
-  await Finanzas.init();
-
-  prefs!.setInt('u', id);
 }
 
 Future<Accounts?> getAdeudos() async {
@@ -45,6 +37,7 @@ Future<Accounts?> getAdeudos() async {
 }
 
 class _FinanzasState extends State<Finanzas> {
+  late GlobalKey<ScaffoldState> _scaffoldKey;
   bool isdone = false;
   Accounts? cuentas;
   List<DatosCuenta> mylist = [];
@@ -56,16 +49,19 @@ class _FinanzasState extends State<Finanzas> {
   VoidCallback? _showPersBottomSheetCallBack;
   bool itsTrue = true;
   String? mes;
+  bool hayRefPadre = false;
   String? ref;
   List<Users> users = [];
   String? userName;
   DatosUsuario? datosUsuario;
+  List<DatosCuenta> refPadre = [];
+  String? bandera;
 
   /// El init state inicializa funciones cuando abre el boton mis pagos
   @override
   void initState() {
     super.initState();
-
+    _scaffoldKey = GlobalKey();
     /// no tocar, muestra la vista para pagar con tarjeta
     _showPersBottomSheetCallBack = _showPersBottomSheetCallBack;
 
@@ -114,66 +110,81 @@ class _FinanzasState extends State<Finanzas> {
             SafeArea(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20),
-                child: ListView(shrinkWrap: true, children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        height: size.width / 20,
-                      ),
-                      Text(
-                        'Toma el control de tus gastos',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: 17),
-                      ),
-                      SizedBox(
-                        height: size.width / 20,
-                      ),
-                      SizedBox(
-                        width: size.width * .6,
-                        child: Text(
-                          'Mantente actualizado revisando tus estados de cuenta y adeudos pendientes.',
-                          style: TextStyle(
-                              color: Colors.white, fontSize: size.width / 21),
+                child: RefreshIndicator(
+                  onRefresh: (){
+                    return Future.delayed(Duration(seconds: 1),(){
+                      setState(() {
+                        if(localList.isNotEmpty){
+                          localList.clear();
+                        data();
+                        }else{
+                          data();
+                        }
+                        
+                      });
+                    });
+                  },
+                  child: ListView(shrinkWrap: true, children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: size.width / 20,
                         ),
-                      ),
-                      Container(
-                          padding: EdgeInsets.only(
-                            top: size.width / 5,
+                        Text(
+                          'Toma el control de tus gastos',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontSize: 17),
+                        ),
+                        SizedBox(
+                          height: size.width / 20,
+                        ),
+                        SizedBox(
+                          width: size.width * .6,
+                          child: Text(
+                            'Mantente actualizado revisando tus estados de cuenta y adeudos pendientes.',
+                            style: TextStyle(
+                                color: Colors.white, fontSize: size.width / 21),
                           ),
-                          child: localList.isEmpty
-                              ? Center(
-                                  child: itsTrue == false
-                                      ? Container(
-                                          padding:
-                                              const EdgeInsets.only(top: 90),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Image.asset(
-                                                'assets/images/magic.png',
-                                                width: size.width / 1,
-                                                height: 200,
-                                              ),
-                                              Text(
-                                                'Lo sentimos, por el momento no cuenta con adeudos',
-                                                style: TextStyle(
-                                                  fontSize: size.width / 20,
-                                                  color: Colors.lightGreen[700],
+                        ),
+                        Container(
+                            padding: EdgeInsets.only(
+                              top: size.width / 5,
+                            ),
+                            child: localList.isEmpty
+                                ? Center(
+                                    child: itsTrue == false
+                                        ? Container(
+                                            padding:
+                                                const EdgeInsets.only(top: 90),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Image.asset(
+                                                  'assets/images/magic.png',
+                                                  width: size.width / 1,
+                                                  height: 200,
                                                 ),
-                                                textAlign: TextAlign.justify,
-                                              )
-                                            ],
-                                          ))
-                                      : CircularProgressIndicator(),
-                                )
-                              : mainView())
-                    ],
-                  ),
-                ]),
+                                                Text(
+                                                  'Lo sentimos, por el momento no cuenta con adeudos',
+                                                  style: TextStyle(
+                                                    fontSize: size.width / 20,
+                                                    color: Colors.lightGreen[700],
+                                                  ),
+                                                  textAlign: TextAlign.justify,
+                                                )
+                                              ],
+                                            ))
+                                        : CircularProgressIndicator(),
+                                  )
+                                : mainView())
+                      ],
+                    ),
+                  ]),
+                ),
               ),
             ),
           ],
@@ -183,27 +194,20 @@ class _FinanzasState extends State<Finanzas> {
   SharedPreferences? prefs;
   getNameUser() async {
     prefs = await SharedPreferences.getInstance();
-    if(mounted){
+    if (mounted) {
       setState(() {
-      userName = prefs!.getString('user');
-    });
+        userName = prefs!.getString('user');
+      });
     }
-    
   }
 
-  //Se usa para atualizar el estado de la tarjeta
+  ///Se usa para atualizar el estado de la tarjeta
   refresh() {
     setState(() {
       if (mounted) {
         mainView();
       }
     });
-  }
-
-  recargos() {
-    for (int i = 0; i < localList.length; i++) {
-      if (localList[i].pagoTardio == 1) {}
-    }
   }
 
   /// esta funcion se usa para crear el pdf
@@ -221,7 +225,7 @@ class _FinanzasState extends State<Finanzas> {
       monto = double.parse(localList[i].montoPago!);
       tardio = double.parse(localList[i].montoTardio!);
       if (localList[i].pago == 1) {
-        mesPagado = localList[i].fechaPago!.month;
+        mesPagado = localList[i].fechaGenerada!.month;
         fecha =
             '${localList[i].fechaPago!.day}/${localList[i].fechaPago!.month}/${localList[i].fechaPago!.year}';
         tipoPago = localList[i].formaDePago!;
@@ -251,6 +255,9 @@ class _FinanzasState extends State<Finanzas> {
                   fecha: fecha,
                   deuda: tardio,
                   folio: folio,
+                  referenciaP: localList[i].referenciaP! == "0"
+                      ? int.parse(localList[i].referenciaP!)
+                      : int.parse(refPadre.last.referenciaP!),
                   tipoPago: tipoPago));
             });
             break;
@@ -265,6 +272,9 @@ class _FinanzasState extends State<Finanzas> {
                   fecha: fecha,
                   deuda: tardio,
                   folio: folio,
+                  referenciaP: localList[i].referenciaP! == "0"
+                      ? int.parse(localList[i].referenciaP!)
+                      : int.parse(refPadre.last.referenciaP!),
                   tipoPago: tipoPago));
             });
             break;
@@ -279,6 +289,9 @@ class _FinanzasState extends State<Finanzas> {
                   ),
                   deuda: tardio,
                   folio: folio,
+                  referenciaP: localList[i].referenciaP! == "0"
+                      ? int.parse(localList[i].referenciaP!)
+                      : int.parse(refPadre.last.referenciaP!),
                   tipoPago: tipoPago));
             });
             break;
@@ -293,6 +306,9 @@ class _FinanzasState extends State<Finanzas> {
                   ),
                   deuda: tardio,
                   folio: folio,
+                  referenciaP: localList[i].referenciaP! == "0"
+                      ? int.parse(localList[i].referenciaP!)
+                      : int.parse(refPadre.last.referenciaP!),
                   tipoPago: tipoPago));
             });
             break;
@@ -307,6 +323,9 @@ class _FinanzasState extends State<Finanzas> {
                   fecha: fecha,
                   deuda: tardio,
                   folio: folio,
+                  referenciaP: localList[i].referenciaP! == "0"
+                      ? int.parse(localList[i].referenciaP!)
+                      : int.parse(refPadre.last.referenciaP!),
                   tipoPago: tipoPago));
             });
             break;
@@ -322,6 +341,9 @@ class _FinanzasState extends State<Finanzas> {
                   ),
                   deuda: tardio,
                   folio: folio,
+                  referenciaP: localList[i].referenciaP! == "0"
+                      ? int.parse(localList[i].referenciaP!)
+                      : int.parse(refPadre.last.referenciaP!),
                   tipoPago: tipoPago));
             });
             break;
@@ -336,6 +358,9 @@ class _FinanzasState extends State<Finanzas> {
                   ),
                   deuda: tardio,
                   folio: folio,
+                  referenciaP: localList[i].referenciaP! == "0"
+                      ? int.parse(localList[i].referenciaP!)
+                      : int.parse(refPadre.last.referenciaP!),
                   tipoPago: tipoPago));
             });
             break;
@@ -349,6 +374,9 @@ class _FinanzasState extends State<Finanzas> {
                     localList[i].referencia!,
                   ),
                   deuda: tardio,
+                  referenciaP: localList[i].referenciaP! == "0"
+                      ? int.parse(localList[i].referenciaP!)
+                      : int.parse(refPadre.last.referenciaP!),
                   folio: folio,
                   tipoPago: tipoPago));
             });
@@ -359,6 +387,9 @@ class _FinanzasState extends State<Finanzas> {
                   concepto: 'Septiembre',
                   monto: monto,
                   fecha: fecha,
+                  referenciaP: localList[i].referenciaP! == "0"
+                      ? int.parse(localList[i].referenciaP!)
+                      : int.parse(refPadre.last.referenciaP!),
                   referencia: int.parse(
                     localList[i].referencia!,
                   ),
@@ -378,6 +409,9 @@ class _FinanzasState extends State<Finanzas> {
                     localList[i].referencia!,
                   ),
                   deuda: tardio,
+                  referenciaP: localList[i].referenciaP! == "0"
+                      ? int.parse(localList[i].referenciaP!)
+                      : int.parse(refPadre.last.referenciaP!),
                   folio: folio,
                   tipoPago: tipoPago));
             });
@@ -392,6 +426,9 @@ class _FinanzasState extends State<Finanzas> {
                     localList[i].referencia!,
                   ),
                   deuda: tardio,
+                  referenciaP: localList[i].referenciaP! == "0"
+                      ? int.parse(localList[i].referenciaP!)
+                      : int.parse(refPadre.last.referenciaP!),
                   folio: folio,
                   tipoPago: tipoPago));
             });
@@ -406,6 +443,9 @@ class _FinanzasState extends State<Finanzas> {
                     localList[i].referencia!,
                   ),
                   deuda: tardio,
+                  referenciaP: localList[i].referenciaP! == "0"
+                      ? int.parse(localList[i].referenciaP!)
+                      : int.parse(refPadre.last.referenciaP!),
                   folio: folio,
                   tipoPago: tipoPago));
             });
@@ -419,21 +459,35 @@ class _FinanzasState extends State<Finanzas> {
     }
   }
 
-   data() async {
+  data() async {
     cuentas = await getAdeudos();
     await getNameUser();
     prefs = await SharedPreferences.getInstance();
     if (cuentas!.data!.isNotEmpty) {
+      if(mounted){
+        setState(() {
+          bandera = cuentas!.bandera;
+        });
+      }
+
       for (int i = 0; i < cuentas!.data!.length; i++) {
+
         if (cuentas!.data![i].idConcepto == "PA        ") {
-          
+          setState(() {
+            hayRefPadre = true;
+          });
+
+          refPadre.add(new DatosCuenta(
+              pago: cuentas!.data![i].pago,
+              referenciaP: cuentas!.data![i].referencaiP!,
+              idConcepto: cuentas!.data![i].idConcepto!));
         } else {
           if (cuentas!.data![i].idConcepto == "ACCTEL    ") {
           } else {
             localList.add(new DatosCuenta(
                 idComu: cuentas!.data![i].idComu,
                 montoCuota: cuentas!.data![i].montoCuota,
-                
+                idAdeudo: cuentas!.data![i].idAdeudo,
                 idConcepto: cuentas!.data![i].idConcepto,
                 fechaGenerada: cuentas!.data![i].fechaGeneracion!,
                 fechaLimite: cuentas!.data![i].fechaLimite == null
@@ -448,14 +502,19 @@ class _FinanzasState extends State<Finanzas> {
                 montoTardio: cuentas!.data![i].montoPagoTardio,
                 folio: cuentas!.data![i].folio!,
                 formaDePago: cuentas!.data![i].formaPago,
-                ));
+                referenciaP: cuentas!.data![i].referencaiP));
           }
         }
       }
 
-      
+      if (hayRefPadre == true) {
+        prefs!.setBool('PA', true);
+      } else {
+        prefs!.setBool('PA', false);
+      }
 
       setState(() {
+        
         datosUsuario = DatosUsuario(
             noExt: cuentas!.data2!.noExterno,
             noInt: cuentas!.data2!.noInterior,
@@ -474,16 +533,16 @@ class _FinanzasState extends State<Finanzas> {
     await ultimoMes();
   }
 
+  /// main view representa la vista a la tarjeta, donde salen los adeudos
   mainView() {
     return Column(
       children: [
-        VistaTarjeta(
-          newList: localList,
-        ),
+        //vista tarejeta es la tarjeta en si
+        VistaTarjeta(newList: localList, refP: refPadre, bandera: bandera,),
         SizedBox(
           height: 15,
         ),
-    /*     users.isEmpty
+        users.isEmpty
             ? SizedBox()
             : OpcionesEdoCuenta(
                 newList: localList,
@@ -501,7 +560,7 @@ class _FinanzasState extends State<Finanzas> {
                 userName: userName,
                 datosUsuario: datosUsuario,
               )
-            : SizedBox() */
+            : SizedBox()
       ],
     );
   }
@@ -510,6 +569,7 @@ class _FinanzasState extends State<Finanzas> {
 class DatosCuenta {
   int? idComu;
   int? idResidente;
+  int? idAdeudo;
   String? montoCuota;
   String? idConcepto;
   String? montoPago;
@@ -524,7 +584,7 @@ class DatosCuenta {
   int? totalApagar;
   String? formaDePago;
   int? folio;
-
+  String? referenciaP;
   DatosCuenta(
       {this.idComu,
       this.fechaGenerada,
@@ -541,7 +601,9 @@ class DatosCuenta {
       this.pago,
       this.totalApagar,
       this.folio,
-      this.formaDePago});
+      this.idAdeudo,
+      this.formaDePago,
+      this.referenciaP});
 }
 
 class DatosUsuario {

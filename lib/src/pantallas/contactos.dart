@@ -1,8 +1,16 @@
+import 'dart:convert';
+
+import 'package:adcom/json/json.dart';
+import 'package:adcom/src/extra/filter_section.dart';
+import 'package:adcom/src/extra/vistaContactos.dart';
 import 'package:adcom/src/methods/emailDashboard.dart';
 import 'package:adcom/src/models/event_provider.dart';
 import 'package:filter_list/filter_list.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Contactos extends StatefulWidget {
   Contactos({Key? key}) : super(key: key);
@@ -11,14 +19,37 @@ class Contactos extends StatefulWidget {
   _ContactosState createState() => _ContactosState();
 }
 
+Future<Welcome?> getData() async {
+  print('Se esta ejecutando');
+
+  prefs = await SharedPreferences.getInstance();
+  var id = prefs!.getInt('id');
+
+  print(id.toString());
+
+  Uri uri = Uri.parse(
+      'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-directorio');
+  final response = await http.post(uri, body: {
+    "params": json.encode({"usuarioId": id})
+  });
+
+  if (response.statusCode == 200) {
+    var data = response.body;
+
+    return welcomeFromJson(data);
+  }
+}
+
 class _ContactosState extends State<Contactos> {
   List<Items>? itemSeleccion = [];
   List<String>? newArr = [];
   TextEditingController? _controller = TextEditingController();
-
+  late Welcome? dt;
+  List<Items> myList = [];
   @override
   void initState() {
     super.initState();
+    holi();
   }
 
   @override
@@ -30,18 +61,26 @@ class _ContactosState extends State<Contactos> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    final residentes = Provider.of<EventProvider>(context).items;
+    var size2 = MediaQuery.of(context).size.width;
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-    /*   floatingActionButton: FloatingActionButton(
+      /* floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.greenAccent[700],
-        onPressed: () => _openFilterDialog(residentes),
+        onPressed: () => _openFilterDialog(myList),
         child: Icon(
           Icons.filter_list,
         ),
       ), */
       appBar: AppBar(
+        title: Text(
+          "Directorio",
+          style: TextStyle(
+              color: Colors.white,
+              fontSize: 30,
+              fontFamily: 'Roboto',
+              fontWeight: FontWeight.w700),
+        ),
         leading: BackButton(
           onPressed: () {
             itemSeleccion!.clear();
@@ -57,7 +96,7 @@ class _ContactosState extends State<Contactos> {
       body: Stack(
         children: [
           Container(
-            height: size.height * .35,
+            height: size.height * .30,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(
                     bottomRight: Radius.circular(5),
@@ -69,12 +108,12 @@ class _ContactosState extends State<Contactos> {
                 color: Colors.greenAccent[700]),
           ),
           Container(
-            padding: EdgeInsets.only(top: 56),
+            padding: EdgeInsets.only(top: 56, right: size.width / 28),
             alignment: Alignment.topRight,
             child: Icon(
               Icons.contacts,
               color: Colors.white,
-              size: size.width/3,
+              size: size.width / 3,
             ),
           ),
           SafeArea(
@@ -84,45 +123,40 @@ class _ContactosState extends State<Contactos> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(
-                  height: 5,
-                ),
-                Text(
-                  "Directorio",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 40,
-                      fontFamily: 'Roboto',
-                      fontWeight: FontWeight.w700),
+                  height: 8,
                 ),
                 SizedBox(
-                  height: 5,
-                ),
-                SizedBox(
-                  width: size.width/2,
+                  width: size.width / 2,
                   child: Text(
                     'Contacta a tus personas de confianza',
                     style: TextStyle(
-                      fontSize: 15,
-                        fontWeight: FontWeight.bold, color: Colors.white),
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
                   ),
                 ),
                 SizedBox(
-                  height: 5,
+                  height: 10,
                 ),
                 SizedBox(
-                  width: size.width * .7,
+                  width: size.width / 2,
+                  height: size.height / 8,
                   child: Text(
                     'Mantente conectado con tu comunidad o asesores de tu comunidad',
-                    style: TextStyle(color: Colors.white, fontSize: size.width/22 ),
+                    style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
                 ),
                 SizedBox(
-                  width: size.width * .55,
-                  child: searchBar(residentes),
+                  width: size.width / 2,
+                  child: searchBar(myList),
                 ),
                 itemSeleccion == null || itemSeleccion!.length == 0
-                    ? ContactDashboard()
-                    : filterView(),
+                    ? myList.isEmpty
+                        ? Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        : contactsView()
+                    : filterView(size2),
               ],
             ),
           )),
@@ -131,10 +165,16 @@ class _ContactosState extends State<Contactos> {
     );
   }
 
+  ContactDashboard contactsView() {
+    return ContactDashboard(
+      contactos: myList,
+    );
+  }
+
   searchBar(List<Items> residentes) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10),
-      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 5),
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
       decoration: BoxDecoration(
           color: Colors.white, borderRadius: BorderRadius.circular(29.5)),
       child: TextField(
@@ -166,142 +206,104 @@ class _ContactosState extends State<Contactos> {
     }
   }
 
-  filterView() => Flexible(
-      child: GridView.builder(
-          shrinkWrap: false,
-          itemCount: itemSeleccion!.length,
-          padding: EdgeInsets.only(left: 4, right:  4, top: 17),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 1,
-            childAspectRatio: 2.9,
-            crossAxisSpacing: 15,
-            mainAxisSpacing: 15,
-          ),
-          itemBuilder: (context, int index) {
-            return InkWell(
-              onTap: () {},
+  filterView(size2) => Flexible(
+          child: GridView.builder(
+        shrinkWrap: false,
+        itemCount: itemSeleccion!.length,
+        padding: EdgeInsets.only(left: 4, right: 4, top: 17),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 1,
+          childAspectRatio: 4.0,
+          crossAxisSpacing: 15,
+          mainAxisSpacing: 15,
+        ),
+        itemBuilder: (context, int index) {
+          return InkWell(
+            onTap: () {
+              ///navigator a vista contactos
+              HapticFeedback.mediumImpact();
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => VistaContactos(
+                            contactos: itemSeleccion![index],
+                          )));
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.grey, blurRadius: 6, offset: Offset(0, 1))
+                  ]),
               child: Container(
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.grey,
-                          blurRadius: 6,
-                          offset: Offset(0, 1))
-                    ]),
-                child: Container(
-                  padding: const EdgeInsets.all(18),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        height: 50,
-                        width: 50,
-                        decoration: BoxDecoration(
-                            color: Colors.grey[300], shape: BoxShape.circle),
-                        child: Icon(
-                          Icons.person,
-                          size: 30,
-                          color: Colors.lightGreen,
-                        ),
-                      ),
-                      SizedBox(
-                        width: 14,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          itemSeleccion![index].title == null
-                              ? Container()
-                              : Text(itemSeleccion![index].title!.toUpperCase(),
+                //margin: EdgeInsets.symmetric(vertical: 20),
+                padding: const EdgeInsets.all(18),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      height: 50,
+                      width: 50,
+                      decoration: BoxDecoration(
+                          color: Colors.grey[300], shape: BoxShape.circle),
+                      child: itemSeleccion![index].icon == null
+                          ? SizedBox()
+                          : itemSeleccion![index].icon!,
+                    ),
+                    SizedBox(
+                      width: 15,
+                    ),
+                    Column(
+                      children: [
+                        itemSeleccion![index].title == null
+                            ? Container()
+                            : SizedBox(
+                                width: size2 / 2,
+                                child: Text(
+                                  itemSeleccion![index].title!.toUpperCase(),
                                   style: TextStyle(
                                       color: Colors.black,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600)),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Row(
-                            children: [
-                              Text('Comunidad',
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold)),
-                              SizedBox(
-                                width: 3,
+                                      fontSize: size2 / 29,
+                                      fontWeight: FontWeight.bold),
+                                ),
                               ),
-                              itemSeleccion![index].comNombre == null
-                                  ? Container()
-                                  : Text(itemSeleccion![index].comNombre!,
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 15,
-                                      ))
-                            ],
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Row(
-                            children: [
-                              Text('Numero',
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold)),
-                              SizedBox(
-                                width: 3,
-                              ),
-                              itemSeleccion![index].telCel == null
-                                  ? Container()
-                                  : Text(itemSeleccion![index].telCel!,
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 15,
-                                      ))
-                            ],
-                          )
-                        ],
-                      )
-                    ],
-                  ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            );
-          }));
+            ),
+          );
+        },
+      ));
 
-  void _openFilterDialog(res) async {
-    await FilterListDialog.display<Items>(context,
-        listData: res,
-        selectedListData: itemSeleccion,
-        height: 480,
-        headlineText: "Que comunidad buscas?",
-        searchFieldHintText: "Buscar...", choiceChipLabel: (item) {
-      return item.toString();
-    }, validateSelectedItem: (list, val) {
-      return list!.contains(val.idComunidad);
-    }, onItemSearch: (list, text) {
-      if (list!.any((element) => element.idComunidad
-          .toString()
-          .toLowerCase()
-          .contains(text.toLowerCase()))) {
-        return list
-            .where((element) => element.comNombre
-                .toString()
-                .toLowerCase()
-                .contains(text.toLowerCase()))
-            .toList();
-      }
-      return [];
-    }, onApplyButtonClick: (list) {
-      if (list != null) {
-        setState(() {
-          itemSeleccion = List.from(list);
-        });
-      }
-      Navigator.pop(context);
+  holi() async {
+    dt = await getData();
+
+    for (int i = 0; i < dt!.residente!.length; i++) {
+      myList.add(new Items(
+          idResidente: dt!.residente![i].idResidente,
+          title: dt!.residente![i].nombreResidente,
+          numero: dt!.residente![i].numero,
+          idComunidad: dt!.residente![i].idCom,
+          calle: dt!.residente![i].calle,
+          cp: dt!.residente![i].cp,
+          email: dt!.residente![i].email,
+          interior: dt!.residente![i].interior,
+          telCel: dt!.residente![i].telefonoCel,
+          telEme: dt!.residente![i].telefonoEmergencia,
+          telFijo: dt!.residente![i].telefonoFijo,
+          comNombre: dt!.residente![i].comNombre,
+          icon: Icon(
+            Icons.person,
+            size: 30,
+            color: Colors.lightGreen,
+          )));
+    }
+    setState(() {
+      myList;
     });
   }
 }

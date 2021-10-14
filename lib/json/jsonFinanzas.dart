@@ -10,12 +10,14 @@ class Accounts {
     this.message,
     this.data,
     this.data2,
+    this.bandera
   });
 
   int? value;
   String? message;
   List<Datum>? data;
   Data2? data2;
+  String? bandera;
 
   factory Accounts.fromJson(Map<String, dynamic> json) => Accounts(
         value: json["value"] == null ? null : json["value"],
@@ -24,6 +26,7 @@ class Accounts {
             ? null
             : List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
         data2: json["data2"] == null ? null : Data2.fromJson(json["data2"]),
+        bandera: json["bandera"] == null? null : json["bandera"]
       );
 
   Map<String, dynamic> toJson() => {
@@ -37,30 +40,30 @@ class Accounts {
 }
 
 class Datum {
-  Datum({
-    this.idAdeudo,
-    this.idComu,
-    this.idResidente,
-    this.montoCuota,
-    this.idConcepto,
-    this.fechaGeneracion,
-    this.fechaLimite,
-    this.fechaPago,
-    this.montoPago,
-    this.idFormaPago,
-    this.idTipoCuota,
-    this.referencia,
-    this.pagoTardio,
-    this.montoPagoTardio,
-    this.impAplicado,
-    this.impMonto,
-    this.inpcPorcentaje,
-    this.pago,
-    this.totalApagar,
-    this.formaPago,
-    this.fechaAcreditacion,
-    this.folio,
-  });
+  Datum(
+      {this.idAdeudo,
+      this.idComu,
+      this.idResidente,
+      this.montoCuota,
+      this.idConcepto,
+      this.fechaGeneracion,
+      this.fechaLimite,
+      this.fechaPago,
+      this.montoPago,
+      this.idFormaPago,
+      this.idTipoCuota,
+      this.referencia,
+      this.pagoTardio,
+      this.montoPagoTardio,
+      this.impAplicado,
+      this.impMonto,
+      this.inpcPorcentaje,
+      this.pago,
+      this.totalApagar,
+      this.formaPago,
+      this.fechaAcreditacion,
+      this.folio,
+      this.referencaiP});
 
   int? idAdeudo;
   int? idComu;
@@ -84,6 +87,7 @@ class Datum {
   String? formaPago;
   DateTime? fechaAcreditacion;
   dynamic? folio;
+  String? referencaiP;
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
         idAdeudo: json["ID_ADEUDO"] == null ? null : json["ID_ADEUDO"],
@@ -118,6 +122,7 @@ class Datum {
             ? null
             : DateTime.parse(json["FECHA_ACREDITACION"]),
         folio: json["FOLIO"] == "" ? 0 : json["FOLIO"],
+        referencaiP: json["REFERENCAI_P"] == null ? null : json["REFERENCAI_P"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -147,6 +152,7 @@ class Datum {
             ? null
             : fechaAcreditacion!.toIso8601String(),
         "FOLIO": folio == null ? null : folio,
+        "REFERENCAI_P": referencaiP == null ? null : referencaiP,
       };
 }
 

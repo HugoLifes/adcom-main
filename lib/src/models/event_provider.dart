@@ -76,18 +76,11 @@ class EventProvider extends ChangeNotifier {
         var comId = post.idCom;
         userd = post.nombreResidente;
         var userType = post.idPerfil;
-        somData(userd, userType, comId, idPrimario, userId );
-       /*  obtainId(userType);
-        accesData(comId, userId);
-        dataOff2(idPrimario, userType);
-        dataOff4(idPrimario);
-        someData(comId, userId);
-        //Adeudos
-        dataOff3(userId);
-        //amenidades
-
-        dataOff5(userId);
- */
+        var comunidad = post.infoUsuario == null? '' :post.infoUsuario!.comunidad;
+        var noInterno = post.infoUsuario == null? '' : post.infoUsuario!.noInterior;
+        var calle = post.infoUsuario == null ? '' : post.infoUsuario!.calle;
+        somData(userd, userType, comId, idPrimario, userId, comunidad, noInterno, calle );
+      
         Navigator.pushReplacementNamed(ctx, '/');
       }
     });
