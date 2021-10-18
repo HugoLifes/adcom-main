@@ -423,7 +423,7 @@ class _ReportEditPageState extends State<ReportEditPage> {
   buildImage() => GridView.builder(
         shrinkWrap: true,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
+            crossAxisCount: 3,
             mainAxisExtent: 200,
             mainAxisSpacing: 15,
             crossAxisSpacing: 14,

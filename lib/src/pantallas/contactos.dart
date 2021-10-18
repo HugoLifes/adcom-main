@@ -180,7 +180,9 @@ class _ContactosState extends State<Contactos> {
       child: TextField(
         //solucionar borrar el texto y regresar al principio
         onChanged: (text) {
-          if (text.isNotEmpty) {}
+          if (text.isNotEmpty) {
+            search(residentes, text);
+          }
         },
         decoration: InputDecoration(
             border: InputBorder.none,
@@ -256,21 +258,18 @@ class _ContactosState extends State<Contactos> {
                     Column(
                       children: [
                         SizedBox(
-                          height: size2 / 2,
+                          height: 5,
                         ),
                         itemSeleccion![index].title == null
                             ? Container()
-                            : Container(
-                                padding: EdgeInsets.only(top: size2 / 50),
-                                child: SizedBox(
-                                  width: size2 / 2,
-                                  child: Text(
-                                    itemSeleccion![index].title!.toUpperCase(),
-                                    style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: size2 / 29,
-                                        fontWeight: FontWeight.bold),
-                                  ),
+                            : SizedBox(
+                                width: size2 / 2,
+                                child: Text(
+                                  itemSeleccion![index].title!.toUpperCase(),
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: size2 / 29,
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ),
                       ],
