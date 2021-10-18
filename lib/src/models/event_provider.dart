@@ -83,7 +83,7 @@ class EventProvider extends ChangeNotifier {
           var noInterior =
               post.infoUsuario == null ? '' : post.infoUsuario!.noInterior;
           var calle = post.infoUsuario == null ? '' : post.infoUsuario!.calle;
-          somData(userd, userType, comId, idPrimario, userId,
+          somData(userd, userType, comId, idPrimario, userId, user, pass,
               comunidad: comunidad, noInterior: noInterior, calle: calle);
 
           Navigator.pushReplacementNamed(ctx, '/');

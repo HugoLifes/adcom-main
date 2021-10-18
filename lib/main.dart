@@ -1,4 +1,5 @@
-import 'package:adcom/src/app.dart';
+import 'package:adcom/app.dart';
+
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter/material.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';

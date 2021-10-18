@@ -87,30 +87,36 @@ class _AddReporteState extends State<AddReporte> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue,
-        leading: CloseButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-        actions: buildEditingActions(),
-      ),
-      resizeToAvoidBottomInset: true,
-      //stepper, propiedades y acciones
-      body: LoaderOverlay(child: stepper()),
-
-      //
-      // Boton que abre la camara
-
-      floatingActionButton: FloatingActionButton(
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.selectionClick();
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        appBar: AppBar(
           backgroundColor: Colors.blue,
-          child: Icon(Icons.camera),
-          onPressed: () => {
-                HapticFeedback.lightImpact(),
-                images.length == 3 ? mensaje() : _optionsCamera(),
-              }),
+          leading: CloseButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          actions: buildEditingActions(),
+        ),
+        resizeToAvoidBottomInset: true,
+        //stepper, propiedades y acciones
+        body: LoaderOverlay(child: stepper()),
+
+        //
+        // Boton que abre la camara
+
+        floatingActionButton: FloatingActionButton(
+            backgroundColor: Colors.blue,
+            child: Icon(Icons.camera),
+            onPressed: () => {
+                  HapticFeedback.lightImpact(),
+                  images.length == 3 ? mensaje() : _optionsCamera(),
+                }),
+      ),
     );
   }
 
@@ -393,6 +399,7 @@ class _AddReporteState extends State<AddReporte> {
       print(idUser.toString());
 
       for (var item in newsPath) {
+        print('$item');
         filesArr.add(item.split('/').last);
       }
 
@@ -405,8 +412,9 @@ class _AddReporteState extends State<AddReporte> {
         }),
         'img[]': [
           for (int i = 0; i < file.length; i++)
-            MultipartFile.fromFileSync(file[i].path,
-                filename: filesArr[i], contentType: MediaType('*', '*'))
+            await MultipartFile.fromFile(file[i].path, filename: filesArr[i])
+          /*   await MultipartFile.fromFileSync(newsPath[i],
+                filename: filesArr[i], contentType: MediaType('*', '*')) */
         ]
       });
 

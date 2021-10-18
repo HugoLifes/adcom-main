@@ -5,6 +5,7 @@ import 'package:adcom/src/extra/servicios.dart';
 import 'package:adcom/src/methods/eventDashboard.dart';
 import 'package:adcom/src/methods/gridDashboard.dart';
 import 'package:adcom/src/models/event_provider.dart';
+import 'package:adcom/src/pantallas/loginPage.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -27,10 +28,11 @@ class MainMenu extends StatefulWidget {
   _MainMenuState createState() => _MainMenuState();
 }
 
-somData(user, userType, idCom, idPrimario, userId,
+somData(user, userType, idCom, idPrimario, userId, userM, pass,
     {comunidad, noInterior, calle}) async {
   await MainMenu.init();
-
+  prefs!.setString('userM', userM);
+  prefs!.setString('passM', pass);
   prefs!.setString('user', user);
   prefs!.setInt('userType', userType);
   prefs!.setInt('idCom', idCom);
@@ -52,6 +54,8 @@ class _MainMenuState extends State<MainMenu> {
   Places? acceso;
   var size;
   int _selectedIndex = 0;
+  String? userM;
+  String? pass;
 
   ConnectivityResult _connectionStatus = ConnectivityResult.none;
   final Connectivity _connectivity = Connectivity();
@@ -99,11 +103,43 @@ class _MainMenuState extends State<MainMenu> {
     });
   }
 
+  obtainData() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      userM = prefs!.getString('userM');
+      pass = prefs!.getString('passM');
+    });
+
+    print(userM);
+    print(pass);
+
+    loginAcces(userM!, pass!).then((value) {
+      var userId;
+      var post = value;
+      if (post!.value == 1) {
+        print('aqui');
+        var idPrimario = post.id;
+        userId = post.idResidente;
+        var comId = post.idCom;
+        var userd = post.nombreResidente;
+        var userType = post.idPerfil;
+
+        var comunidad =
+            post.infoUsuario == null ? '' : post.infoUsuario!.comunidad;
+        var noInterior =
+            post.infoUsuario == null ? '' : post.infoUsuario!.noInterior;
+        var calle = post.infoUsuario == null ? '' : post.infoUsuario!.calle;
+        somData(userd, userType, comId, idPrimario, userId, userM, pass,
+            comunidad: comunidad, noInterior: noInterior, calle: calle);
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     initConnectivity();
-
+    obtainData();
     _connectivitySubscription =
         _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
     userName();

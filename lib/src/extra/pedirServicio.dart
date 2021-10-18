@@ -90,25 +90,30 @@ class _PedirServicioState extends State<PedirServicio> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: BackButton(
-          color: Colors.black,
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.selectionClick();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: BackButton(
+            color: Colors.black,
+          ),
+          title: Text(
+            'Confirme su información',
+            style: TextStyle(color: Colors.black),
+          ),
+          backgroundColor: Colors.white,
         ),
-        title: Text(
-          'Confirme su información',
-          style: TextStyle(color: Colors.black),
+        body: LoaderOverlay(
+          child: Theme(
+              data: ThemeData(
+                  primaryColor:
+                      widget.service == 1 ? Colors.blue[800] : Colors.red[900],
+                  primarySwatch:
+                      widget.service == 1 ? Colors.lightGreen : Colors.orange),
+              child: stepper()),
         ),
-        backgroundColor: Colors.white,
-      ),
-      body: LoaderOverlay(
-        child: Theme(
-            data: ThemeData(
-                primaryColor:
-                    widget.service == 1 ? Colors.blue[800] : Colors.red[900],
-                primarySwatch:
-                    widget.service == 1 ? Colors.lightGreen : Colors.orange),
-            child: stepper()),
       ),
     );
   }
@@ -323,6 +328,7 @@ class _PedirServicioState extends State<PedirServicio> {
                               tipoDePago = "Efectivo";
                             });
                           }
+                          print('$tipoDePago');
                         },
                       ),
                     ],
@@ -343,6 +349,7 @@ class _PedirServicioState extends State<PedirServicio> {
                               isChecked2 = value!;
                               tipoDePago = "Tarjeta";
                             });
+                            print('$tipoDePago');
                           }
                         },
                       ),
@@ -857,6 +864,7 @@ class EnviarCorreo {
 
     print(goDate);
     print(newDate);
+    print(tipoPago);
     Uri url = Uri.parse(
         "http://187.189.53.8:8080/AdcomBackend/backend/web/index.php?r=adcom/envio-correo-servicio");
 

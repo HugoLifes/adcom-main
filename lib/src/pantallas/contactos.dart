@@ -180,9 +180,7 @@ class _ContactosState extends State<Contactos> {
       child: TextField(
         //solucionar borrar el texto y regresar al principio
         onChanged: (text) {
-          if (text.isNotEmpty) {
-            search(residentes, text);
-          }
+          if (text.isNotEmpty) {}
         },
         decoration: InputDecoration(
             border: InputBorder.none,
