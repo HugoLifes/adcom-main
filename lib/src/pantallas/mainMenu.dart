@@ -4,6 +4,7 @@ import 'package:adcom/json/jsonAmenidades.dart';
 import 'package:adcom/src/extra/servicios.dart';
 
 import 'package:adcom/src/methods/gridDashboard.dart';
+import 'package:adcom/src/pantallas/loginPage.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -26,23 +27,22 @@ class MainMenu extends StatefulWidget {
   _MainMenuState createState() => _MainMenuState();
 }
 
-somData(user, userType, idCom, idPrimario, userId, comunidad, noInt, calle) async {
+somData(user, userType, idCom, idPrimario, userId, userM, pass,
+    {comunidad, noInterior, calle}) async {
   await MainMenu.init();
-
+  prefs!.setString('userM', userM);
+  prefs!.setString('passM', pass);
   prefs!.setString('user', user);
   prefs!.setInt('userType', userType);
   prefs!.setInt('idCom', idCom);
   prefs!.setInt('idPrimario', idPrimario);
   prefs!.setInt('userId', userId);
-
-  if(comunidad == null && noInt == null){
-
-  }else{
+  if (comunidad == null && noInterior == null) {
+  } else {
     prefs!.setString('comunidad', comunidad);
-    prefs!.setString('noInterno', noInt);
+    prefs!.setString('noInterno', noInterior);
     prefs!.setString('calle', calle);
   }
-  
 }
 
 class _MainMenuState extends State<MainMenu> {
@@ -53,7 +53,8 @@ class _MainMenuState extends State<MainMenu> {
   Places? acceso;
   var size;
   int _selectedIndex = 0;
-
+  String? userM;
+  String? pass;
  
   
   userName() async {
@@ -73,8 +74,40 @@ class _MainMenuState extends State<MainMenu> {
   @override
   void initState() {
     super.initState();
-    
+    obtainData();
     userName();
+  }
+
+    obtainData() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      userM = prefs!.getString('userM');
+      pass = prefs!.getString('passM');
+    });
+
+    print(userM);
+    print(pass);
+
+    loginAcces(userM!, pass!).then((value) {
+      var userId;
+      var post = value;
+      if (post!.value == 1) {
+        print('aqui');
+        var idPrimario = post.id;
+        userId = post.idResidente;
+        var comId = post.idCom;
+        var userd = post.nombreResidente;
+        var userType = post.idPerfil;
+
+        var comunidad =
+            post.infoUsuario == null ? '' : post.infoUsuario!.comunidad;
+        var noInterior =
+            post.infoUsuario == null ? '' : post.infoUsuario!.noInterior;
+        var calle = post.infoUsuario == null ? '' : post.infoUsuario!.calle;
+        somData(userd, userType, comId, idPrimario, userId, userM, pass,
+            comunidad: comunidad, noInterior: noInterior, calle: calle);
+      }
+    });
   }
 
   @override
@@ -164,7 +197,7 @@ class _MainMenuState extends State<MainMenu> {
                                         style: TextStyle(
                                             color: Colors.black,
                                             fontFamily: 'Roboto',
-                                            fontSize: 18,
+                                            fontSize: 35,
                                             fontWeight: FontWeight.w700))
                                     : Text(
                                         '¡${greeting()}!',

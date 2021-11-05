@@ -127,7 +127,7 @@ class _VistaContactosState extends State<VistaContactos> {
                     ),
                     InkWell(
                       onTap: () {
-                        _makePhoneCall('tel:${widget.contactos!.telCel!.trimRight()}');
+                        _makePhoneCall('tel:${widget.contactos!.telCel!.trimRight().replaceAll(' ',  '')}');
                       },
                       child: Padding(
                         padding: EdgeInsets.only(left: 10),
@@ -158,8 +158,11 @@ class _VistaContactosState extends State<VistaContactos> {
                       'Email:',
                       style: TextStyle(fontSize: 25),
                     ),
-                    Text('${widget.contactos!.email}',
-                        style: TextStyle(fontSize: 16))
+                    SizedBox(
+                      width: size.width * 0.4,
+                      child: Text('${widget.contactos!.email}',
+                          style: TextStyle(fontSize: 16)),
+                    )
                   ],
                 ),
               ],

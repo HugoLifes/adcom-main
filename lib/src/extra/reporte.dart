@@ -1,12 +1,12 @@
-import 'dart:convert';
 
 import 'package:adcom/json/jsonReporte.dart';
 import 'package:adcom/src/extra/add_reporte.dart';
 import 'package:adcom/src/extra/report_edit_page.dart';
 import 'package:adcom/src/models/event_provider.dart';
+import 'package:adcom/src/pantallas/avisos.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -32,7 +32,7 @@ Future<GetReportes?> getReportes() async {
 
     return getReportesFromJson(data);
   } else {
-    print('error');
+    print('${response.body}');
   }
 }
 
@@ -42,7 +42,7 @@ class _LevantarReporteState extends State<LevantarReporte> {
   List<dynamic> idProgress = [];
   List<DataReporte> myListReversed = [];
   var progress = [];
-
+  List<AvisosCall> comunities = [];
   /// progreso data
   var maps = <dynamic, Map>{};
   var progreso = <dynamic, dynamic>{};
@@ -50,6 +50,7 @@ class _LevantarReporteState extends State<LevantarReporte> {
   String? comunidad;
   String? numero;
   String? interior;
+  List<String> idComName = [];
 
   /// datos del progreso
   ///     mapeado dinamico que espera otro mapeado
@@ -91,10 +92,39 @@ class _LevantarReporteState extends State<LevantarReporte> {
     });
   }
 
+   getComunidades() async {
+    AvisosCall().getComunidades().then((value) => {
+          for (int i = 0; i < value!.data!.length; i++)
+            {
+              idComName.add(value.data![i].nombreComu!),
+              comunities.add(AvisosCall(
+                  id: value.data![i].idCom,
+                  nombreComu: value.data![i].nombreComu,
+                  ubicacion: value.data![i].ubicacion,
+                  cp: value.data![i].cp,
+                  idAdmin: value.data![i].idAdministrador == null
+                      ? 0
+                      : value.data![i].idAdministrador,
+                  idComite: value.data![i].idComite == null
+                      ? 0
+                      : value.data![i].idComite,
+                  idTipoComu: value.data![i].idTipoComu,
+                  banco: value.data![i].banco,
+                  cuentaBanco: value.data![i].cuentaBanco,
+                  cuentaClabe: value.data![i].cuentaClabe,
+                  RFC: value.data![i].rfc)),
+            }
+        });
+  }
+
   /// Llama al service y asigna los datos obtenido a una clase
   data() async {
     cuentas = await getReportes();
     await addata();
+    await getComunidades();
+    print(idCom);
+    print(idUser);
+    print(userType);
 
     for (int i = 0; i < cuentas!.data!.length; i++) {
       if (userType == 2) {
@@ -205,7 +235,10 @@ class _LevantarReporteState extends State<LevantarReporte> {
       floatingActionButton: FloatingActionButton(
         elevation: 7,
         onPressed: () => Navigator.of(context)
-            .push(MaterialPageRoute(builder: (_) => AddReporte())),
+            .push(MaterialPageRoute(builder: (_) => AddReporte(
+              comunities: comunities,
+              idComu: idComName,
+            ))),
         backgroundColor: Colors.blue,
         child: Icon(
           Icons.add,

@@ -4,7 +4,6 @@ import 'package:adcom/json/json-getComunidades.dart';
 import 'package:adcom/json/obtenerAvisos.dart';
 import 'package:adcom/src/extra/dashboard_Avisos.dart';
 import 'package:adcom/src/extra/nuevo_post.dart';
-import 'package:adcom/src/methods/searchBar.dart';
 import 'package:flutter/material.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:http/http.dart' as http;

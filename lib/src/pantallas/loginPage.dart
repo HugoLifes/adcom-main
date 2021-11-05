@@ -31,7 +31,7 @@ Future<Posting?> loginAcces(String user, String pass) async {
   });
   if (response.statusCode == 200) {
     var data = response.body;
-
+    print(data);
     return postingFromJson(data);
   } else {
     return null;

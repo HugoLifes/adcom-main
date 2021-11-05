@@ -1,4 +1,7 @@
 import 'dart:convert';
+import 'package:adcom/json/tipoAvisot.dart';
+import 'package:adcom/src/extra/nuevo_post.dart';
+import 'package:adcom/src/pantallas/avisos.dart';
 import 'package:camera/camera.dart';
 import 'package:dio/dio.dart';
 import 'dart:io';
@@ -13,20 +16,24 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path/path.dart' as path;
+import 'package:http/http.dart' as http;
 
 SharedPreferences? prefs;
 var cameras;
 var firstCamera;
 
+// ignore: must_be_immutable
 class AddReporte extends StatefulWidget {
-  final Report? report;
-
+  List<AvisosCall>? comunities = [];
+  final Report ? report;
+  List<String>? idComu;
   static init() async {
     cameras = await availableCameras();
     firstCamera = cameras.first;
   }
 
-  AddReporte({Key? key, this.report}) : super(key: key);
+  AddReporte({Key? key, this.report, this.comunities, this.idComu})
+      : super(key: key);
 
   @override
   _AddReporteState createState() => _AddReporteState();
@@ -49,12 +56,31 @@ class _AddReporteState extends State<AddReporte> {
   int? pages = 0;
   List<Slide>? _slides = [];
   List<String> newsPath = [];
-
+  String? chosenValue;
   int _currentStep = 0;
   int? idCom;
+  int? idCom2;
   int? idUser;
-
+  List<String> type = [];
+  List<TipoAvisoS>? avisos = [];
   
+
+  Future sendId() async {
+    for (int i = 0; i < widget.comunities!.length; i++) {
+      if (chosenValue == widget.comunities![i].nombreComu) {
+        setState(() {
+          idCom = widget.comunities![i].id;
+        });
+      }
+    }
+
+    await getTipoAviso().then((value) => {
+          for (int i = 0; i < value!.data!.length; i++)
+            {
+              type.add(value.data![i].tipoAviso!),
+            }
+        });
+  }
 
   addata() async {
     prefs = await SharedPreferences.getInstance();
@@ -67,8 +93,8 @@ class _AddReporteState extends State<AddReporte> {
   @override
   void initState() {
     super.initState();
-
-  
+    addata();
+   
   }
 
   @override
@@ -82,7 +108,7 @@ class _AddReporteState extends State<AddReporte> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: (){
+      onTap: () {
         HapticFeedback.selectionClick();
         FocusScope.of(context).unfocus();
       },
@@ -99,10 +125,10 @@ class _AddReporteState extends State<AddReporte> {
         resizeToAvoidBottomInset: true,
         //stepper, propiedades y acciones
         body: LoaderOverlay(child: stepper()),
-    
+
         //
         // Boton que abre la camara
-    
+
         floatingActionButton: FloatingActionButton(
             backgroundColor: Colors.blue,
             child: Icon(Icons.camera),
@@ -181,6 +207,53 @@ class _AddReporteState extends State<AddReporte> {
                 key: _formKey2,
                 child: buildComents(),
               ),
+              idUser == 0
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 20, top: 10),
+                        child: DropdownButton<String>(
+                          isExpanded: true,
+                          elevation: 6,
+                          value: chosenValue,
+                          style: TextStyle(color: Colors.black),
+                          items: widget.idComu!
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                                value: value, child: Text(value));
+                          }).toList(),
+                          onChanged: (val) {
+                            print(val);
+                            print(chosenValue);
+                            if (chosenValue == null) {
+                              setState(() {
+                                chosenValue = val;
+                              });
+                              sendId();
+                            } else {
+                              if (val != chosenValue) {
+                                type.clear();
+                                setState(() {
+                                  chosenValue = val;
+                                });
+                                sendId();
+                              } else {
+                                if (val == chosenValue) {
+                                } else {
+                                  type.clear();
+                                  sendId();
+                                }
+                              }
+                            }
+                          },
+                          hint: Text("Elige una comunidad",
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600)),
+                        ),
+                      ),
+                    )
+                  : Container()
             ],
           )),
       Step(
@@ -208,7 +281,7 @@ class _AddReporteState extends State<AddReporte> {
                 )
               : buildImage(),
           state: StepState.disabled,
-          isActive: _currentStep >= 2)
+          isActive: _currentStep >= 3)
     ];
     return _steps;
   }
@@ -281,28 +354,7 @@ class _AddReporteState extends State<AddReporte> {
     });
   }
 
-  void openCamera2() async {
-    var image =
-        await _picker.pickImage(source: ImageSource.camera, imageQuality: 40);
-    var i = 0;
-    if (image != null) {
-      if (images.length == 3) {
-        // muestra el mensaje de archivo excedido
-        mensaje();
-        Navigator.of(context).pop();
-      } else {
-        i++;
-        String dir = path.dirname(image.path);
-        String newPath = path.join(dir, 'reportesAdcom$i.jpg');
-        print(newPath);
-        newsPath.add(newPath);
-        images.add(File(image.path));
-        print(images[0].path);
-      }
-    } else {
-      print('No se ha seleccionado una imagen');
-    }
-  }
+ 
 
   mensaje() => Fluttertoast.showToast(
       msg: "Maximo excedido",
@@ -314,8 +366,7 @@ class _AddReporteState extends State<AddReporte> {
       fontSize: 17.0);
   // funcion que abre la galeria para las fotos
   void openGallery() async {
-    var image =
-        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 30);
+    var image = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 30);
     var i = 0;
     setState(() {
       if (image != null) {
@@ -324,6 +375,7 @@ class _AddReporteState extends State<AddReporte> {
         String newPath = path.join(dir, 'reportesAdcom$i.jpg');
         print(newPath);
         newsPath.add(newPath);
+        images.add(File(image.path));
       } else {
         print('No se ha seleccionado una imagen');
       }
@@ -384,15 +436,15 @@ class _AddReporteState extends State<AddReporte> {
   // envia las fotos al serv mas toda su informacion que reqiere como los params
   sendingData(String titulo, String descrip, List<File> file,
       List<String> newpath) async {
-    await addata();
     try {
       List<String> filesArr = [];
       Dio dio = Dio();
 
-      print(idCom.toString());
+      print('here${idCom}');
       print(idUser.toString());
 
       for (var item in newsPath) {
+        print('$item');
         filesArr.add(item.split('/').last);
       }
 
@@ -405,8 +457,9 @@ class _AddReporteState extends State<AddReporte> {
         }),
         'img[]': [
           for (int i = 0; i < file.length; i++)
-            MultipartFile.fromFileSync(file[i].path,
-                filename: filesArr[i], contentType: MediaType('*', '*'))
+            await MultipartFile.fromFile(file[i].path, filename: filesArr[i], contentType: MediaType('media', '*'))
+          /*   await MultipartFile.fromFileSync(newsPath[i],
+                filename: filesArr[i], contentType: MediaType('*', '*')) */
         ]
       });
 
@@ -501,6 +554,22 @@ class _AddReporteState extends State<AddReporte> {
       });
 
       return response;
+    }
+  }
+
+  Future<TipoAviso?> getTipoAviso() async {
+    print(idCom);
+    print(idUser);
+    final Uri url = Uri.parse(
+        'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-tipo-aviso');
+    final response = await http.post(url, body: {"idCom": idCom.toString()});
+
+    if (response.statusCode == 200) {
+      var data = response.body;
+      print(data);
+      return tipoAvisoFromJson(data);
+    } else {
+      print(response.body);
     }
   }
 
@@ -603,3 +672,4 @@ class Report {
       required this.description,
       this.image});
 }
+ 

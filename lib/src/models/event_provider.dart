@@ -79,7 +79,8 @@ class EventProvider extends ChangeNotifier {
         var comunidad = post.infoUsuario == null? '' :post.infoUsuario!.comunidad;
         var noInterno = post.infoUsuario == null? '' : post.infoUsuario!.noInterior;
         var calle = post.infoUsuario == null ? '' : post.infoUsuario!.calle;
-        somData(userd, userType, comId, idPrimario, userId, comunidad, noInterno, calle );
+        somData(userd, userType, comId, idPrimario, userId, user, pass,
+              comunidad: comunidad, noInterior: noInterno, calle: calle);
       
         Navigator.pushReplacementNamed(ctx, '/');
       }

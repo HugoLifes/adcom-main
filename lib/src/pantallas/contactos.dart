@@ -139,11 +139,11 @@ class _ContactosState extends State<Contactos> {
                   height: 10,
                 ),
                 SizedBox(
-                  width: size.width / 2,
-                  height: size.height / 8,
+                  width: size.width / 1.7,
+                  
                   child: Text(
                     'Mantente conectado con tu comunidad o asesores de tu comunidad',
-                    style: TextStyle(color: Colors.white, fontSize: 20),
+                    style: TextStyle(color: Colors.white, fontSize: 18.4),
                   ),
                 ),
                 SizedBox(

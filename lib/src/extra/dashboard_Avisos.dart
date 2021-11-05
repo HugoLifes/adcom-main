@@ -66,7 +66,7 @@ class _AvisosDashboardState extends State<AvisosDashboard2> {
             itemCount: avisosRevers!.length,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 1,
-              childAspectRatio: size / 250,
+              childAspectRatio: size / 255,
               crossAxisSpacing: 25,
               mainAxisSpacing: 20,
             ),
