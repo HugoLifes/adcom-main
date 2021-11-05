@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:adcom/json/jsonReporte.dart';
@@ -86,12 +87,14 @@ class _LevantarReporteState extends State<LevantarReporte> {
   /// Activa el guardado en memoria
   addata() async {
     prefs = await SharedPreferences.getInstance();
-    setState(() {
-      /// obtiene el id comunidad y la del usuario
-      idCom = prefs!.getInt('idCom');
-      idUser = prefs!.getInt('userId');
-      userType = prefs!.getInt('userType');
-    });
+    if (mounted) {
+      setState(() {
+        /// obtiene el id comunidad y la del usuario
+        idCom = prefs!.getInt('idCom');
+        idUser = prefs!.getInt('userId');
+        userType = prefs!.getInt('userType');
+      });
+    }
   }
 
   getComunidades() async {
@@ -120,7 +123,7 @@ class _LevantarReporteState extends State<LevantarReporte> {
   }
 
   /// Llama al service y asigna los datos obtenido a una clase
-  data() async {
+  Future data() async {
     cuentas = await getReportes();
     await addata();
     await getComunidades();
@@ -189,21 +192,34 @@ class _LevantarReporteState extends State<LevantarReporte> {
     reversedList3 = superMap2.reversed.toList();
     reversedList4 = superMap.reversed.toList();
     reversedList = myList.reversed.toList();
-
-    refresh();
   }
 
   @override
   void initState() {
-    data();
+    data().then((value) {
+      setState(() {
+        listview();
+      });
+    });
+
     super.initState();
   }
 
   refresh() {
     if (mounted) {
-      setState(() {
-        listview();
-      });
+      if (myList.isNotEmpty) {
+        myList.clear();
+        fechasSuperMap.clear();
+        superMap.clear();
+        superMap2.clear();
+        reversedList.clear();
+        reversedList2.clear();
+        reversedList3.clear();
+        reversedList4.clear();
+        data();
+      } else {
+        data();
+      }
     }
   }
 
@@ -232,11 +248,13 @@ class _LevantarReporteState extends State<LevantarReporte> {
           : listview(),
       floatingActionButton: FloatingActionButton(
         elevation: 7,
-        onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-            builder: (_) => AddReporte(
-                  comunities: comunities,
-                  idComu: idComName,
-                ))),
+        onPressed: () => Navigator.of(context)
+            .push(MaterialPageRoute(
+                builder: (_) => AddReporte(
+                      comunities: comunities,
+                      idComu: idComName,
+                    )))
+            .then(onGoBack),
         backgroundColor: Colors.blue,
         child: Icon(
           Icons.add,
@@ -244,6 +262,10 @@ class _LevantarReporteState extends State<LevantarReporte> {
         ),
       ),
     );
+  }
+
+  FutureOr onGoBack(dynamic value) {
+    refresh();
   }
 
   listview() {

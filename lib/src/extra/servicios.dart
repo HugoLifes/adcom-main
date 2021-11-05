@@ -21,6 +21,11 @@ class _ServicesState extends State<Services> {
         nombre: 'Gas',
         descripcion: 'Servicios de Gas LP',
         horario: '8:00 am - 6:00 pm',
+        image: Image.asset(
+          'assets/images/home.png',
+          fit: BoxFit.contain,
+          color: Colors.red,
+        ),
         icon: Icon(
           Icons.fireplace,
           size: 52,
@@ -63,7 +68,7 @@ class _ServicesState extends State<Services> {
         elevation: 7,
         backgroundColor: Colors.white,
         title: Text(
-          'Servicios de la comunidad',
+          'Servicios para tu comunidad',
           style: TextStyle(color: Colors.black),
         ),
       ),
@@ -73,6 +78,7 @@ class _ServicesState extends State<Services> {
           itemBuilder: (_, int index) {
             return InkWell(
               onTap: () {
+                print(servicios[index].tipoDeServ.toString());
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (_) => MultiServicios(
                           service: servicios[index].tipoDeServ,
@@ -85,24 +91,29 @@ class _ServicesState extends State<Services> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       Container(
-                        ///Image.asset('assets/images/k19.png', width: 110)
-                        child: servicios[index].icon,
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text(
-                            servicios[index].descripcion!,
-                            style: TextStyle(fontSize: 18),
-                          ),
-                          SizedBox(
-                            height: 5,
-                          ),
-                          Text(
-                            servicios[index].horario!,
-                            style: TextStyle(fontSize: 16),
-                          )
-                        ],
+
+                          ///Image.asset('assets/images/k19.png', width: 110)
+                          child: servicios[index].image),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 15),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              child: Text(
+                                'Servicios',
+                                style: TextStyle(fontSize: 18),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Text(
+                              servicios[index].horario!,
+                              style: TextStyle(fontSize: 16),
+                            )
+                          ],
+                        ),
                       )
                     ],
                   )),

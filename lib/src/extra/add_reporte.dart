@@ -18,6 +18,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path/path.dart' as path;
 import 'package:http/http.dart' as http;
+import 'package:async/async.dart';
 
 SharedPreferences? prefs;
 var cameras;
@@ -126,7 +127,7 @@ class _AddReporteState extends State<AddReporte> {
               Navigator.of(context).pop();
             },
           ),
-          actions: buildEditingActions(),
+          //actions: buildEditingActions(),
         ),
         resizeToAvoidBottomInset: true,
         //stepper, propiedades y acciones
@@ -213,49 +214,47 @@ class _AddReporteState extends State<AddReporte> {
                 key: _formKey2,
                 child: buildComents(),
               ),
-              idCom == 99
-                  ? Center(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 20, top: 10),
-                        child: DropdownButton<String>(
-                          elevation: 6,
-                          value: chosenValue,
-                          style: TextStyle(color: Colors.black),
-                          items: widget.idComu!
-                              .map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                                value: value, child: Text(value));
-                          }).toList(),
-                          onChanged: (val) {
-                            print(val);
-                            print(chosenValue);
-                            if (chosenValue == null) {
+              idUser == 0
+                  ? Container(
+                      child: DropdownButton<String>(
+                        isExpanded: true,
+                        elevation: 6,
+                        value: chosenValue,
+                        style: TextStyle(color: Colors.black),
+                        items: widget.idComu!
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                              value: value, child: Text(value));
+                        }).toList(),
+                        onChanged: (val) {
+                          print(val);
+                          print(chosenValue);
+                          if (chosenValue == null) {
+                            setState(() {
+                              chosenValue = val;
+                            });
+                            sendId();
+                          } else {
+                            if (val != chosenValue) {
+                              type.clear();
                               setState(() {
                                 chosenValue = val;
                               });
                               sendId();
                             } else {
-                              if (val != chosenValue) {
-                                type.clear();
-                                setState(() {
-                                  chosenValue = val;
-                                });
-                                sendId();
+                              if (val == chosenValue) {
                               } else {
-                                if (val == chosenValue) {
-                                } else {
-                                  type.clear();
-                                  sendId();
-                                }
+                                type.clear();
+                                sendId();
                               }
                             }
-                          },
-                          hint: Text("Elige una comunidad",
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600)),
-                        ),
+                          }
+                        },
+                        hint: Text("Elige una comunidad",
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600)),
                       ),
                     )
                   : Container()
@@ -286,7 +285,7 @@ class _AddReporteState extends State<AddReporte> {
                 )
               : buildImage(),
           state: StepState.disabled,
-          isActive: _currentStep >= 3)
+          isActive: _currentStep >= 2)
     ];
     return _steps;
   }
@@ -338,7 +337,7 @@ class _AddReporteState extends State<AddReporte> {
   //funcion que abre la camara y muestra
   void openCamera() async {
     var image =
-        await _picker.pickImage(source: ImageSource.camera, imageQuality: 30);
+        await _picker.pickImage(source: ImageSource.camera, imageQuality: 40);
 
     setState(() {
       if (image != null) {
@@ -393,7 +392,7 @@ class _AddReporteState extends State<AddReporte> {
   // funcion que abre la galeria para las fotos
   void openGallery() async {
     var image =
-        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 30);
+        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 40);
     var i = 0;
     setState(() {
       if (image != null) {
@@ -402,6 +401,7 @@ class _AddReporteState extends State<AddReporte> {
         String newPath = path.join(dir, 'reportesAdcom$i.jpg');
         print(newPath);
         newsPath.add(newPath);
+        images.add(File(image.path));
       } else {
         print('No se ha seleccionado una imagen');
       }
@@ -483,7 +483,8 @@ class _AddReporteState extends State<AddReporte> {
         }),
         'img[]': [
           for (int i = 0; i < file.length; i++)
-            await MultipartFile.fromFile(file[i].path, filename: filesArr[i])
+            await MultipartFile.fromFile(file[i].path,
+                filename: filesArr[i], contentType: MediaType('*', '*'))
           /*   await MultipartFile.fromFileSync(newsPath[i],
                 filename: filesArr[i], contentType: MediaType('*', '*')) */
         ]
@@ -507,6 +508,59 @@ class _AddReporteState extends State<AddReporte> {
       } else {
         print('aqui2:${e.response!.data.toString()}');
       }
+    }
+  }
+
+  sendingData2(String titulo, String descrip, List<File> files,
+      List<String> newpath) async {
+    // string to uri
+    var uri = Uri.parse(
+        "http://187.189.53.8:8081/backend/web/index.php?r=adcom/reportes");
+    print("image upload URL - $uri");
+// create multipart request
+    var request = new http.MultipartRequest("POST", uri);
+    for (var file in files) {
+      String fileName = newsPath.last;
+      var stream = new http.ByteStream(DelegatingStream.typed(file.openRead()));
+
+      // get file length
+
+      var length = await file.length(); //imageFile is your image file
+      print("File lenght - $length");
+      print("fileName - $fileName");
+      // multipart that takes file
+      var multipartFileSign =
+          new http.MultipartFile('img[]', stream, length, filename: fileName);
+
+      request.files.add(multipartFileSign);
+    }
+//adding params
+    request.fields['params'] = json.encode({
+      'descripcionCorta': titulo,
+      'descripcionLarga': descrip,
+      'idCom': idCom,
+      'idUsusarioResidente': idUser
+    });
+
+// send
+    var response = await request.send();
+
+    print(response.statusCode);
+
+    var res = await http.Response.fromStream(response);
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      print("Item form is statuscode 200");
+      print(res.body);
+      var responseDecode = json.decode(res.body);
+
+      if (responseDecode['status'] == true) {
+        return res.body;
+      } else {
+        print(res.body);
+        return res.body;
+      }
+    } else {
+      print(res.body);
     }
   }
 
@@ -566,7 +620,7 @@ class _AddReporteState extends State<AddReporte> {
           image: images,
           time: DateTime.now());
       final provider = Provider.of<EventProvider>(context, listen: false);
-      final Response? response = await sendingData(titleController.text,
+      final Response? response = await sendingData2(titleController.text,
               descriptionController.text, images, newsPath)
           .then((value) {
         provider.addReport(report);

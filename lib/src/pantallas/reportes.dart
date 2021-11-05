@@ -46,7 +46,7 @@ class _ReportesState extends State<Reportes> {
       body: Stack(
         children: [
           Container(
-            height: size.height * .32,
+            height: size.height * .30,
             decoration: BoxDecoration(color: Colors.blue),
           ),
           Container(
@@ -84,7 +84,7 @@ class _ReportesState extends State<Reportes> {
                   child: Text(
                     'Reporta incidencias en tu comunidad para que todos estén al tanto de comportamientos inusuales o faltas a la comunidad.',
                     style: TextStyle(
-                        color: Colors.white, fontSize: size.width / 17),
+                        color: Colors.white, fontSize: size.width / 18),
                   ),
                 ),
                 SizedBox(

@@ -48,13 +48,14 @@ Future<Places?> idso() async {
 }
 
 class _AmenidadesState extends State<Amenidades> {
+  var id;
   gtData() async {
     try {
       var places = (await idso())!;
 
       final provider = Provider.of<EventProvider>(context, listen: false);
       for (int i = 0; i < places.data!.length; i++) {
-        provider.addAmenidad(new Amenidad(id: places.data![i].id));
+        /* provider.addAmenidad(new Amenidad(id: places.data![i].idAmenidad)); */
       }
     } catch (e) {
       final provider = Provider.of<EventProvider>(context, listen: false);
@@ -66,6 +67,7 @@ class _AmenidadesState extends State<Amenidades> {
   @override
   void initState() {
     super.initState();
+    print(DateTime.now());
     gtData();
   }
 
@@ -79,7 +81,7 @@ class _AmenidadesState extends State<Amenidades> {
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
           title: Text(
-            "Amenidades",
+            "Amenidades ",
             style: TextStyle(
                 color: Colors.white,
                 fontSize: 30,

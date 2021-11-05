@@ -14,11 +14,17 @@ import 'package:flutter/services.dart';
 class OpcionesEdoCuenta extends StatefulWidget {
   List<DatosCuenta>? newList = [];
   Users? users;
+  Deudas? deuda;
   String? userName;
   DatosUsuario? datosUsuario;
 
   OpcionesEdoCuenta(
-      {Key? key, this.newList, this.users, this.userName, this.datosUsuario})
+      {Key? key,
+      this.newList,
+      this.users,
+      this.userName,
+      this.datosUsuario,
+      this.deuda})
       : super(key: key);
 
   @override
@@ -248,9 +254,7 @@ class _OpcionesEdoCuentaState extends State<OpcionesEdoCuenta> {
     final users = [
       Users(
           concepto: 'Mantenimiento ${widget.users!.concepto}',
-          referencia: widget.users!.referenciaP == 0
-              ? widget.users!.referencia
-              : widget.users!.referenciaP,
+          referencia: widget.users!.referencia,
           monto: widget.users!.monto,
           tipoPago: widget.users!.tipoPago),
     ];
@@ -312,7 +316,7 @@ class _OpcionesEdoCuentaState extends State<OpcionesEdoCuenta> {
 class Users {
   final String? tipoPago;
   final double? cuota;
-  final int? referencia;
+  final String? referencia;
   final double? monto;
   final String? concepto;
   final double? deuda;

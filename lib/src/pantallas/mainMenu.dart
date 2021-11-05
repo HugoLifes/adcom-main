@@ -247,7 +247,7 @@ class _MainMenuState extends State<MainMenu> {
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontFamily: 'Roboto',
-                                      fontSize: size.width / 11.3,
+                                      fontSize: size.width / 10.5,
                                       fontWeight: FontWeight.w700),
                                 ),
                               ],

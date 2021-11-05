@@ -76,11 +76,17 @@ class _VistaContactosState extends State<VistaContactos> {
                       'Numero:',
                       style: TextStyle(fontSize: 25),
                     ),
-                    Text(
-                      '${widget.contactos!.numero!.trimRight()}',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
+                    widget.contactos!.numero == null
+                        ? Text(
+                            'No tiene numero',
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                          )
+                        : Text(
+                            '${widget.contactos!.numero!.trimRight()}',
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
                   ],
                 ),
                 Divider(
@@ -138,11 +144,14 @@ class _VistaContactosState extends State<VistaContactos> {
                             SizedBox(
                               width: 10,
                             ),
-                            Text(
-                              '${widget.contactos!.telCel!.trimRight()}',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold),
-                            ),
+                            widget.contactos!.telCel == null
+                                ? Text('')
+                                : Text(
+                                    '${widget.contactos!.telCel!.trimRight()}',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold),
+                                  ),
                           ],
                         ),
                       ),

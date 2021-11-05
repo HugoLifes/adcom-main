@@ -30,9 +30,11 @@ class _PedirServicioState extends State<PedirServicio> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<FormState> _formKey2 = GlobalKey<FormState>();
   final GlobalKey<FormState> _formKey3 = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey4 = GlobalKey<FormState>();
   final descpController = TextEditingController();
   final descriptionController = TextEditingController();
   final cantidadController = TextEditingController();
+  final descripCompra = TextEditingController();
   bool _lights = false;
   String? userName;
   String? comu;
@@ -93,6 +95,7 @@ class _PedirServicioState extends State<PedirServicio> {
     return GestureDetector(
       onTap: () {
         HapticFeedback.selectionClick();
+        FocusScope.of(context).unfocus();
       },
       child: Scaffold(
         appBar: AppBar(
@@ -162,7 +165,8 @@ class _PedirServicioState extends State<PedirServicio> {
               } else {
                 /// chequea si hay imagenes seleccionadas
                 if (this._currentStep == 1) {
-                  if ((select! || select2! || select3!) == false) {
+                  if ((select! || select2! || select3!) == false &&
+                      descripCompra.text.isEmpty) {
                     alerta5();
                   } else {
                     setState(() {
@@ -219,148 +223,13 @@ class _PedirServicioState extends State<PedirServicio> {
             children: [
               Form(
                 key: _formKey2,
-                child: buildComents(),
+                child: buildComents(
+                    descriptionController, 'Nombre y Dirección', _currentStep),
               ),
             ],
           )),
-      Step(
-          title: Text('Tipo de tanque'),
-          isActive: _currentStep >= 1,
-          state: StepState.disabled,
-          content: Container(
-              //padding: EdgeInsets.only(top: 10, right: 190),
-              child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              InkWell(
-                onTap: () {
-                  setState(() {
-                    eleccion = '30kg';
-                    select = true;
-                    select2 = false;
-                    select3 = false;
-                  });
-                },
-                child: Container(
-                    width: 90,
-                    height: 90,
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                            color: select == true
-                                ? Colors.red
-                                : Colors.transparent,
-                            width: 2.0)),
-                    child: Image.asset(
-                      'assets/images/30kg.png',
-                      fit: BoxFit.contain,
-                    )),
-              ),
-              InkWell(
-                onTap: () {
-                  setState(() {
-                    eleccion = '45kg';
-                    select = false;
-                    select2 = true;
-                    select3 = false;
-                  });
-                },
-                child: Container(
-                    width: 90,
-                    height: 90,
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                            color: select2 == true
-                                ? Colors.red
-                                : Colors.transparent,
-                            width: 2.0)),
-                    child: Image.asset('assets/images/45kg.png',
-                        fit: BoxFit.contain)),
-              ),
-              InkWell(
-                onTap: () {
-                  setState(() {
-                    eleccion = 'Estacionario';
-                    select = false;
-                    select2 = false;
-                    select3 = true;
-                  });
-                },
-                child: Container(
-                    width: 90,
-                    height: 90,
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                            color: select3 == true
-                                ? Colors.red
-                                : Colors.transparent,
-                            width: 2.0)),
-                    child: Image.asset('assets/images/estacionario.png',
-                        fit: BoxFit.contain)),
-              )
-            ],
-          ))),
-      Step(
-          title: Text('Cantidad y Tipo de pago'),
-          content: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Form(
-                key: _formKey3,
-                child: buildCantidad(),
-              ),
-              Column(
-                ///tipoDePago = "Efectivo";
-                children: [
-                  Row(
-                    children: [
-                      Text('Efectivo'),
-                      Checkbox(
-                        checkColor: Colors.white,
-                        value: isChecked,
-                        onChanged: (bool? value) {
-                          setState(() {
-                            isChecked = value!;
-                          });
-                          if (isChecked2 == true) {
-                            setState(() {
-                              isChecked2 = false;
-                              isChecked = value!;
-                              tipoDePago = "Efectivo";
-                            });
-                          }
-                          print('$tipoDePago');
-                        },
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text('Tarjeta  '),
-                      Checkbox(
-                        checkColor: Colors.white,
-                        value: isChecked2,
-                        onChanged: (bool? value) {
-                          setState(() {
-                            isChecked2 = value!;
-                          });
-                          if (isChecked == true) {
-                            setState(() {
-                              isChecked = false;
-                              isChecked2 = value!;
-                              tipoDePago = "Tarjeta";
-                            });
-                            print('$tipoDePago');
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-          state: StepState.disabled,
-          isActive: _currentStep >= 2),
+      tipoDeServicio()!,
+      caracteristicasTipoPago()!,
       Step(
         title: Text('Horario de preferencia'),
         isActive: _currentStep >= 3,
@@ -375,12 +244,238 @@ class _PedirServicioState extends State<PedirServicio> {
             children: [
               Form(
                 key: _formKey,
-                child: buildComents2(),
+                child:
+                    buildComents(descpController, 'Comentarios', _currentStep),
               ),
             ],
           )),
     ];
     return _steps;
+  }
+
+  Step? tipoDeServicio() {
+    switch (widget.servicio!.idTipoProveedor) {
+      case 1:
+        return Step(
+            title: Text('Tipo de tanque'),
+            isActive: _currentStep >= 1,
+            state: StepState.disabled,
+            content: Container(
+                //padding: EdgeInsets.only(top: 10, right: 190),
+                child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                InkWell(
+                  onTap: () {
+                    setState(() {
+                      eleccion = '30kg';
+                      select = true;
+                      select2 = false;
+                      select3 = false;
+                    });
+                  },
+                  child: Container(
+                      width: 90,
+                      height: 90,
+                      decoration: BoxDecoration(
+                          border: Border.all(
+                              color: select == true
+                                  ? Colors.red
+                                  : Colors.transparent,
+                              width: 2.0)),
+                      child: Image.asset(
+                        'assets/images/30kg.png',
+                        fit: BoxFit.contain,
+                      )),
+                ),
+                InkWell(
+                  onTap: () {
+                    setState(() {
+                      eleccion = '45kg';
+                      select = false;
+                      select2 = true;
+                      select3 = false;
+                    });
+                  },
+                  child: Container(
+                      width: 90,
+                      height: 90,
+                      decoration: BoxDecoration(
+                          border: Border.all(
+                              color: select2 == true
+                                  ? Colors.red
+                                  : Colors.transparent,
+                              width: 2.0)),
+                      child: Image.asset('assets/images/45kg.png',
+                          fit: BoxFit.contain)),
+                ),
+                InkWell(
+                  onTap: () {
+                    setState(() {
+                      eleccion = 'Estacionario';
+                      select = false;
+                      select2 = false;
+                      select3 = true;
+                    });
+                  },
+                  child: Container(
+                      width: 90,
+                      height: 90,
+                      decoration: BoxDecoration(
+                          border: Border.all(
+                              color: select3 == true
+                                  ? Colors.red
+                                  : Colors.transparent,
+                              width: 2.0)),
+                      child: Image.asset('assets/images/estacionario.png',
+                          fit: BoxFit.contain)),
+                )
+              ],
+            )));
+      case 2:
+        return Step(
+            title: Text('Comente su pedido'),
+            isActive: _currentStep >= 1,
+            state: StepState.disabled,
+            content: Column(
+              children: [
+                Form(
+                  key: _formKey4,
+                  child: buildComents(
+                      descripCompra, 'Describa su compra', _currentStep),
+                ),
+              ],
+            ));
+      default:
+    }
+  }
+
+  Step? caracteristicasTipoPago() {
+    switch (widget.servicio!.idTipoProveedor) {
+      case 1:
+        return Step(
+            title: Text('Tipo de pago'),
+            content: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Form(
+                  key: _formKey3,
+                  child: buildCantidad(),
+                ),
+                Column(
+                  ///tipoDePago = "Efectivo";
+                  children: [
+                    Row(
+                      children: [
+                        Text('Efectivo'),
+                        Checkbox(
+                          checkColor: Colors.white,
+                          value: isChecked,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              isChecked = value!;
+                            });
+                            if (isChecked2 == true) {
+                              setState(() {
+                                isChecked2 = false;
+                                isChecked = value!;
+                                tipoDePago = "Efectivo";
+                              });
+                            }
+                            print('$tipoDePago');
+                          },
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Text('Tarjeta  '),
+                        Checkbox(
+                          checkColor: Colors.white,
+                          value: isChecked2,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              isChecked2 = value!;
+                            });
+                            if (isChecked == true) {
+                              setState(() {
+                                isChecked = false;
+                                isChecked2 = value!;
+                                tipoDePago = "Tarjeta";
+                              });
+                              print('$tipoDePago');
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            state: StepState.disabled,
+            isActive: _currentStep >= 2);
+      case 2:
+        return Step(
+            title: Text('Tipo de pago'),
+            content: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Row(
+                  ///tipoDePago = "Efectivo";
+                  children: [
+                    Row(
+                      children: [
+                        Text('Efectivo'),
+                        Checkbox(
+                          checkColor: Colors.white,
+                          value: isChecked,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              isChecked = value!;
+                            });
+                            if (isChecked2 == true) {
+                              setState(() {
+                                isChecked2 = false;
+                                isChecked = value!;
+                                tipoDePago = "Efectivo";
+                              });
+                            }
+                            print('$tipoDePago');
+                          },
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Text('Tarjeta  '),
+                        Checkbox(
+                          checkColor: Colors.white,
+                          value: isChecked2,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              isChecked2 = value!;
+                            });
+                            if (isChecked == true) {
+                              setState(() {
+                                isChecked = false;
+                                isChecked2 = value!;
+                                tipoDePago = "Tarjeta";
+                              });
+                              print('$tipoDePago');
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            state: StepState.disabled,
+            isActive: _currentStep >= 2);
+      default:
+    }
   }
 
   /// inserta la cantindad de dinero que quiere el usuario
@@ -430,11 +525,12 @@ class _PedirServicioState extends State<PedirServicio> {
       );
 
   /// funcion que construye los comentarios
-  buildComents() => TextFormField(
+  buildComents(TextEditingController controller, String text, int step) =>
+      TextFormField(
         cursorColor: Colors.black,
-        readOnly: true,
+        readOnly: step == 0 ? true : false,
         onFieldSubmitted: (_) => {},
-        controller: descriptionController,
+        controller: controller,
         style: TextStyle(fontSize: 20),
         validator: (title) => title != null && title.isEmpty
             ? 'Este campo no puede estar vacio'
@@ -442,30 +538,12 @@ class _PedirServicioState extends State<PedirServicio> {
         decoration: InputDecoration(
             icon: Icon(Icons.receipt),
             //suffixIcon: Icon(Icons.check_circle_outline_sharp),
-            helperText: 'Nombre y Dirección',
+            helperText: text,
             border: UnderlineInputBorder(),
-            hintText: 'Nombre y Dirección'),
+            hintText: text),
         maxLines: 3,
         keyboardType: TextInputType.multiline,
         inputFormatters: [new LengthLimitingTextInputFormatter(500)],
-      );
-  buildComents2() => TextFormField(
-        cursorColor: Colors.black,
-        onFieldSubmitted: (_) => {},
-        controller: descpController,
-        style: TextStyle(fontSize: 20),
-        validator: (title) => title != null && title.isEmpty
-            ? 'Este campo no puede estar vacio'
-            : null,
-        decoration: InputDecoration(
-            icon: Icon(Icons.receipt),
-            //suffixIcon: Icon(Icons.check_circle_outline_sharp),
-            helperText: 'Comentarios',
-            border: UnderlineInputBorder(),
-            hintText: 'Comentarios'),
-        maxLines: 3,
-        keyboardType: TextInputType.multiline,
-        inputFormatters: [new LengthLimitingTextInputFormatter(200)],
       );
 
   Widget buildHeader({required String header, required Widget child}) => Column(
@@ -812,7 +890,7 @@ class _PedirServicioState extends State<PedirServicio> {
             SizedBox(
               height: 15,
             ),
-            Text('Seleccione el tipo de tanque')
+            Text('Este campo no puede ir vacio')
           ],
         ),
       ),

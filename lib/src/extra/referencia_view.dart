@@ -13,6 +13,14 @@ class RefView extends StatefulWidget {
 }
 
 class _RefViewState extends State<RefView> {
+  String? tipoReferencia;
+
+  @override
+  void initState() {
+    super.initState();
+    referenciaApagar();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,10 +31,17 @@ class _RefViewState extends State<RefView> {
       body: SafeArea(
         child: Container(
           //margin: EdgeInsets.all(16.0),
-          padding: EdgeInsets.only(top: 50),
+          padding: EdgeInsets.only(top: 10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              Text(
+                'Tipo Ref: $tipoReferencia',
+                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(
+                height: 25,
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -96,22 +111,53 @@ class _RefViewState extends State<RefView> {
   referenciaApagar() {
     String? ref;
     for (int i = 0; i < widget.list!.length; i++) {
+      //no hay referencia padre
       if (widget.refP!.isEmpty) {
-        if (widget.list![i].referenciaP == "0" ||
-            widget.list![i].referenciaP == null) {
-          ref = widget.list![i].referencia;
+        //no hay referencia padre
+        print('aqui1');
+        // checa si esta pagado
+        if (widget.list![i].pago == 1) {
+          print('aqui1.1');
+          setState(() {
+            tipoReferencia = "";
+          });
+          ref = 'Pagado';
         } else {
-          ref = widget.list![i].referenciaP;
-        }
-      } else {
-        if (widget.refP![i].idConcepto == "PA        ") {
-          // poner return
-          return ref = widget.refP!.last.referenciaP;
-        } else {
+          //si no esta pagado ve si hay referencia padre
           if (widget.list![i].referenciaP == "0" ||
               widget.list![i].referenciaP == null) {
+            print('aqui 2');
+            // si no hay la muestra la referencia normal
+            setState(() {
+              tipoReferencia = "Normal";
+            });
             ref = widget.list![i].referencia;
           } else {
+            // si hay muestra la referencia padre no anual
+            print('aqui 2.2');
+            setState(() {
+              tipoReferencia = "Agrupada";
+            });
+            ref = widget.list![i].referenciaP;
+          }
+        }
+        //hay referencia padre
+      } else {
+        print('aqui 3');
+        //checa si la referencia padre anual esta pagada
+        if (widget.refP!.last.pago == 1) {
+          ref = 'Pagado';
+        } else {
+          if (widget.refP!.last.referenciaP != '0' ||
+              widget.refP!.last.referenciaP != null) {
+            setState(() {
+              tipoReferencia = "Pago Anual";
+            });
+            ref = widget.refP!.last.referenciaP;
+          } else {
+            setState(() {
+              tipoReferencia = "Agrupada";
+            });
             ref = widget.list![i].referenciaP;
           }
         }
