@@ -114,11 +114,11 @@ class _EventDashboardState extends State<EventDashboard> {
         });
       }
     } catch (e) {
-      setState(() {
-        if (mounted) {
+      if (mounted) {
+        setState(() {
           itsTrue = false;
-        }
-      });
+        });
+      }
     }
 
     if (itsTrue == false) {
@@ -194,6 +194,7 @@ class _EventDashboardState extends State<EventDashboard> {
           onTap: () async {
             prefs = await SharedPreferences.getInstance();
 
+            /// navegacion que te lleva a la pantalla de reservas
             Navigator.of(context).push(MaterialPageRoute(
                 builder: (_) => EventWeekly(
                       needReserva: myList[data].needReserva,

@@ -65,6 +65,7 @@ class _AddReporteState extends State<AddReporte> {
   int? idUser;
   List<String> type = [];
   List<TipoAvisoS>? avisos = [];
+  List<String>? idComName = [];
   getCameras() async {
     await Permission.camera.request();
     await Permission.storage.request();
@@ -95,6 +96,13 @@ class _AddReporteState extends State<AddReporte> {
       idCom = prefs!.getInt('idCom');
       idUser = prefs!.getInt('userId');
     });
+
+    AvisosCall().getComunidades().then((value) => {
+          for (int i = 0; i < value!.data!.length; i++)
+            {
+              idComName!.add(value.data![i].nombreComu!),
+            }
+        });
   }
 
   @override
@@ -221,11 +229,17 @@ class _AddReporteState extends State<AddReporte> {
                         elevation: 6,
                         value: chosenValue,
                         style: TextStyle(color: Colors.black),
-                        items: widget.idComu!
-                            .map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                              value: value, child: Text(value));
-                        }).toList(),
+                        items: widget.idComu == null
+                            ? idComName!
+                                .map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                    value: value, child: Text(value));
+                              }).toList()
+                            : widget.idComu!
+                                .map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                    value: value, child: Text(value));
+                              }).toList(),
                         onChanged: (val) {
                           print(val);
                           print(chosenValue);
@@ -553,12 +567,7 @@ class _AddReporteState extends State<AddReporte> {
       print(res.body);
       var responseDecode = json.decode(res.body);
 
-      if (responseDecode['status'] == true) {
-        return res.body;
-      } else {
-        print(res.body);
-        return res.body;
-      }
+      return res.body;
     } else {
       print(res.body);
     }

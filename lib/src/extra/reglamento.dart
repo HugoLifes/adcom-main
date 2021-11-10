@@ -468,18 +468,17 @@ accesorio de la palapa.
 """;
           });
         } else {
-          if (idAmen == 5) {
+          if (idAmen == 1) {
             setState(() {
-              pdfText = """ Reglamento de Casa club
-
+              pdfText = """ Reglamento de la alberca.
 
 I. Horario
 Lunes cerrado por mantenimiento.
 Martes a domingo de 7:00 a 22:00 hrs.
+
 II. Uso de la alberca.
 El uso de la alberca es exclusivo de los residentes.
 Queda estrictamente prohibido consumir comida en el área de la alberca.
-
 Sólo podrán consumirse bebidas sin alcohol dentro del área de la alberca en recipientes
 plásticos como thermos, etc. Queda prohibido cualquier envase de vidrio y aluminio.
 La única vestimenta permitida dentro de la alberca es el traje de baño y calzado adecuado.
@@ -500,14 +499,12 @@ Queda prohibido fumar dentro de la alberca y en esta área en general.
 Cada residente es responsable de mantener limpia el área de la que está haciendo uso.
 """;
               privacy =
-                  """Queda prohibido usar lenguaje anti sonante y ofensivo, así como juegos bruscos.
+                  """ Queda prohibido usar lenguaje anti sonante y ofensivo, así como juegos bruscos.
 En caso de ocurrir un accidente de cualquier índole, bajo ó no del reglamento, el comité no se
 hace responsable.
-
 Los usuarios de la alberca están obligados a guardar la debida compostura dentro y fuera de
 ella y queda bajo su responsabilidad cualquier daño a su persona ó a las instalaciones, sin
 ninguna responsabilidad sobre el comité de vecinos y la asociación civil.
-
 La falta al reglamento en cualquiera de los puntos anteriores será sancionada por el comité
 de vecinos dependiendo de la gravedad de la falta, pudiendo ser desde una sanción
 económica, hasta la cancelación de los accesos automáticos.

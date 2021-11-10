@@ -18,11 +18,13 @@ class AvisosDashboard extends StatefulWidget {
   List<AvisosUsuario>? avisos = [];
   List? links;
   List? name;
+  List<AvisosCall>? comunities = [];
   AvisosDashboard({
     Key? key,
     this.links,
     this.name,
     this.avisos,
+    this.comunities,
   }) : super(key: key);
 
   @override
@@ -40,6 +42,7 @@ class _AvisosDashboardState extends State<AvisosDashboard> {
   List<AvisosUsuario>? avisosRevers = [];
   List<dynamic> namesRev = [];
   List<dynamic> linksrev = [];
+  List<AvisosCall>? comunities = [];
   var filePath;
   ReceivePort _receivePort = ReceivePort();
   reversedList() {
@@ -228,50 +231,11 @@ class _AvisosDashboardState extends State<AvisosDashboard> {
                                   }))
                         ],
                       )),
-            )).then((value) => {names.clear()});
-  }
-
-  Future<void>? downloadLink(link, names) async {
-    setState(() {
-      downloading = true;
-    });
-    Dio dio = Dio();
-    String savePath = await getPath(names);
-
-    print('${savePath}');
-    print('aquui');
-    String urlPath = link;
-    dio.download(
-      urlPath,
-      savePath,
-      onReceiveProgress: (rcv, total) {
-        print(
-            'received: ${rcv.toStringAsFixed(0)} out of total: ${total.toStringAsFixed(0)}');
-
-        setState(() {
-          progress = ((rcv / total) * 100).toStringAsFixed(0);
+            )).then((value) => {
+          /// sirve para que se cierre el modal cuando se presione el boton de descargar
+          links.clear(),
+          names.clear()
         });
-
-        if (progress == '100') {
-          setState(() {
-            isDownloaded = true;
-          });
-        } else if (double.parse(progress) < 100) {
-          print('aqui');
-        }
-      },
-      deleteOnError: true,
-    ).then((_) {
-      setState(() {
-        if (progress == '100') {
-          isDownloaded = true;
-        }
-
-        downloading = false;
-      });
-    }).onError((error, stackTrace) {
-      print('$error');
-    });
   }
 
   Future download2(String url, String names) async {
@@ -331,7 +295,7 @@ class _AvisosDashboardState extends State<AvisosDashboard> {
   Future<String> getPath(names) async {
     Directory path = await getApplicationDocumentsDirectory();
 
-    print(path.path);
+    print('here${path.path}');
 
     setState(() {
       filePath = path.path + '/$names';

@@ -154,9 +154,11 @@ class _LevantarReporteState extends State<LevantarReporte> {
         var progress = [];
         //añade los estatus a la lista progress
         cuentas!.data![i].progreso!.forEach((element) {
-          setState(() {
-            progress.add(element.idProgreso);
-          });
+          if (mounted) {
+            setState(() {
+              progress.add(element.idProgreso);
+            });
+          }
         });
         //se mapea la lista progress
 
@@ -207,19 +209,21 @@ class _LevantarReporteState extends State<LevantarReporte> {
 
   refresh() {
     if (mounted) {
-      if (myList.isNotEmpty) {
-        myList.clear();
-        fechasSuperMap.clear();
-        superMap.clear();
-        superMap2.clear();
-        reversedList.clear();
-        reversedList2.clear();
-        reversedList3.clear();
-        reversedList4.clear();
-        data();
-      } else {
-        data();
-      }
+      setState(() {
+        if (myList.isNotEmpty) {
+          myList.clear();
+          fechasSuperMap.clear();
+          superMap.clear();
+          superMap2.clear();
+          reversedList.clear();
+          reversedList2.clear();
+          reversedList3.clear();
+          reversedList4.clear();
+          data();
+        } else {
+          data();
+        }
+      });
     }
   }
 
@@ -283,14 +287,18 @@ class _LevantarReporteState extends State<LevantarReporte> {
             padding: EdgeInsets.all(8),
             child: ListTile(
               onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) => ReportEditPage(
-                        report: reversedList[index],
-                        data: listProgreso,
-                        progreso: reversedList4[index],
-                        datos: reversedList3[index],
-                        id: reversedList[index].id,
-                        fechas: reversedList2[index])));
+                Navigator.of(context)
+                    .push(MaterialPageRoute(
+                        builder: (_) => ReportEditPage(
+                            report: reversedList[index],
+                            data: listProgreso,
+                            progreso: reversedList4[index],
+                            datos: reversedList3[index],
+                            id: reversedList[index].id,
+                            fechas: reversedList2[index])))
+                    .then((value) {
+                  onGoBack(value);
+                });
               },
               title: Text(
                 '${reversedList[index].descripCorta}',

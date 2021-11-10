@@ -10,6 +10,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:glyphicon/glyphicon.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -138,6 +139,12 @@ class _MainMenuState extends State<MainMenu> {
   @override
   void initState() {
     super.initState();
+    OneSignal.shared
+        .setNotificationOpenedHandler((OSNotificationOpenedResult result) {
+      // Will be called whenever a notification is opened/button pressed.
+      print('Message: ${result.notification.body}');
+    });
+
     initConnectivity();
     obtainData();
     _connectivitySubscription =
