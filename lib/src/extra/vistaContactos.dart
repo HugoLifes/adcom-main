@@ -59,11 +59,17 @@ class _VistaContactosState extends State<VistaContactos> {
                       'Calle:',
                       style: TextStyle(fontSize: 25),
                     ),
-                    Text(
-                      '${widget.contactos!.calle!.trimRight()}',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
+                    widget.contactos!.numero == null
+                        ? Text(
+                            'No tiene numero',
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                          )
+                        : Text('${widget.contactos!.numero!.trimRight()}',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            )),
                   ],
                 ),
                 Divider(
@@ -127,7 +133,8 @@ class _VistaContactosState extends State<VistaContactos> {
                     ),
                     InkWell(
                       onTap: () {
-                        _makePhoneCall('tel:${widget.contactos!.telCel!.trimRight().replaceAll(' ',  '')}');
+                        _makePhoneCall(
+                            'tel:${widget.contactos!.telCel!.trimRight().replaceAll(' ', '')}');
                       },
                       child: Padding(
                         padding: EdgeInsets.only(left: 10),
@@ -137,11 +144,12 @@ class _VistaContactosState extends State<VistaContactos> {
                             SizedBox(
                               width: 10,
                             ),
-                            Text(
-                              '${widget.contactos!.telCel!.trimRight()}',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold),
-                            ),
+                            widget.contactos!.telCel == null
+                                ? Text(
+                                    '',
+                                  )
+                                : Text(
+                                    '${widget.contactos!.telCel!.trimRight()}'),
                           ],
                         ),
                       ),
@@ -176,7 +184,7 @@ class _VistaContactosState extends State<VistaContactos> {
   Future<void> _makePhoneCall(String num) async {
     if (await canLaunch(num)) {
       await launch(num);
-  } else {
+    } else {
       throw 'No esta disponible $num';
     }
   }

@@ -1,3 +1,4 @@
+import 'dart:async';
 
 import 'package:adcom/json/jsonReporte.dart';
 import 'package:adcom/src/extra/add_reporte.dart';
@@ -43,6 +44,7 @@ class _LevantarReporteState extends State<LevantarReporte> {
   List<DataReporte> myListReversed = [];
   var progress = [];
   List<AvisosCall> comunities = [];
+
   /// progreso data
   var maps = <dynamic, Map>{};
   var progreso = <dynamic, dynamic>{};
@@ -84,15 +86,17 @@ class _LevantarReporteState extends State<LevantarReporte> {
   /// Activa el guardado en memoria
   addata() async {
     prefs = await SharedPreferences.getInstance();
-    setState(() {
-      /// obtiene el id comunidad y la del usuario
-      idCom = prefs!.getInt('idCom');
-      idUser = prefs!.getInt('userId');
-      userType = prefs!.getInt('userType');
-    });
+    if (mounted) {
+      setState(() {
+        /// obtiene el id comunidad y la del usuario
+        idCom = prefs!.getInt('idCom');
+        idUser = prefs!.getInt('userId');
+        userType = prefs!.getInt('userType');
+      });
+    }
   }
 
-   getComunidades() async {
+  getComunidades() async {
     AvisosCall().getComunidades().then((value) => {
           for (int i = 0; i < value!.data!.length; i++)
             {
@@ -118,7 +122,7 @@ class _LevantarReporteState extends State<LevantarReporte> {
   }
 
   /// Llama al service y asigna los datos obtenido a una clase
-  data() async {
+  Future data() async {
     cuentas = await getReportes();
     await addata();
     await getComunidades();
@@ -190,21 +194,32 @@ class _LevantarReporteState extends State<LevantarReporte> {
     reversedList3 = superMap2.reversed.toList();
     reversedList4 = superMap.reversed.toList();
     reversedList = myList.reversed.toList();
-
-    refresh();
   }
 
   @override
   void initState() {
-    data();
+    data().then((value) {
+      setState(() {
+        listview();
+      });
+    });
     super.initState();
   }
 
   refresh() {
     if (mounted) {
-      setState(() {
-        listview();
-      });
+      if (myList.isNotEmpty) {
+        myList.clear();
+        superMap.clear();
+        superMap2.clear();
+        reversedList.clear();
+        reversedList2.clear();
+        reversedList3.clear();
+        reversedList4.clear();
+        data();
+      } else {
+        data();
+      }
     }
   }
 
@@ -235,10 +250,12 @@ class _LevantarReporteState extends State<LevantarReporte> {
       floatingActionButton: FloatingActionButton(
         elevation: 7,
         onPressed: () => Navigator.of(context)
-            .push(MaterialPageRoute(builder: (_) => AddReporte(
-              comunities: comunities,
-              idComu: idComName,
-            ))),
+            .push(MaterialPageRoute(
+                builder: (_) => AddReporte(
+                      comunities: comunities,
+                      idComu: idComName,
+                    )))
+            .then(onGoBack),
         backgroundColor: Colors.blue,
         child: Icon(
           Icons.add,
@@ -246,6 +263,10 @@ class _LevantarReporteState extends State<LevantarReporte> {
         ),
       ),
     );
+  }
+
+  FutureOr onGoBack(dynamic value) {
+    refresh();
   }
 
   listview() {
@@ -302,7 +323,10 @@ class _LevantarReporteState extends State<LevantarReporte> {
                           ? Text('')
                           : SizedBox(
                               width: 110,
-                              child: Text(reversedList[index].comunidad!, textAlign: TextAlign.center,)),
+                              child: Text(
+                                reversedList[index].comunidad!,
+                                textAlign: TextAlign.center,
+                              )),
                       reversedList[index].numero == null
                           ? Text('')
                           : Row(
@@ -323,13 +347,12 @@ class _LevantarReporteState extends State<LevantarReporte> {
     );
   }
 
-  transform12hrs(int index){
+  transform12hrs(int index) {
     var fromhr = DateFormat("hh:mma");
     var newTime = fromhr.format(reversedList[index].fechaRep!);
 
     return newTime;
   }
-
 }
 
 class Progreso {

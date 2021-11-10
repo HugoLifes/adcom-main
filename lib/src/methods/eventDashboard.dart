@@ -37,7 +37,6 @@ Future<Places?> amenidades() async {
     "params": json.encode({"usuarioId": id})
   });
 
-  
   if (response.statusCode == 200) {
     var data = response.body;
 
@@ -92,16 +91,19 @@ class _EventDashboardState extends State<EventDashboard> {
         for (int i = 0; i < places.data!.length; i++) {
           myList.add(new Amenidad(
               //route: '/screen12',
-              id: places.data![i].id,
+              id: places.data![i].idAmenidad,
               idComu: places.data![i].idCom,
               title: places.data![i].amenidadDesc,
               route: '/screen12',
-              subtitle: 'Only residentes',
+              subtitle: places.data![i].descrip,
               icon: Icon(
                 Icons.pool,
                 size: 30,
                 color: Colors.deepPurple,
-              )));
+              ),
+              needReserva: places.data![i].necReserva,
+              comReserva: places.data![i].comReserva,
+              estadoActual: places.data![i].estadoAct));
         }
       } else {
         setState(() {
@@ -115,16 +117,16 @@ class _EventDashboardState extends State<EventDashboard> {
         itsTrue = false;
       });
     }
+    if (itsTrue == false) {
+    } else {
+      refresh();
+    }
   }
 
   @override
   void initState() {
     super.initState();
     gtData();
-    if (itsTrue == false) {
-    } else {
-      Future.delayed(Duration(milliseconds: 988), () => {refresh()});
-    }
   }
 
   refresh() {
@@ -165,11 +167,11 @@ class _EventDashboardState extends State<EventDashboard> {
                       ],
                     ))
                 : Container(
-                  padding: EdgeInsets.only(top: size/20),
-                  child: CircularProgressIndicator(
+                    padding: EdgeInsets.only(top: size / 20),
+                    child: CircularProgressIndicator(
                       backgroundColor: Colors.white,
                     ),
-                ),
+                  ),
           )
         : viewAmenidades(width: size, heigth: size2);
   }
@@ -177,7 +179,7 @@ class _EventDashboardState extends State<EventDashboard> {
   viewAmenidades({width, heigth}) {
     return Flexible(
         child: GridView.builder(
-      padding: EdgeInsets.only(left: 10, right: 10, top: 20),
+      padding: EdgeInsets.only(left: 10, right: 15, top: 20),
       itemCount: myList.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 1,
@@ -191,7 +193,10 @@ class _EventDashboardState extends State<EventDashboard> {
             if (itsTrue == false) {
             } else {
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (_) => EventWeekly(id: myList[data].id)));
+                  builder: (_) => EventWeekly(
+                      needReserva: myList[data].needReserva,
+                      id: myList[data].id,
+                      amen: myList[data])));
             }
           },
           child: Container(
@@ -221,6 +226,7 @@ class _EventDashboardState extends State<EventDashboard> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      SizedBox(height: heigth / 50),
                       myList[data].title == null
                           ? Container()
                           : Text(
@@ -229,15 +235,6 @@ class _EventDashboardState extends State<EventDashboard> {
                                   color: Colors.black,
                                   fontSize: 15,
                                   fontWeight: FontWeight.w600),
-                            ),
-                      SizedBox(
-                        height: heigth / 100,
-                      ),
-                      myList[data].subtitle == null
-                          ? Container()
-                          : Text(
-                              myList[data].subtitle!,
-                              style: TextStyle(fontSize: 12),
                             ),
                     ],
                   ),
@@ -256,7 +253,6 @@ class _EventDashboardState extends State<EventDashboard> {
                       SizedBox(
                         height: width / 50,
                       ),
-                      
                     ],
                   ),
                 ],
@@ -277,6 +273,9 @@ class Amenidad {
   int? id;
   int? idComu;
   String? subtitle;
+  int? needReserva;
+  String? comReserva;
+  int? estadoActual;
   //el evento puede ayudar a las notificaciones, checar despues
   String? event;
   Icon? icon;
@@ -286,6 +285,10 @@ class Amenidad {
       this.icon,
       this.subtitle,
       this.route,
+      this.needReserva,
+      this.comReserva,
+      this.estadoActual,
+      this.event,
       this.id,
       this.numero,
       this.idComu});

@@ -217,7 +217,8 @@ class _DetallesPagoState extends State<DetallesPago> {
                                 width: size.width / 26,
                               ),
                               checkedAll == true
-                                  ? Text('${numberFormat.format(contadorTotal) } MXN',
+                                  ? Text(
+                                      '${numberFormat.format(contadorTotal)} MXN',
                                       style: TextStyle(fontSize: 19))
                                   : Text(
                                       ///contador
@@ -325,13 +326,13 @@ class _DetallesPagoState extends State<DetallesPago> {
                 child: Text('Pagar ahora'),
                 callback: () {
                   Fluttertoast.showToast(
-                  msg: "Proximamente",
-                  toastLength: Toast.LENGTH_SHORT,
-                  gravity: ToastGravity.CENTER,
-                  timeInSecForIosWeb: 1,
-                  backgroundColor: Colors.white,
-                  textColor: Colors.black,
-                  fontSize: 17.0);
+                      msg: "Proximamente",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.CENTER,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.white,
+                      textColor: Colors.black,
+                      fontSize: 17.0);
                 },
                 gradient: LinearGradient(colors: [
                   Colors.lightGreen[500]!,
@@ -350,48 +351,64 @@ class _DetallesPagoState extends State<DetallesPago> {
   pagarTodo() {
     double? cuota;
     double? cuotaDeudora;
-    int meses;
+    int? meses;
     double deuda;
     bool flag = false;
+    bool pagoPendiente = false;
+    double pagoP = 0.0;
 
     ///el checked all se obtiene en el check de pagar todo
     if (checkedAll == true) {
       ///
       for (int i = 0; i < widget.list!.length; i++) {
         /// se saca la cuota
+        meses = widget.list![i].fechaGenerada!.month;
         cuota = double.parse(widget.list![i].montoCuota!);
 
         /// la deuda que se cobra
         deuda = double.parse(widget.list![i].montoTardio!);
 
-        /// si es tardio suma la deuda a la cuota
-        if (widget.list![i].pagoTardio == 1) {
-          setState(() {
-            flag = true;
-          });
-          cuotaDeudora = cuota + deuda;
-        } else {
-          /// solo es la cuota
-          setState(() {
-            flag = false;
-          });
+        ///Sentencia que realiza la suma si existen pagos pendientes
+        ///apesar de los meses que faltan para pagar el año
+        ///
+        if (widget.list![i].pago == 0) {
+          if (widget.list![i].pagoTardio == 1) {
+            setState(() {
+              pagoPendiente = true;
+            });
+            pagoP += cuota + deuda;
+            print('aqui $pagoP');
+          } else {
+            print('aqui123');
+            setState(() {
+              pagoPendiente = true;
+            });
+            pagoP += cuota;
+            print(pagoP);
+          }
+
           cuotaDeudora = cuota;
         }
       }
 
       /// asigno el mes en numero
-      meses = widget.list!.first.fechaLimite!.month;
+      print(meses);
 
+      ///despues de sumar los meses, adeudar los pagos pendientes
       ///Recorro el me hasta el mes 12
       /// ejem  mes = 8 entonces lo que falte para llegar a 12
-      for (meses; meses <= 12; meses++) {
-        if (flag == true) {
-          contadorTotal += cuotaDeudora!;
-        } else {
-          contadorTotal += cuota!;
-        }
+      for (meses; meses! < 12; meses++) {
+        contadorTotal += cuota!;
+
+        print('contador: $contadorTotal');
       }
 
+      if (pagoPendiente == true) {
+        print('flag');
+        contadorTotal += pagoP;
+      }
+
+      print(contadorTotal);
       setState(() {
         contadorTotal;
       });

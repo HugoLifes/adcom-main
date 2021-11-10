@@ -59,7 +59,7 @@ class _ServicesState extends State<Services> {
         elevation: 7,
         backgroundColor: Colors.white,
         title: Text(
-          'Servicios de la comunidad',
+          'Servicios para tu comunidad',
           style: TextStyle(color: Colors.black),
         ),
       ),
@@ -84,21 +84,24 @@ class _ServicesState extends State<Services> {
                         ///Image.asset('assets/images/k19.png', width: 110)
                         child: servicios[index].icon,
                       ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text(
-                            servicios[index].descripcion!,
-                            style: TextStyle(fontSize: 18),
-                          ),
-                          SizedBox(
-                            height: 5,
-                          ),
-                          Text(
-                            servicios[index].horario!,
-                            style: TextStyle(fontSize: 16),
-                          )
-                        ],
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              servicios[index].descripcion!,
+                              style: TextStyle(fontSize: 18),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Text(
+                              servicios[index].horario!,
+                              style: TextStyle(fontSize: 16),
+                            )
+                          ],
+                        ),
                       )
                     ],
                   )),

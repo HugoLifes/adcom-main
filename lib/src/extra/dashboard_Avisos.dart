@@ -39,11 +39,10 @@ class _AvisosDashboardState extends State<AvisosDashboard2> {
   List<dynamic> namesRev = [];
   List<dynamic> linksRev = [];
 
-  reversedList(){
+  reversedList() {
     avisosRevers = widget.avisos!.reversed.toList();
     namesRev = widget.name!.reversed.toList();
     linksRev = widget.links!.reversed.toList();
-
   }
 
   @override
@@ -73,14 +72,14 @@ class _AvisosDashboardState extends State<AvisosDashboard2> {
             itemBuilder: (_, int data) {
               return Container(
                 decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.grey,
-                                blurRadius: 10,
-                                offset: Offset(0, 5))
-                          ]),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.grey,
+                          blurRadius: 10,
+                          offset: Offset(0, 5))
+                    ]),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -89,7 +88,6 @@ class _AvisosDashboardState extends State<AvisosDashboard2> {
                       color: Color(0xFF455A64).withOpacity(0.3),
                     ),
                     postMessage(data, size),
-                   
                   ],
                 ),
               );
@@ -101,23 +99,20 @@ class _AvisosDashboardState extends State<AvisosDashboard2> {
       padding: EdgeInsets.only(left: 10, right: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        
         children: [
           Padding(
             padding: EdgeInsets.only(left: size / 51),
             child: SizedBox(
-              width: size/1,
+              width: size / 1,
               child: Text(
                 'Comunicado! ${avisosRevers![data].avisos}',
-                style: TextStyle(fontSize: size/20 ),
+                style: TextStyle(fontSize: size / 20),
               ),
             ),
           ),
-
           SizedBox(
-            height: size/13,
+            height: size / 13,
           ),
-          
           InkWell(
             onTap: () {
               _showModalSheet(data);
@@ -217,7 +212,7 @@ class _AvisosDashboardState extends State<AvisosDashboard2> {
                                   }))
                         ],
                       )),
-            )).then((value) => {names.clear()});
+            )).then((value) => {names.clear(), links.clear()});
   }
 
   Future<void>? downloadLink(link, names) async {
@@ -299,26 +294,23 @@ class _AvisosDashboardState extends State<AvisosDashboard2> {
   }
 
   Future<String> getPath(names) async {
-    if(Platform.isIOS){
-      Directory  temp = await getApplicationDocumentsDirectory();
+    if (Platform.isIOS) {
+      Directory temp = await getApplicationDocumentsDirectory();
       print(temp.path);
-    var filePath =   temp.path + '/$names';
+      var filePath = temp.path + '/$names';
 
-    return filePath;
-    }else{
+      return filePath;
+    } else {
       String path = await ExternalPath.getExternalStoragePublicDirectory(
-        ExternalPath.DIRECTORY_DOWNLOADS);
-        print(path);
-    var filePath = path + '/$names';
+          ExternalPath.DIRECTORY_DOWNLOADS);
+      print(path);
+      var filePath = path + '/$names';
 
-    return filePath;
+      return filePath;
     }
-    
-
-    
   }
 
-  Container whoPublish(data,size) {
+  Container whoPublish(data, size) {
     return Container(
       padding: EdgeInsets.only(top: 10, left: 10),
       child: Row(
@@ -337,10 +329,9 @@ class _AvisosDashboardState extends State<AvisosDashboard2> {
             'Administrador',
             style: (TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
           ),
-          SizedBox(
-            width: size/35
-          ),
-          Text('${avisosRevers![data].fecha!.day}/${avisosRevers![data].fecha!.month}/${avisosRevers![data].fecha!.year}')
+          SizedBox(width: size / 35),
+          Text(
+              '${avisosRevers![data].fecha!.day}/${avisosRevers![data].fecha!.month}/${avisosRevers![data].fecha!.year}')
         ],
       ),
     );

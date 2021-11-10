@@ -24,8 +24,8 @@ class LoginPage extends StatefulWidget {
 }
 
 Future<Posting?> loginAcces(String user, String pass) async {
-  final Uri uri = Uri.parse(
-      'http://187.189.53.8:8081/backend/web/index.php?r=adcom/login');
+  final Uri uri =
+      Uri.parse('http://187.189.53.8:8081/backend/web/index.php?r=adcom/login');
   final response = await http.post(uri, body: {
     "params": jsonEncode({'username': user, 'password': pass}),
   });
@@ -50,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: (){
+      onTap: () {
         HapticFeedback.selectionClick();
         FocusScope.of(context).unfocus();
       },
@@ -132,16 +132,16 @@ class _LoginPageState extends State<LoginPage> {
                             autofocus: false,
                             decoration: InputDecoration(
                                 enabledBorder: UnderlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Colors.grey, width: 2)),
+                                    borderSide: BorderSide(
+                                        color: Colors.grey, width: 2)),
                                 contentPadding: EdgeInsets.all(10),
                                 hintText: 'Usuario',
                                 prefixIcon: Icon(
                                   Icons.person,
                                   color: Colors.red,
                                 ),
-                                hintStyle:
-                                    TextStyle(color: Colors.grey, fontSize: 18)),
+                                hintStyle: TextStyle(
+                                    color: Colors.grey, fontSize: 18)),
                           ),
                         ),
                       ),
@@ -166,16 +166,16 @@ class _LoginPageState extends State<LoginPage> {
                             autofocus: false,
                             decoration: InputDecoration(
                                 enabledBorder: UnderlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Colors.grey, width: 2)),
+                                    borderSide: BorderSide(
+                                        color: Colors.grey, width: 2)),
                                 contentPadding: EdgeInsets.all(10),
                                 hintText: 'Contraseña',
                                 prefixIcon: Icon(
                                   Icons.security,
                                   color: Colors.red,
                                 ),
-                                hintStyle:
-                                    TextStyle(color: Colors.grey, fontSize: 18)),
+                                hintStyle: TextStyle(
+                                    color: Colors.grey, fontSize: 18)),
                           ),
                         ),
                       ),
@@ -187,10 +187,11 @@ class _LoginPageState extends State<LoginPage> {
                             Checkbox(
                                 activeColor: Colors.red,
                                 value: rememberMe,
-                                onChanged: (v){}),
+                                onChanged: (v) {}),
                             Text(
                               'Recordarme',
-                              style: TextStyle(fontSize: 18, color: Colors.grey),
+                              style:
+                                  TextStyle(fontSize: 18, color: Colors.grey),
                             )
                           ],
                         ),
@@ -209,7 +210,6 @@ class _LoginPageState extends State<LoginPage> {
                             } catch (e) {
                               HapticFeedback.heavyImpact();
                               showAlertDialog();
-                              
                             }
                           } else {
                             HapticFeedback.heavyImpact();
@@ -249,8 +249,6 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-
-  
 
   showAlertDialog2() {
     Widget okButton = TextButton(

@@ -1,5 +1,6 @@
 import 'dart:convert';
-
+import 'package:http/http.dart' as http;
+import 'package:adcom/json/jsonAmenidadReserva.dart';
 import 'package:adcom/src/extra/reporte.dart';
 import 'package:adcom/src/models/event.dart';
 import 'package:adcom/src/models/event_provider.dart';
@@ -24,12 +25,6 @@ class EventEditingPage extends StatefulWidget {
   _EventEditingPageState createState() => _EventEditingPageState();
 }
 
-accesData(comId, userId) async {
-  await EventEditingPage.init();
-  prefs!.setInt('idCom', comId);
-  prefs!.setInt('idUser', userId);
-}
-
 //intentar llamar id Amenidad de otra manera
 
 class _EventEditingPageState extends State<EventEditingPage> {
@@ -40,6 +35,25 @@ class _EventEditingPageState extends State<EventEditingPage> {
   int? idCom;
   int? idUser;
   int? idAm;
+  bool apartado = false;
+  bool maxHoras = false;
+
+  Future<ReservaData?> getReserva() async {
+    prefs = await SharedPreferences.getInstance();
+
+    Uri uri = Uri.parse(
+        'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-amenidad-reserva');
+
+    final response = await http.post(uri, body: {"idAmenidad": "${widget.id}"});
+
+    if (response.statusCode == 200) {
+      var data = response.body;
+
+      return reservaDataFromJson(data);
+    } else {
+      print('error');
+    }
+  }
 
   addata() async {
     prefs = await SharedPreferences.getInstance();
@@ -59,6 +73,7 @@ class _EventEditingPageState extends State<EventEditingPage> {
   @override
   void initState() {
     super.initState();
+    print('here${widget.id}');
     addata();
 
     if (widget.event == null) {
@@ -186,17 +201,95 @@ class _EventEditingPageState extends State<EventEditingPage> {
 
       final isEditing = widget.event != null;
       final provider = Provider.of<EventProvider>(context, listen: false);
-      final Response? response = await sendingData(
-        titleController.text,
-        fromDate,
-        toDate,
-      ).then((value) {
-        if (isEditing) {
-          provider.editEvent(event, widget.event!);
+
+      await getReserva().then((value) {
+        var dateFormat = DateFormat("yyy-MM-dd hh:mm");
+        var newFromDate = dateFormat.format(fromDate);
+        var newToDate = dateFormat.format(toDate);
+
+        for (int i = 0; i < value!.data!.reservas!.length; i++) {
+          /// formato a la fecha inicial que tomo del service
+          var newFechaReserva =
+              dateFormat.format(value.data!.reservas![i].fechaIni!);
+
+          /// formato de la fecha final que tomo del service
+          var fechaFinal =
+              dateFormat.format(value.data!.reservas![i].fechafinEvent!);
+
+          if (fromDate.difference(toDate).inHours < 6 || widget.id != 2) {
+            //checa si no esta sobre puesta una agenda
+
+            if (fromDate.isAtSameMomentAs(value.data!.reservas![i].fechaIni!) ||
+                toDate.isAtSameMomentAs(
+                    value.data!.reservas![i].fechafinEvent!)) {
+              print('here');
+              setState(() {
+                apartado = true;
+                maxHoras = false;
+              });
+            } else {
+              if (fromDate.isAfter(value.data!.reservas![i].fechaIni!) &&
+                  fromDate.isBefore(value.data!.reservas![i].fechafinEvent!)) {
+                print("porque");
+                setState(() {
+                  apartado = true;
+                  maxHoras = false;
+                });
+                return apartado;
+              } else {
+                if (toDate.isAfter(value.data!.reservas![i].fechaIni!) &&
+                    toDate.isBefore(value.data!.reservas![i].fechafinEvent!)) {
+                  setState(() {
+                    apartado = true;
+                    maxHoras = false;
+                  });
+                  return apartado;
+                } else {
+                  if (value.data!.reservas![i].fechaIni!.isAfter(fromDate) &&
+                      value.data!.reservas![i].fechafinEvent!
+                          .isBefore(toDate)) {
+                    setState(() {
+                      apartado = true;
+                      maxHoras = false;
+                    });
+                  } else {
+                    setState(() {
+                      apartado = false;
+                      apartado = false;
+                    });
+                  }
+                }
+              }
+            }
+
+            //falta validar sobre una fecha
+
+          } else {
+            print('Limite de apartado son 6 horas, en palapas');
+            setState(() {
+              apartado = true;
+              maxHoras = true;
+            });
+          }
         }
-        Navigator.of(context).pop();
       });
-      return response;
+
+      if (apartado == true) {
+        alerta5();
+      } else {
+        final Response? response = await sendingData(
+          titleController.text,
+          fromDate,
+          toDate,
+        ).then((value) {
+          /* if (isEditing) {
+          provider.editEvent(event, widget.event!);
+        } */
+          ///navegar hacia atras y actualizar
+          Navigator.pop(context);
+        });
+        return response;
+      }
     } else {
       print('no es valido');
     }
@@ -214,9 +307,9 @@ class _EventEditingPageState extends State<EventEditingPage> {
       print(formatFromDate);
 
       String formatToDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(to);
-      final data = Provider.of<EventProvider>(context, listen: false).amenidad;
-      print('${data.length}');
-      print('${data[0].id}');
+      //final data = Provider.of<EventProvider>(context, listen: false).amenidad;
+      //print('${data.length}');
+      //print('${data[0].id}');
 
       var formData = FormData.fromMap({
         'params': json.encode({
@@ -287,7 +380,7 @@ class _EventEditingPageState extends State<EventEditingPage> {
       final date = await showDatePicker(
           context: context,
           initialDate: initialDate,
-          firstDate: firstDate ?? DateTime(2015, 8),
+          firstDate: firstDate ?? DateTime.now(),
           lastDate: DateTime(2101));
 
       if (date == null) return null;
@@ -315,6 +408,56 @@ class _EventEditingPageState extends State<EventEditingPage> {
     if (date == null) return null;
 
     setState(() => toDate = date);
+  }
+
+  alerta5() {
+    Widget okButton = TextButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: Text(
+          'Si, continuar',
+          style: TextStyle(color: Colors.red[900]),
+        ));
+    Widget backButton = TextButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: Text(
+          'Regresar',
+          style: TextStyle(color: Colors.orange),
+        ));
+    AlertDialog alert = AlertDialog(
+      actions: [backButton],
+      title: Text(
+        'Atención!',
+        style: TextStyle(
+          fontSize: 25,
+        ),
+      ),
+      content: Container(
+        width: 140,
+        height: 150,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Adcom informa',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            maxHoras == true
+                ? Text('El maximo de apartado de esta amenidad es de 6 horas')
+                : Text(
+                    'Esta amenidad ya se encuentra apartada, favor de seleccionar otra fecha, gracias')
+          ],
+        ),
+      ),
+    );
+
+    showDialog(context: context, builder: (_) => alert);
   }
 }
 

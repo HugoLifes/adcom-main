@@ -76,37 +76,38 @@ class _AvisosState extends State<Avisos> {
     AvisosUsuario()
         .getAvisos(idComu)
         .then((value) => {
-            if(value!.data!.isNotEmpty){
-              for (int i = 0; i < value.data!.length; i++)
+              if (value!.data!.isNotEmpty)
                 {
-                  avisos.add(new AvisosUsuario(
-                    avisos: value.data![i].aviso,
-                    tipoAviso: value.data![i].tipoAviso,
-                    fecha: value.data![i].fechaAviso,
-                  )),
-                },
-              links = List.generate(
-                  value.data!.length,
-                  (index2) => List.generate(
-                      value.data![index2].archivos!.length,
-                      (index) => value
-                          .data![index2].archivos![index].direccionArchivo),
-                  growable: true),
-              name = List.generate(
-                  value.data!.length,
-                  (index2) => List.generate(
-                      value.data![index2].archivos!.length,
-                      (index) =>
-                          value.data![index2].archivos![index].nombreArchivo),
-                  growable: true),
-        }else{
-          
-          esFalso()
-        }
-        }).whenComplete(() => refresh());
+                  for (int i = 0; i < value.data!.length; i++)
+                    {
+                      avisos.add(new AvisosUsuario(
+                        avisos: value.data![i].aviso,
+                        tipoAviso: value.data![i].tipoAviso,
+                        fecha: value.data![i].fechaAviso,
+                      )),
+                    },
+                  links = List.generate(
+                      value.data!.length,
+                      (index2) => List.generate(
+                          value.data![index2].archivos!.length,
+                          (index) => value
+                              .data![index2].archivos![index].direccionArchivo),
+                      growable: true),
+                  name = List.generate(
+                      value.data!.length,
+                      (index2) => List.generate(
+                          value.data![index2].archivos!.length,
+                          (index) => value
+                              .data![index2].archivos![index].nombreArchivo),
+                      growable: true),
+                }
+              else
+                {esFalso()}
+            })
+        .whenComplete(() => refresh());
   }
 
-  esFalso(){
+  esFalso() {
     setState(() {
       itsTrue = false;
     });
@@ -116,10 +117,10 @@ class _AvisosState extends State<Avisos> {
   void initState() {
     userCheck();
     super.initState();
-    OneSignal.shared.setNotificationWillShowInForegroundHandler((OSNotificationReceivedEvent event) {
-  
-        event.complete(event.notification);                                 
-});
+    OneSignal.shared.setNotificationWillShowInForegroundHandler(
+        (OSNotificationReceivedEvent event) {
+      event.complete(event.notification);
+    });
   }
 
   refresh() {
@@ -148,7 +149,8 @@ class _AvisosState extends State<Avisos> {
               decoration: BoxDecoration(color: Colors.blueGrey[700]),
             ),
             Container(
-              padding: EdgeInsets.only(top: size.height/ 15, right: size.width / 20),
+              padding: EdgeInsets.only(
+                  top: size.height / 15, right: size.width / 20),
               alignment: Alignment.topRight,
               child: Icon(
                 Icons.announcement_rounded,
@@ -188,7 +190,8 @@ class _AvisosState extends State<Avisos> {
                     width: size.width / 1.5,
                     child: Text(
                       'Enterate de lo que sucede en tu comunidad! Desde recordatorios, alertas, novedades y más.',
-                      style: TextStyle(color: Colors.white, fontSize: size.width/19 ),
+                      style: TextStyle(
+                          color: Colors.white, fontSize: size.width / 19),
                     ),
                   ),
                   SizedBox(
@@ -196,32 +199,34 @@ class _AvisosState extends State<Avisos> {
                   ),
                   avisos.isEmpty
                       ? Center(
-                          child: itsTrue == false ? Container(
-                                          padding: EdgeInsets.only(
-                                              top: size.width / 10),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Image.asset(
-                                                'assets/images/magic.png',
-                                                width: size.width / 1,
-                                                height: 200,
-                                              ),
-                                              Text(
-                                                'Lo sentimos por el momento no cuenta con avisos',
-                                                style: TextStyle(
-                                                  fontSize: size.width / 20,
-                                                  color: Colors.blueGrey[700],
-                                                ),
-                                                textAlign: TextAlign.justify,
-                                              )
-                                            ],
-                                          )) :Container(
-                                            padding: EdgeInsets.only(top: size.width/20),
-                                            child: CircularProgressIndicator(),
-                                          ),
-                         )
+                          child: itsTrue == false
+                              ? Container(
+                                  padding:
+                                      EdgeInsets.only(top: size.width / 10),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Image.asset(
+                                        'assets/images/magic.png',
+                                        width: size.width / 1,
+                                        height: 200,
+                                      ),
+                                      Text(
+                                        'Lo sentimos por el momento no cuenta con avisos',
+                                        style: TextStyle(
+                                          fontSize: size.width / 20,
+                                          color: Colors.blueGrey[700],
+                                        ),
+                                        textAlign: TextAlign.justify,
+                                      )
+                                    ],
+                                  ))
+                              : Container(
+                                  padding:
+                                      EdgeInsets.only(top: size.width / 20),
+                                  child: CircularProgressIndicator(),
+                                ),
+                        )
                       : AvisosDashboard2(
                           links: links,
                           name: name,
@@ -247,7 +252,7 @@ class _AvisosState extends State<Avisos> {
                       builder: (_) => MakeNewPost(
                             idComu: idComName,
                             comunities: comunities,
-                          )));  
+                          )));
                 },
                 tooltip: 'add post',
                 child: const Icon(
@@ -337,7 +342,7 @@ class AvisosUsuario {
     this.tipoAviso,
     this.id,
   });
- 
+
   Future<GetAvisos?> getAvisos(int id) async {
     Uri url = Uri.parse(
         "http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-avisos-by-residente");

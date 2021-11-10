@@ -54,7 +54,7 @@ class _AmenidadesState extends State<Amenidades> {
 
       final provider = Provider.of<EventProvider>(context, listen: false);
       for (int i = 0; i < places.data!.length; i++) {
-        provider.addAmenidad(new Amenidad(id: places.data![i].id));
+        // provider.addAmenidad(new Amenidad(id: places.data![i].idAmenidad));
       }
     } catch (e) {
       final provider = Provider.of<EventProvider>(context, listen: false);
@@ -68,9 +68,9 @@ class _AmenidadesState extends State<Amenidades> {
     super.initState();
     gtData();
   }
+
   @override
   void dispose() {
-    
     super.dispose();
   }
 
@@ -139,7 +139,6 @@ class _AmenidadesState extends State<Amenidades> {
                           color: Colors.white, fontSize: size.width / 20),
                     ),
                   ),
-                  
                   EventDashboard()
                 ],
               ),

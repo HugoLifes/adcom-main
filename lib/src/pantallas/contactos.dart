@@ -93,74 +93,78 @@ class _ContactosState extends State<Contactos> {
         elevation: 5,
         backgroundColor: Colors.greenAccent[700],
       ),
-      body: Stack(
-        children: [
-          Container(
-            height: size.height * .30,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                    bottomRight: Radius.circular(5),
-                    bottomLeft: Radius.circular(5)),
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.grey, blurRadius: 6, offset: Offset(0, 1))
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: Stack(
+          children: [
+            Container(
+              height: size.height * .30,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                      bottomRight: Radius.circular(5),
+                      bottomLeft: Radius.circular(5)),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.grey, blurRadius: 6, offset: Offset(0, 1))
+                  ],
+                  color: Colors.greenAccent[700]),
+            ),
+            Container(
+              padding: EdgeInsets.only(top: 56, right: size.width / 28),
+              alignment: Alignment.topRight,
+              child: Icon(
+                Icons.contacts,
+                color: Colors.white,
+                size: size.width / 3,
+              ),
+            ),
+            SafeArea(
+                child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 8,
+                  ),
+                  SizedBox(
+                    width: size.width / 2,
+                    child: Text(
+                      'Contacta a tus personas de confianza',
+                      style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  SizedBox(
+                    width: size.width / 1.7,
+                    child: Text(
+                      'Mantente conectado con tu comunidad o asesores de tu comunidad',
+                      style: TextStyle(color: Colors.white, fontSize: 18.4),
+                    ),
+                  ),
+                  SizedBox(
+                    width: size.width / 2,
+                    child: searchBar(myList),
+                  ),
+                  itemSeleccion == null || itemSeleccion!.length == 0
+                      ? myList.isEmpty
+                          ? Center(
+                              child: CircularProgressIndicator(),
+                            )
+                          : contactsView()
+                      : filterView(size2),
                 ],
-                color: Colors.greenAccent[700]),
-          ),
-          Container(
-            padding: EdgeInsets.only(top: 56, right: size.width / 28),
-            alignment: Alignment.topRight,
-            child: Icon(
-              Icons.contacts,
-              color: Colors.white,
-              size: size.width / 3,
-            ),
-          ),
-          SafeArea(
-              child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: 8,
-                ),
-                SizedBox(
-                  width: size.width / 2,
-                  child: Text(
-                    'Contacta a tus personas de confianza',
-                    style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
-                  ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                SizedBox(
-                  width: size.width / 1.7,
-                  
-                  child: Text(
-                    'Mantente conectado con tu comunidad o asesores de tu comunidad',
-                    style: TextStyle(color: Colors.white, fontSize: 18.4),
-                  ),
-                ),
-                SizedBox(
-                  width: size.width / 2,
-                  child: searchBar(myList),
-                ),
-                itemSeleccion == null || itemSeleccion!.length == 0
-                    ? myList.isEmpty
-                        ? Center(
-                            child: CircularProgressIndicator(),
-                          )
-                        : contactsView()
-                    : filterView(size2),
-              ],
-            ),
-          )),
-        ],
+              ),
+            )),
+          ],
+        ),
       ),
     );
   }
@@ -290,7 +294,9 @@ class _ContactosState extends State<Contactos> {
           idComunidad: dt!.residente![i].idCom,
           calle: dt!.residente![i].calle,
           cp: dt!.residente![i].cp,
-          email: dt!.residente![i].email,
+          email: dt!.residente![i].email == null
+              ? ''
+              : dt!.residente![i].email!.trim(),
           interior: dt!.residente![i].interior,
           telCel: dt!.residente![i].telefonoCel,
           telEme: dt!.residente![i].telefonoEmergencia,
@@ -302,8 +308,10 @@ class _ContactosState extends State<Contactos> {
             color: Colors.lightGreen,
           )));
     }
-    setState(() {
-      myList;
-    });
+    if (mounted) {
+      setState(() {
+        myList;
+      });
+    }
   }
 }

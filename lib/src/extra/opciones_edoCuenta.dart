@@ -14,9 +14,13 @@ class OpcionesEdoCuenta extends StatefulWidget {
   String? userName;
   DatosUsuario? datosUsuario;
 
-  OpcionesEdoCuenta(
-      {Key? key, this.newList, this.users, this.userName, this.datosUsuario})
-      : super(key: key);
+  OpcionesEdoCuenta({
+    Key? key,
+    this.newList,
+    this.users,
+    this.userName,
+    this.datosUsuario,
+  }) : super(key: key);
 
   @override
   _OpcionesEdoCuentaState createState() => _OpcionesEdoCuentaState();
@@ -68,12 +72,7 @@ class _OpcionesEdoCuentaState extends State<OpcionesEdoCuenta> {
                         TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500)),
                 InkWell(
                   onTap: () async {
-
-
-                    PdfPreview(
-                      build: (format) => buildPdf(format)
-                      
-                    );
+                    PdfPreview(build: (format) => buildPdf(format));
                     /* Printing.layoutPdf(
                         dynamicLayout: true,
                         onLayout: (PdfPageFormat format) {
@@ -99,12 +98,7 @@ class _OpcionesEdoCuentaState extends State<OpcionesEdoCuenta> {
                     style: TextStyle(color: Colors.black, fontSize: 14.0)),
                 InkWell(
                   onTap: () async {
-
-
-                    PdfPreview(
-                      build: (format) => buildPdf(format)
-                      
-                    );
+                    PdfPreview(build: (format) => buildPdf(format));
                     /* Printing.layoutPdf(
                         dynamicLayout: true,
                         onLayout: (PdfPageFormat format) {
@@ -139,7 +133,7 @@ class _OpcionesEdoCuentaState extends State<OpcionesEdoCuenta> {
               pw.Divider(thickness: 10),
               _totales(),
             ]));
-            
+
     return await doc.save();
   }
 
@@ -188,7 +182,7 @@ class _OpcionesEdoCuentaState extends State<OpcionesEdoCuenta> {
     );
   }
 
-  _buildCustomHeadline( bytesImgList) {
+  _buildCustomHeadline(bytesImgList) {
     return pw.Header(
       child: pw
           .Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
@@ -313,8 +307,8 @@ class _OpcionesEdoCuentaState extends State<OpcionesEdoCuenta> {
 
 class Users {
   final String? tipoPago;
-
-  final int? referencia;
+  final double? cuota;
+  final String? referencia;
   final double? monto;
   final String? concepto;
   final double? deuda;
@@ -328,10 +322,10 @@ class Users {
       this.concepto,
       this.deuda,
       this.folio,
+      this.cuota,
       this.referenciaP,
       this.fecha});
 }
-
 
 class Comunidad {
   final String? nombreFracc;

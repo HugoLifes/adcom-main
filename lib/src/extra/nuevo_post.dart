@@ -211,16 +211,16 @@ class _MakeNewPostState extends State<MakeNewPost> {
                       print(val);
                       print(chosenValue);
                       if (chosenValue == null) {
-                           setState(() {
+                        setState(() {
                           chosenValue = val;
                         });
-                       sendId(val);
+                        sendId(val);
                       } else {
                         if (val != chosenValue) {
                           type.clear();
                           setState(() {
-                          chosenValue = val;
-                        });
+                            chosenValue = val;
+                          });
                           sendId(val);
                         } else {
                           if (val == chosenValue) {
@@ -306,31 +306,25 @@ class _MakeNewPostState extends State<MakeNewPost> {
       if (chosenValue == widget.comunities![i].nombreComu) {
         setState(() {
           idCom = widget.comunities![i].id;
-
         });
-        print('aqui'+idCom.toString());
+        print('aqui' + idCom.toString());
       }
     }
 
     await getTipoAviso().then((value) => {
           for (int i = 0; i < value!.data!.length; i++)
             {
-             
-            
-                      type.add(value.data![i].tipoAviso!),              
+              type.add(value.data![i].tipoAviso!),
               avisos.add(new TipoAvisoS(
                   tipoAviso: value.data![i].tipoAviso,
                   idCatTipoAviso: value.data![i].idCatTipoaviso,
-                  idCom: value.data![i].idCom))  
-                    
-              
+                  idCom: value.data![i].idCom))
             }
         });
 
-        setState(() {
-          drop();
-        });
-    
+    setState(() {
+      drop();
+    });
   }
 
   Future<List<File?>?> filePick() async {
