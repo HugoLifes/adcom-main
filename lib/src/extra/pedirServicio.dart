@@ -370,11 +370,16 @@ class _PedirServicioState extends State<PedirServicio> {
                         Text('Efectivo'),
                         Checkbox(
                           checkColor: Colors.white,
+                          tristate: true,
                           value: isChecked,
                           onChanged: (bool? value) {
-                            setState(() {
-                              isChecked = value!;
-                            });
+                            if (value == true) {
+                              setState(() {
+                                isChecked = value!;
+                                tipoDePago = "Efectivo";
+                              });
+                            }
+
                             if (isChecked2 == true) {
                               setState(() {
                                 isChecked2 = false;
@@ -393,10 +398,15 @@ class _PedirServicioState extends State<PedirServicio> {
                         Checkbox(
                           checkColor: Colors.white,
                           value: isChecked2,
+                          tristate: true,
                           onChanged: (bool? value) {
-                            setState(() {
-                              isChecked2 = value!;
-                            });
+                            if (value == true) {
+                              setState(() {
+                                isChecked2 = value!;
+                                tipoDePago = "Tarjeta";
+                              });
+                            }
+
                             if (isChecked == true) {
                               setState(() {
                                 isChecked = false;
@@ -430,17 +440,21 @@ class _PedirServicioState extends State<PedirServicio> {
                         Checkbox(
                           checkColor: Colors.white,
                           value: isChecked,
-                          onChanged: (bool? value) {
+                          onChanged: (value) {
+                            print('$value');
                             setState(() {
                               isChecked = value!;
                             });
-                            if (isChecked2 == true) {
+                            if (isChecked == true) {
                               setState(() {
-                                isChecked2 = false;
-                                isChecked = value!;
                                 tipoDePago = "Efectivo";
                               });
+                            } else {
+                              setState(() {
+                                tipoDePago = "";
+                              });
                             }
+                            print(isChecked.toString());
                             print('$tipoDePago');
                           },
                         ),
@@ -456,14 +470,16 @@ class _PedirServicioState extends State<PedirServicio> {
                             setState(() {
                               isChecked2 = value!;
                             });
-                            if (isChecked == true) {
+                            if (isChecked2 == true) {
                               setState(() {
-                                isChecked = false;
-                                isChecked2 = value!;
                                 tipoDePago = "Tarjeta";
                               });
-                              print('$tipoDePago');
+                            } else {
+                              setState(() {
+                                tipoDePago = "";
+                              });
                             }
+                            print('$tipoDePago');
                           },
                         ),
                       ],
@@ -693,7 +709,7 @@ class _PedirServicioState extends State<PedirServicio> {
               height: 15,
             ),
             Text(
-                'Este dia, el gas no tiene prioridad en este fraccionamiento, esto podría hacer que demore un poco mas, le pedimos que sea paciente.')
+                'Este día, el gas no tiene prioridad en este fraccionamiento, esto podría hacer que demore un poco más, le pedimos que sea paciente.')
           ],
         ),
       ),
@@ -790,7 +806,7 @@ class _PedirServicioState extends State<PedirServicio> {
             SizedBox(
               height: 15,
             ),
-            Text('Su solicitud se ha mandado con extio')
+            Text('Su solicitud se ha mandado con exito')
           ],
         ),
       ),

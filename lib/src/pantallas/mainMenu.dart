@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:adcom/json/jsonAmenidades.dart';
 import 'package:adcom/src/extra/servicios.dart';
@@ -13,6 +14,7 @@ import 'package:glyphicon/glyphicon.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 SharedPreferences? prefs;
 
@@ -57,6 +59,8 @@ class _MainMenuState extends State<MainMenu> {
   int _selectedIndex = 0;
   String? userM;
   String? pass;
+  OSDeviceState? status;
+  int? idPrim;
 
   ConnectivityResult _connectionStatus = ConnectivityResult.none;
   final Connectivity _connectivity = Connectivity();
@@ -104,15 +108,20 @@ class _MainMenuState extends State<MainMenu> {
     });
   }
 
-  obtainData() async {
+  Future obtainData() async {
     prefs = await SharedPreferences.getInstance();
-    setState(() {
-      userM = prefs!.getString('userM');
-      pass = prefs!.getString('passM');
-    });
+    status = await OneSignal.shared.getDeviceState();
+    if (mounted) {
+      setState(() {
+        userM = prefs!.getString('userM');
+        pass = prefs!.getString('passM');
+        idPrim = prefs!.getInt('idPrimario');
+      });
+    }
 
     print(userM);
     print(pass);
+    print(idPrim);
 
     loginAcces(userM!, pass!).then((value) {
       var userId;
@@ -134,6 +143,10 @@ class _MainMenuState extends State<MainMenu> {
             comunidad: comunidad, noInterior: noInterior, calle: calle);
       }
     });
+    if (prefs!.getBool('EnvioId') == true) {
+    } else {
+      SendIdNotification().sendId(status!.userId!, idPrim!);
+    }
   }
 
   @override
@@ -290,5 +303,28 @@ class _MainMenuState extends State<MainMenu> {
       return 'Buenas Tardes';
     }
     return 'Buenas Noches';
+  }
+}
+
+class SendIdNotification {
+  Future sendId(String nuserId, int userIdApp) async {
+    Uri uri = Uri.parse(
+        'http://187.189.53.8:8081/backend/web/index.php?r=adcom/token');
+    print(nuserId);
+    print(userIdApp);
+    var response = await http.post(uri, body: {
+      "params": json.encode({
+        "idUsurioApp": userIdApp,
+        "uuid": nuserId,
+      })
+    });
+    print(response.body);
+    if (response.statusCode == 200) {
+      print('ok');
+    } else {
+      print('error');
+    }
+    prefs = await SharedPreferences.getInstance();
+    prefs!.setBool('EnvioId', true);
   }
 }

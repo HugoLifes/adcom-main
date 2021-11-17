@@ -96,17 +96,18 @@ class Datum {
 }
 
 class Progreso {
-  Progreso({
-    this.fechaSeg,
-    this.comentario,
-    this.progreso,
-    this.idProgreso,
-  });
+  Progreso(
+      {this.fechaSeg,
+      this.comentario,
+      this.progreso,
+      this.idProgreso,
+      this.evidencia});
 
   DateTime? fechaSeg;
   String? comentario;
   String? progreso;
   int? idProgreso;
+  List<dynamic>? evidencia;
 
   factory Progreso.fromJson(Map<String, dynamic> json) => Progreso(
         fechaSeg: json["FECHA_SEG"] == null
@@ -115,6 +116,9 @@ class Progreso {
         comentario: json["COMENTARIO"] == null ? null : json["COMENTARIO"],
         progreso: json["PROGRESO"] == null ? null : json["PROGRESO"],
         idProgreso: json["ID_PROGRESO"] == null ? null : json["ID_PROGRESO"],
+        evidencia: json["EVIDENCIA"] == null
+            ? null
+            : List<dynamic>.from(json["EVIDENCIA"].map((x) => x)),
       );
 
   Map<String, dynamic> toJson() => {
@@ -122,5 +126,8 @@ class Progreso {
         "COMENTARIO": comentario == null ? null : comentario,
         "PROGRESO": progreso == null ? null : progreso,
         "ID_PROGRESO": idProgreso == null ? null : idProgreso,
+        "EVIDENCIA": evidencia == null
+            ? null
+            : List<dynamic>.from(evidencia!.map((x) => x)),
       };
 }

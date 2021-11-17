@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:adcom/json/jsonSiguiemntos.dart';
 import 'package:adcom/src/extra/add_reporte.dart';
 import 'package:adcom/src/extra/reporte.dart';
+import 'package:adcom/src/extra/responderSeguimiento.dart';
+import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -9,9 +11,11 @@ import 'package:glyphicon/glyphicon.dart';
 import 'package:im_stepper/stepper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:loader_overlay/loader_overlay.dart';
+import 'package:open_file/open_file.dart';
 import 'dart:convert';
 import 'package:path/path.dart' as path;
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:async/src/delegate/stream.dart';
@@ -28,6 +32,8 @@ class ReportEditPage extends StatefulWidget {
   /// variable que indiga el progreso actual del estatus.
   Map<dynamic, Map>? progreso;
 
+  Map<dynamic, Map>? evidencia;
+
   ///  variable que muestra los comentarios por progreso.
   Map<dynamic, Map>? datos;
 
@@ -43,6 +49,7 @@ class ReportEditPage extends StatefulWidget {
       this.datos,
       this.progreso,
       this.fechas,
+      this.evidencia,
       this.idProgreso,
       this.id})
       : super(key: key);
@@ -52,6 +59,7 @@ class ReportEditPage extends StatefulWidget {
 }
 
 class _ReportEditPageState extends State<ReportEditPage> {
+  ScrollController controller = ScrollController();
   final _formKey = GlobalKey<FormState>();
   TextEditingController textController = TextEditingController();
   var activestep = 0;
@@ -69,9 +77,12 @@ class _ReportEditPageState extends State<ReportEditPage> {
   List<String> seguimientos = [];
   String? chosenValue;
   List<int> idS = [];
+  List<String> evidencias = [];
   int? id;
   int? idCom;
   int? usertype;
+  List<String>? evidenciaPdf = [];
+  var filePath;
 
   userType() async {
     prefs = await SharedPreferences.getInstance();
@@ -108,6 +119,28 @@ class _ReportEditPageState extends State<ReportEditPage> {
         });
       } else {
         return;
+      }
+    });
+  }
+
+  evidencia() {
+    widget.evidencia!.forEach((key, value) {
+      if (widget.id == key) {
+        value.forEach((key, value) {
+          if (key == 'Evidencias') {
+            print('here');
+            setState(() {
+              for (int i = 0; i < value.length; i++) {
+                print(value[i]);
+                if (value[i].contains('jpg')) {
+                  evidencias.add(value[i]);
+                } else if (value[i].contains('pdf')) {
+                  evidenciaPdf!.add(value[i]);
+                }
+              }
+            });
+          }
+        });
       }
     });
   }
@@ -156,6 +189,7 @@ class _ReportEditPageState extends State<ReportEditPage> {
     /// en lo que abre la pantalla
     userType();
     estatus();
+    evidencia();
     datos();
     fechasR();
 
@@ -194,23 +228,14 @@ class _ReportEditPageState extends State<ReportEditPage> {
           floatingActionButton: usertype == 4
               ? FloatingActionButton(
                   onPressed: () {
-                    if (mostrarCampoDescripcion == false) {
-                      setState(() {
-                        mostrarCampoDescripcion = !mostrarCampoDescripcion;
-                      });
-                    }
-
-                    if (mostrarCampoDescripcion == true) {
-                      if (_formKey.currentState!.validate()) {
-                        context.loaderOverlay.show();
-                        sendingData2(textController.text, widget.id.toString(),
-                                images, newsPath!)
-                            .then((value) {
-                          context.loaderOverlay.hide();
-                          Navigator.of(context).pop();
-                        });
-                      }
-                    } else {}
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => ResponseSeguimiento(
+                                  seguimiento: seguimientos,
+                                  idS: idS,
+                                  id: widget.id,
+                                )));
                   },
                   child: mostrarCampoDescripcion == false
                       ? Icon(Icons.edit)
@@ -218,89 +243,43 @@ class _ReportEditPageState extends State<ReportEditPage> {
                   backgroundColor: Colors.blue,
                 )
               : null,
-          body: LoaderOverlay(
-            child: Padding(
-              padding: EdgeInsets.all(10),
-              child: Stack(
-                children: [
-                  ListView(
-                    children: [
-                      IconStepper(
-                        enableStepTapping: isFinalizado(),
-                        icons: [
-                          Icon(Icons.supervised_user_circle),
-                          Icon(Icons.check),
-                          Icon(Icons.flag),
-                          Icon(Icons.access_alarm),
-                          Icon(Icons.check)
-                        ],
-                        activeStep: progres.isEmpty ? 0 : progres.last.id,
-                        onStepReached: (index) {
-                          setState(() {
-                            if (progres.isEmpty) {
-                              activestep = index;
-                            } else {
-                              progres.last.id = index;
-                            }
-                          });
-                        },
-                      ),
-                      header(),
-                      help(),
-                      plainText(size),
-                      SizedBox(
-                        height: size * 0.1,
-                      ),
-                      mostrarCampoDescripcion
-                          ? Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                textBoxResponse(),
-                                SizedBox(
-                                  height: 15,
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    _optionsCamera();
-                                  },
-                                  child: Container(
-                                      padding: EdgeInsets.only(left: 20),
-                                      child: Row(
-                                        children: [
-                                          Icon(Glyphicon.file_plus_fill),
-                                          SizedBox(
-                                            width: 10,
-                                          ),
-                                          Text(
-                                            'Sube un archivo',
-                                            style: TextStyle(),
-                                          ),
-                                        ],
-                                      )),
-                                ),
-                                elejirSeguiminto(),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                newFiles(),
-                              ],
-                            )
-                          : Container(),
-                    ],
-                  ),
-                ],
-              ),
+          body: Padding(
+            padding: EdgeInsets.all(10),
+            child: Stack(
+              children: [
+                ListView(
+                  children: [
+                    IconStepper(
+                      enableStepTapping: isFinalizado(),
+                      icons: [
+                        Icon(Icons.supervised_user_circle),
+                        Icon(Icons.check),
+                        Icon(Icons.flag),
+                        Icon(Icons.access_alarm),
+                        Icon(Icons.check)
+                      ],
+                      activeStep: progres.isEmpty ? 0 : progres.last.id,
+                      onStepReached: (index) {
+                        setState(() {
+                          if (progres.isEmpty) {
+                            activestep = index;
+                          } else {
+                            progres.last.id = index;
+                          }
+                        });
+                      },
+                    ),
+                    header(),
+                    help(),
+                    plainText(size),
+                    SizedBox(
+                      height: size * 0.1,
+                    ),
+                  ],
+                ),
+              ],
             ),
           )),
-    );
-  }
-
-  newFiles() {
-    return Container(
-      padding: EdgeInsets.only(left: 20),
-      child: Column(
-        children: nameFile,
-      ),
     );
   }
 
@@ -366,6 +345,8 @@ class _ReportEditPageState extends State<ReportEditPage> {
                           )),
                     ),
                     respuestaView(size),
+                    buildImageEvidencia(),
+                    mostraryDescargarPdF()
                   ],
                 ),
               );
@@ -404,6 +385,8 @@ class _ReportEditPageState extends State<ReportEditPage> {
                           )),
                     ),
                     respuestaView(size),
+                    buildImageEvidencia(),
+                    mostraryDescargarPdF()
                   ],
                 ),
               );
@@ -442,6 +425,8 @@ class _ReportEditPageState extends State<ReportEditPage> {
                           )),
                     ),
                     respuestaView(size),
+                    buildImageEvidencia(),
+                    mostraryDescargarPdF()
                   ],
                 ),
               );
@@ -480,6 +465,8 @@ class _ReportEditPageState extends State<ReportEditPage> {
                           )),
                     ),
                     respuestaView(size),
+                    buildImageEvidencia(),
+                    mostraryDescargarPdF()
                   ],
                 ),
               );
@@ -520,29 +507,6 @@ class _ReportEditPageState extends State<ReportEditPage> {
             ),
           );
         }),
-      ),
-    );
-  }
-
-  textBoxResponse() {
-    return Container(
-      padding: EdgeInsets.only(left: 20, right: 80),
-      height: 60,
-      child: Form(
-        key: _formKey,
-        child: TextFormField(
-          controller: textController,
-          maxLines: 200,
-          validator: (title) => title != null && title.isEmpty
-              ? 'Este campo no puede estar vacio'
-              : null,
-          decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            labelText: 'Escribe tu respuesta',
-          ),
-        ),
       ),
     );
   }
@@ -596,6 +560,53 @@ class _ReportEditPageState extends State<ReportEditPage> {
         ),
       );
 
+  buildImageEvidencia() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: List.generate(
+        evidencias.length,
+        (index) {
+          return Container(
+            padding: EdgeInsets.only(left: 20, top: 15),
+            child: FadeInImage.memoryNetwork(
+                width: 120,
+                height: 120,
+                placeholder: kTransparentImage,
+                image: evidencias[index]),
+          );
+        },
+      ),
+    );
+  }
+
+  mostraryDescargarPdF() {
+    return Column(
+      children: List.generate(
+        evidenciaPdf!.length,
+        (index) {
+          return Container(
+            padding: EdgeInsets.only(left: 30, top: 10),
+            child: InkWell(
+              onTap: () {
+                download2(
+                  evidenciaPdf![index],
+                  evidenciaPdf![index].split('/').last.split('-').last,
+                );
+              },
+              child: Text(
+                evidenciaPdf![index].split('/').last.split('-').last,
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    decoration: TextDecoration.underline),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   ///muestra el titulo del reporte y las imagenes del reporte
   /// chechar buildImage para cualquier detalle de imagenes
   help() {
@@ -634,121 +645,7 @@ class _ReportEditPageState extends State<ReportEditPage> {
     );
   }
 
-  openCamera() async {
-    var image =
-        await _picker.pickImage(source: ImageSource.camera, imageQuality: 40);
-
-    setState(() {
-      if (image != null) {
-        if (images.length == 3) {
-          // muestra el mensaje de archivo excedido
-          mensaje();
-          Navigator.of(context).pop();
-        } else {
-          String dir = path.dirname(image.path);
-          String newPath = path.join(dir, 'respuestaAdcom.jpg');
-          print(newPath);
-          newsPath!.add(newPath);
-          images.add(File(image.path));
-        }
-      } else {
-        print('No se ha seleccionado una imagen');
-      }
-    });
-    return images;
-  }
-
-  Future<List<File?>?> filePick() async {
-    FilePickerResult? result =
-        await FilePicker.platform.pickFiles(allowMultiple: true);
-
-    if (result != null) {
-      images = result.paths.map((path) => File(path!)).toList();
-      newsPath = result.paths.map((path) => path!).toList();
-      return images;
-    } else {
-      Fluttertoast.showToast(
-          msg: "No selecciono archivos",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.CENTER,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.white,
-          textColor: Colors.black,
-          fontSize: 17.0);
-    }
-  }
-
-  mensaje() => Fluttertoast.showToast(
-      msg: "Maximo excedido",
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.CENTER,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.white,
-      textColor: Colors.black,
-      fontSize: 17.0);
-
   /// funcion que muesrtra los botones de la camara y la galeria
-  Future<void> _optionsCamera() {
-    return showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            actions: [CloseButton()],
-            title: Text('Seleccione una opción'),
-            content: SingleChildScrollView(
-              child: ListBody(
-                children: [
-                  GestureDetector(
-                      child: Text(
-                        'Tomar fotografía',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      onTap: () {
-                        openCamera().then((value) => {
-                              if (value != null)
-                                {
-                                  for (var item in value)
-                                    {
-                                      nameFile.add(
-                                          Text('${item!.path.split('/').last}'))
-                                    }
-                                }
-                              else
-                                {print('no selecciono nada')}
-                            });
-                        setState(() {
-                          nameFile;
-                        });
-                      }),
-                  Divider(),
-                  GestureDetector(
-                      child: Text(
-                        'Seleccionar varios archivos',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      onTap: () {
-                        filePick().then((value) => {
-                              if (value != null)
-                                {
-                                  for (var item in value)
-                                    {
-                                      nameFile
-                                          .add(Text(item!.path.split('/').last))
-                                    }
-                                }
-                              else
-                                {print('No selecciono archivos')}
-                            });
-                        setState(() {
-                          nameFile;
-                        });
-                      })
-                ],
-              ),
-            ),
-          );
-        });
-  }
 
   /// funcion que envia el reporte
   sendingData2(String titulo, String descrip, List<File> files,
@@ -763,8 +660,8 @@ class _ReportEditPageState extends State<ReportEditPage> {
 // create multipart request
     var request = new http.MultipartRequest("POST", uri);
     for (var file in files) {
-      String fileName = newsPath!.last;
-      var stream = new http.ByteStream(DelegatingStream.typed(file.openRead()));
+      String fileName = file.path.split('/').last;
+      var stream = new http.ByteStream(Stream.castFrom(file.openRead()));
 
       // get file length
 
@@ -811,57 +708,56 @@ class _ReportEditPageState extends State<ReportEditPage> {
     }
   }
 
-  elejirSeguiminto() {
-    return Container(
-      padding: EdgeInsets.only(left: 20),
-      child: DropdownButton<String>(
-        elevation: 6,
-        value: chosenValue,
-        style: TextStyle(color: Colors.black),
-        items: seguimientos.map<DropdownMenuItem<String>>((String value) {
-          return DropdownMenuItem<String>(value: value, child: Text(value));
-        }).toList(),
-        onChanged: (val) {
-          print(val);
-          print(chosenValue);
-          if (chosenValue == null) {
-            setState(() {
-              chosenValue = val;
-            });
-            next();
-          } else {
-            if (val != chosenValue) {
-              setState(() {
-                chosenValue = val;
-              });
+  Future download2(String url, String names) async {
+    Dio dio = Dio();
 
-              next();
-            } else {
-              if (val == chosenValue) {
-              } else {
-                next();
-              }
-            }
-          }
-        },
-        hint: Text("Elige el seguimiento",
-            style: TextStyle(
-                color: Colors.black,
-                fontSize: 16,
-                fontWeight: FontWeight.w600)),
-      ),
-    );
+    String savePath = await getPath(names);
+    try {
+      Response response = await dio.get(
+        url,
+        onReceiveProgress: showDownloadProgress,
+        //Received data with List<int>
+        options: Options(
+            responseType: ResponseType.bytes,
+            followRedirects: false,
+            validateStatus: (status) {
+              return status! < 500;
+            }),
+      );
+      print(response.headers);
+      File file = File(savePath);
+      var raf = file.openSync(mode: FileMode.write);
+      // response.data is List<int> type
+      raf.writeFromSync(response.data);
+      await raf.close();
+    } catch (e) {
+      print(e);
+    }
+    await OpenFile.open(filePath);
   }
 
-  next() {
-    for (int i = 0; i < seguimientos.length; i++) {
-      if (chosenValue == seguimientos[i]) {
-        setState(() {
-          id = idS[i];
-        });
-        print(id);
-      }
+  void showDownloadProgress(received, total) {
+    if (total != -1) {
+      print((received / total * 100).toStringAsFixed(0) + "%");
     }
+  }
+
+  Future<String> getPath(names) async {
+    Directory path = await getApplicationDocumentsDirectory();
+
+    print('here${path.path}');
+
+    if (names.contains('.pdf') == false) {
+      setState(() {
+        filePath = path.path + '/' + names + '.pdf';
+      });
+    } else {
+      setState(() {
+        filePath = path.path + '/$names';
+      });
+    }
+
+    return filePath;
   }
 }
 

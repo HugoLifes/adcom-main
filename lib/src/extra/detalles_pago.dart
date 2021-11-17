@@ -645,7 +645,7 @@ class _DetallesPagoState extends State<DetallesPago> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Su referencia ha sido generada con exito!, Actualice y revise el apartado de referencias',
+              'Su referencia ha sido generada con exito!, Actualice y revise el apartado de referencias en +',
               style: TextStyle(fontSize: 18),
             )
           ],

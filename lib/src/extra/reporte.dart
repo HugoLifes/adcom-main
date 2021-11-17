@@ -73,6 +73,7 @@ class _LevantarReporteState extends State<LevantarReporte> {
   List<Map<dynamic, Map>> reversedList2 = [];
   List<Map<dynamic, Map>> reversedList3 = [];
   List<Map<dynamic, Map>> reversedList4 = [];
+  List<Map<dynamic, Map>> reversedList5 = [];
   List<AvisosCall> comunities = [];
   String? comunidad;
   String? numero;
@@ -80,21 +81,26 @@ class _LevantarReporteState extends State<LevantarReporte> {
   var userType;
   List<String> idComName = [];
   GetReportes? cuentas;
+  List<String> evidencia = [];
 
   var idCom;
   var idUser;
 
+  var maps3 = <dynamic, Map>{};
+  var evidencias = <dynamic, dynamic>{};
+
+  List<Map<dynamic, Map>> superEvidencia = [];
+
   /// Activa el guardado en memoria
   addata() async {
     prefs = await SharedPreferences.getInstance();
-    if (mounted) {
-      setState(() {
-        /// obtiene el id comunidad y la del usuario
-        idCom = prefs!.getInt('idCom');
-        idUser = prefs!.getInt('userId');
-        userType = prefs!.getInt('userType');
-      });
-    }
+
+    setState(() {
+      /// obtiene el id comunidad y la del usuario
+      idCom = prefs!.getInt('idCom');
+      idUser = prefs!.getInt('userId');
+      userType = prefs!.getInt('userType');
+    });
   }
 
   getComunidades() async {
@@ -185,14 +191,25 @@ class _LevantarReporteState extends State<LevantarReporte> {
 
         fDatos = {"Fechas": fechasList};
         fechasMap.addAll({cuentas!.data![i].idReporte: fDatos});
+
+        cuentas!.data![i].progreso!.forEach((element) {
+          setState(() {
+            evidencias = {"Evidencias": element.evidencia!.toList()};
+          });
+        });
+
+        maps3.addAll({cuentas!.data![i].idReporte: evidencias});
+        print(maps3);
       }
       fechasSuperMap.add(fechasMap);
+      superEvidencia.add(maps3);
       superMap2.add(maps2);
       superMap.add(maps);
     }
     reversedList2 = fechasSuperMap.reversed.toList();
     reversedList3 = superMap2.reversed.toList();
     reversedList4 = superMap.reversed.toList();
+    reversedList5 = superEvidencia.reversed.toList();
     reversedList = myList.reversed.toList();
   }
 
@@ -219,6 +236,8 @@ class _LevantarReporteState extends State<LevantarReporte> {
           reversedList2.clear();
           reversedList3.clear();
           reversedList4.clear();
+          reversedList5.clear();
+          comunities.clear();
           data();
         } else {
           data();
@@ -290,6 +309,7 @@ class _LevantarReporteState extends State<LevantarReporte> {
                 Navigator.of(context)
                     .push(MaterialPageRoute(
                         builder: (_) => ReportEditPage(
+                            evidencia: reversedList5[index],
                             report: reversedList[index],
                             data: listProgreso,
                             progreso: reversedList4[index],

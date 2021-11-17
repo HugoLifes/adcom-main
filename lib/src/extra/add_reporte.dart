@@ -129,6 +129,7 @@ class _AddReporteState extends State<AddReporte> {
       },
       child: Scaffold(
         appBar: AppBar(
+          title: Text('Añade un reporte'),
           backgroundColor: Colors.blue,
           leading: CloseButton(
             onPressed: () {
@@ -229,17 +230,11 @@ class _AddReporteState extends State<AddReporte> {
                         elevation: 6,
                         value: chosenValue,
                         style: TextStyle(color: Colors.black),
-                        items: widget.idComu == null
-                            ? idComName!
-                                .map<DropdownMenuItem<String>>((String value) {
-                                return DropdownMenuItem<String>(
-                                    value: value, child: Text(value));
-                              }).toList()
-                            : widget.idComu!
-                                .map<DropdownMenuItem<String>>((String value) {
-                                return DropdownMenuItem<String>(
-                                    value: value, child: Text(value));
-                              }).toList(),
+                        items: idComName!
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                              value: value, child: Text(value));
+                        }).toList(),
                         onChanged: (val) {
                           print(val);
                           print(chosenValue);
@@ -372,29 +367,6 @@ class _AddReporteState extends State<AddReporte> {
     });
   }
 
-  void openCamera2() async {
-    var image =
-        await _picker.pickImage(source: ImageSource.camera, imageQuality: 40);
-    var i = 0;
-    if (image != null) {
-      if (images.length == 3) {
-        // muestra el mensaje de archivo excedido
-        mensaje();
-        Navigator.of(context).pop();
-      } else {
-        i++;
-        String dir = path.dirname(image.path);
-        String newPath = path.join(dir, 'reportesAdcom$i.jpg');
-        print(newPath);
-        newsPath.add(newPath);
-        images.add(File(image.path));
-        print(images[0].path);
-      }
-    } else {
-      print('No se ha seleccionado una imagen');
-    }
-  }
-
   mensaje() => Fluttertoast.showToast(
       msg: "Maximo excedido",
       toastLength: Toast.LENGTH_SHORT,
@@ -412,7 +384,7 @@ class _AddReporteState extends State<AddReporte> {
       if (image != null) {
         i++;
         String dir = path.dirname(image.path);
-        String newPath = path.join(dir, 'reportesAdcom$i.jpg');
+        String newPath = path.join(dir, 'reportesAdcom.jpg');
         print(newPath);
         newsPath.add(newPath);
         images.add(File(image.path));
@@ -535,7 +507,7 @@ class _AddReporteState extends State<AddReporte> {
     var request = new http.MultipartRequest("POST", uri);
     for (var file in files) {
       String fileName = newsPath.last;
-      var stream = new http.ByteStream(DelegatingStream.typed(file.openRead()));
+      var stream = new http.ByteStream(Stream.castFrom(file.openRead()));
 
       // get file length
 
@@ -548,6 +520,13 @@ class _AddReporteState extends State<AddReporte> {
 
       request.files.add(multipartFileSign);
     }
+
+    print("params - ${json.encode({
+          'descripcionCorta': titulo,
+          'descripcionLarga': descrip,
+          'idCom': idCom,
+          'idUsusarioResidente': idUser
+        })}");
 //adding params
     request.fields['params'] = json.encode({
       'descripcionCorta': titulo,
@@ -567,7 +546,7 @@ class _AddReporteState extends State<AddReporte> {
       print(res.body);
       var responseDecode = json.decode(res.body);
 
-      return res.body;
+      return responseDecode;
     } else {
       print(res.body);
     }
@@ -632,7 +611,6 @@ class _AddReporteState extends State<AddReporte> {
       final Response? response = await sendingData2(titleController.text,
               descriptionController.text, images, newsPath)
           .then((value) {
-        provider.addReport(report);
         Navigator.of(context).pop();
 
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(

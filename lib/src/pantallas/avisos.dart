@@ -532,7 +532,6 @@ class CustomSearchDelegate extends SearchDelegate {
                       .substring(query.length),
                   style: TextStyle(color: Colors.grey),
                 ),
-                TextSpan(text: index.toString())
               ],
             ),
           ),

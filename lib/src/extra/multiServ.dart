@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:adcom/json/jsonProveedores.dart';
 import 'package:adcom/src/extra/pedirServicio.dart';
 import 'package:adcom/src/extra/servicios.dart';
@@ -254,4 +256,19 @@ class Servicios {
       this.telCont1,
       this.telCont2,
       this.telGuard});
+}
+
+class datosProveedor {
+  Future getDatos() async {
+    Uri uri = Uri.parse(
+        'http://192.168.1.178:8081/backend/web/index.php?r=adcom/get-datos-provedores-by-com');
+
+    var response = await http.post(uri, body: {'idCom': 2});
+
+    if (response.statusCode == 200) {
+      var data = json.decode(response.body);
+
+      return data;
+    }
+  }
 }
