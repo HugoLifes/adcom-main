@@ -70,7 +70,7 @@ class _EventWeeklyState extends State<EventWeekly> {
 
     if (idCom == 99) {
     } else {
-      if (widget.id == 2 || widget.id == 5) {
+      if (widget.id == 2 || widget.id == 5 || widget.id == 1) {
         Future.delayed(
             Duration(milliseconds: 999),
             () => {
@@ -137,7 +137,7 @@ class _EventWeeklyState extends State<EventWeekly> {
       case 3:
         break;
       case 4:
-        if (widget.id == 2 || widget.id == 5) {
+        if (widget.id == 2 || widget.id == 5 || widget.id == 1) {
           Future.delayed(
               Duration(milliseconds: 999),
               () => {

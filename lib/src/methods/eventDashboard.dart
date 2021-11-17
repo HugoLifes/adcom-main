@@ -119,7 +119,9 @@ class _EventDashboardState extends State<EventDashboard> {
     }
     if (itsTrue == false) {
     } else {
-      refresh();
+      setState(() {
+        refresh();
+      });
     }
   }
 

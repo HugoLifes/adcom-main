@@ -1,11 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:adcom/json/jsonAmenidades.dart';
 import 'package:adcom/src/extra/servicios.dart';
-
+import 'package:http/http.dart' as http;
 import 'package:adcom/src/methods/gridDashboard.dart';
 import 'package:adcom/src/pantallas/loginPage.dart';
-
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:glyphicon/glyphicon.dart';
@@ -27,6 +28,8 @@ class MainMenu extends StatefulWidget {
   _MainMenuState createState() => _MainMenuState();
 }
 
+/// se encarga de iniciar la memoria y guardar datos en el
+///  revisar [login] en models/event_provider.dart para ver el parametrizaje de los datos
 somData(user, userType, idCom, idPrimario, userId, userM, pass,
     {comunidad, noInterior, calle}) async {
   await MainMenu.init();
@@ -55,8 +58,10 @@ class _MainMenuState extends State<MainMenu> {
   int _selectedIndex = 0;
   String? userM;
   String? pass;
- 
-  
+  OSDeviceState? statusOneSignal;
+  int? idPrim;
+
+  /// obtiene en memoria el tipo de usuario y el nombre de usuario
   userName() async {
     prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -71,6 +76,7 @@ class _MainMenuState extends State<MainMenu> {
     });
   }
 
+  /// inicia las siguientes funciones cuando se entra a una pantalla
   @override
   void initState() {
     super.initState();
@@ -78,15 +84,19 @@ class _MainMenuState extends State<MainMenu> {
     userName();
   }
 
-    obtainData() async {
+  /// obtiene el usuario y password
+  Future obtainData() async {
     prefs = await SharedPreferences.getInstance();
+    statusOneSignal = await OneSignal.shared.getDeviceState();
     setState(() {
       userM = prefs!.getString('userM');
       pass = prefs!.getString('passM');
+      idPrim = prefs!.getInt('idPrimario');
     });
 
     print(userM);
     print(pass);
+    print(idPrim);
 
     loginAcces(userM!, pass!).then((value) {
       var userId;
@@ -108,11 +118,14 @@ class _MainMenuState extends State<MainMenu> {
             comunidad: comunidad, noInterior: noInterior, calle: calle);
       }
     });
+    if (prefs!.getBool('EnvioId') == true) {
+    } else {
+      SendIdNotification().sendId(statusOneSignal!.userId!, idPrim!);
+    }
   }
 
   @override
   void dispose() {
-   
     super.dispose();
   }
 
@@ -204,7 +217,7 @@ class _MainMenuState extends State<MainMenu> {
                                         style: TextStyle(
                                             color: Colors.black,
                                             fontFamily: 'Roboto',
-                                            fontSize: size.width/ 18,
+                                            fontSize: size.width / 18,
                                             fontWeight: FontWeight.w700),
                                       ),
                                 Text(
@@ -248,5 +261,28 @@ class _MainMenuState extends State<MainMenu> {
       return 'Buenas Tardes';
     }
     return 'Buenas Noches';
+  }
+}
+
+class SendIdNotification {
+  Future sendId(String nuserId, int userIdApp) async {
+    Uri uri = Uri.parse(
+        'http://187.189.53.8:8081/backend/web/index.php?r=adcom/token');
+    print(nuserId);
+    print(userIdApp);
+    var response = await http.post(uri, body: {
+      "params": json.encode({
+        "idUsurioApp": userIdApp,
+        "uuid": nuserId,
+      })
+    });
+    print(response.body);
+    if (response.statusCode == 200) {
+      print('ok');
+    } else {
+      print('error');
+    }
+    prefs = await SharedPreferences.getInstance();
+    prefs!.setBool('EnvioId', true);
   }
 }

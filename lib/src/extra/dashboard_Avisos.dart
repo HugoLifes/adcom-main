@@ -15,8 +15,10 @@ class AvisosDashboard2 extends StatefulWidget {
   List<AvisosUsuario>? avisos = [];
   List? links;
   List? name;
+  List<AvisosCall>? comunities = [];
   AvisosDashboard2({
     Key? key,
+    this.comunities,
     this.links,
     this.name,
     this.avisos,
@@ -34,7 +36,7 @@ class _AvisosDashboardState extends State<AvisosDashboard2> {
   bool downloading = false;
   String progress = '0';
   bool isDownloaded = false;
-
+  List<AvisosCall> comunities = [];
   List<AvisosUsuario>? avisosRevers = [];
   List<dynamic> namesRev = [];
   List<dynamic> linksRev = [];
@@ -297,8 +299,12 @@ class _AvisosDashboardState extends State<AvisosDashboard2> {
     if (Platform.isIOS) {
       Directory temp = await getApplicationDocumentsDirectory();
       print(temp.path);
-      var filePath = temp.path + '/$names';
-
+      var filePath;
+      if (names.contains('.pdf') == false) {
+        filePath = temp.path + '/' + names + '.pdf';
+      } else {
+        filePath = temp.path + '/$names';
+      }
       return filePath;
     } else {
       String path = await ExternalPath.getExternalStoragePublicDirectory(

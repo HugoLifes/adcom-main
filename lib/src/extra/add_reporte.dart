@@ -65,6 +65,7 @@ class _AddReporteState extends State<AddReporte> {
   int? idUser;
   List<String> type = [];
   List<TipoAvisoS>? avisos = [];
+  List<String>? idComName = [];
 
   Future sendId() async {
     for (int i = 0; i < widget.comunities!.length; i++) {
@@ -89,6 +90,11 @@ class _AddReporteState extends State<AddReporte> {
       idCom = prefs!.getInt('idCom');
       idUser = prefs!.getInt('userId');
     });
+
+    AvisosCall().getComunidades().then((value) => {
+          for (int i = 0; i < value!.data!.length; i++)
+            {idComName!.add(value.data![i].nombreComu!)}
+        });
   }
 
   @override
@@ -114,6 +120,7 @@ class _AddReporteState extends State<AddReporte> {
       },
       child: Scaffold(
         appBar: AppBar(
+          title: Text('Añade un reporte'),
           backgroundColor: Colors.blue,
           leading: CloseButton(
             onPressed: () {
@@ -214,7 +221,7 @@ class _AddReporteState extends State<AddReporte> {
                         elevation: 6,
                         value: chosenValue,
                         style: TextStyle(color: Colors.black),
-                        items: widget.idComu!
+                        items: idComName!
                             .map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
                               value: value, child: Text(value));
@@ -327,7 +334,7 @@ class _AddReporteState extends State<AddReporte> {
         inputFormatters: [new LengthLimitingTextInputFormatter(50)],
       );
 
-  //funcion que abre la camara y muestra
+  /// funcion que abre la camara y muestra
   void openCamera() async {
     var image =
         await _picker.pickImage(source: ImageSource.camera, imageQuality: 30);
@@ -363,12 +370,11 @@ class _AddReporteState extends State<AddReporte> {
   void openGallery() async {
     var image =
         await _picker.pickImage(source: ImageSource.gallery, imageQuality: 30);
-    var i = 0;
+
     setState(() {
       if (image != null) {
-        i++;
         String dir = path.dirname(image.path);
-        String newPath = path.join(dir, 'reportesAdcom$i.jpg');
+        String newPath = path.join(dir, 'reportesAdcom.jpg');
         print(newPath);
         newsPath.add(newPath);
         images.add(File(image.path));
@@ -491,7 +497,7 @@ class _AddReporteState extends State<AddReporte> {
     var request = new http.MultipartRequest("POST", uri);
     for (var file in files) {
       String fileName = newsPath.last;
-      var stream = new http.ByteStream(DelegatingStream.typed(file.openRead()));
+      var stream = new http.ByteStream(Stream.castFrom(file.openRead()));
 
       // get file length
 
@@ -584,11 +590,10 @@ class _AddReporteState extends State<AddReporte> {
           description: descriptionController.text,
           image: images,
           time: DateTime.now());
-      final provider = Provider.of<EventProvider>(context, listen: false);
+
       final Response? response = await sendingData2(titleController.text,
               descriptionController.text, images, newsPath)
           .then((value) {
-        provider.addReport(report);
         Navigator.of(context).pop();
 
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(

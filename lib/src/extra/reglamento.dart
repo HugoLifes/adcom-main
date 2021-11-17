@@ -117,6 +117,7 @@ class _ReglamentoState extends State<Reglamento> {
         Text(
           text,
           style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
         )
       ],
     );
@@ -138,16 +139,21 @@ class _ReglamentoState extends State<Reglamento> {
         if (idAmen == 5) {
           setState(() {
             pdfText = """ FRACCIONAMIENTO BOSQUES DEL REJÓN
+
 PROCEDIMIENTO PARA EL USO DE LA CASA CLUB:
+
 a) Para solicitar el uso de la Casa Club se deberá de acreditar estar al corriente en el pago
 de las cuotas regulares de mantenimiento, así
 ́como de las extraordinarias que hayan sido aprobadas por la asamblea general.
+
 b) Si se cumple con el supuesto anterior, se deberá consultar a Diana Hernández a efecto
 de corroborar la disponibilidad de fechas para eventos.
+
 c) Acto seguido deberá presentarse previa cita con alguno de los miembros de la mesa
 directiva para solicitar formalmente la fecha de reserva de su evento, detallando el
 tipo de evento a realizar, horario de uso, tipo de música que utilizará, y número de
 personas asistentes al mismo (máximo 60 personas).
+
 d) La Casa Club sólo podrá reservarse con anticipación a la celebración de su evento
 durante 2 semanas previas a la fecha de su evento. Para confirmar su reserva se
 deberán de cumplir los siguientes requisitos:
@@ -155,60 +161,79 @@ deberán de cumplir los siguientes requisitos:
 contrato referido deberá llevarlo previamente impreso con los datos
 solicitados para ser entregado al administrador (dicho contrato deberá
 solicitarlo a alguno de los miembros de la mesa directiva).
+
  Pagar la cantidad de 1,500.00 (MIL DOSCIENTOS PESOS 00/100 M.M.), por
 concepto de reserva del salón, se toma como cuota de recuperación para la
 limpieza la cantidad de 350 y el resto se regresa al entregar en optimas
 condiciones el salón.
 Hecho lo anterior le será entregado el recibo correspondiente a su reserva y garantía referida.
 De lo contrario, la administración podrá disponer de esa fecha y pasarla a otro condómino.
+
 e) Si previo al inicio de su evento, usted advierte algún desperfecto en la Casa Club,
 deberá reportarlo de inmediato a la administración a efecto de que no le sea realizado
 cargo alguno.
+
 f) Finalizado su evento, se deberá entregar las llaves del inmueble en la caseta de
 vigilancia, teniendo para ello un tiempo de tolerancia de MEDIA HORA.
+
 g) Si en su evento se utilizó mobiliario de alquiler, se deberá reportarlo a la caseta de
 vigilancia para que al día siguiente le sean proporcionadas de nueva cuenta las llaves y
 se proceda a retirarlo por el proveedor que le proporcionó el servicio. El solicitante 
 será responsable y deberá estar presente a la hora de realizar la entrega del mobiliario
 o demás servicios que se hayan alquilado.
+
 h) La devolución del depósito en garantía procederá dentro de las 72 horas siguientes a la
 realización de su evento, previa inspección y conformidad de que el inmueble se ha
 entregado tal y como se le entregó.
+
 REGLAMENTO DE LA CASA CLUB
 HORARIO DE USO.
 El horario de uso establecido para la Casa Club es de 6 seis horas continuas mismo que
 comprenderá́
  de las 10:00 a las 24:00 horas de domingo a jueves, y de 10:00 hasta las 2:00 horas
 para viernes y sábados .
+
 El tiempo de tolerancia para retirarse posterior al horario establecido será de 20 MINUTOS.
 Desacatar esta disposición, así como el prolongar su evento fuera del horario establecido, se
 procederá a hacer efectivos 500.00 pesos de multa, mismos que se tomarán del depósito en
 garantía y no le será permitido al residente-usuario la renta de la Casa Club por el término de un
 año.
+
 De suscitarse cualquiera de los supuestos mencionados, el personal de seguridad está autorizado
 para cortar la energía eléctrica y facultado para solicitar el apoyo de las autoridades municipales si
 el caso lo amerita.
+
 CUOTA DE RECUPERACIÓN
 El uso de la Casa Club tiene un costo por evento de 1,500.00 (MIL DOSCIENTOS PESOS 00/100
 M.N.) por concepto de reserva del salón.
 DEPÓSITO EN GARANTÍA.
+
 La cantidad establecida por concepto de depósito en garantía será de 1,150.00(MIL CIENTO
 CINCUENTA PESOS), la cual deberá entregarse en efectivo por el residente - usuario al momento
 de la firma del “contrato de uso temporal de la Casa Club”, previo a la fecha programada para su
 evento.
 La garantía se hará efectiva en los siguientes casos:
+
 1. En caso de que no se haya realizado la limpieza posterior al evento (incluyendo salón
 cerrado, jardín, baños, pasillos y terraza; y en caso de haber ensuciado los vidrios
 también aplica).
+
 2. En caso de que se ocasionen daños a la Casa Club o al mobiliario que se le haya sido
 proporcionado.
+
 3. Cuando termine su evento fuera del horario establecido para ello.
+
 4. Si coloca brincolines, toldos, mesas, sillas, etc., fuera de las áreas destinadas para ello.
+
 5. Si al término de su evento deja en la Casa Club basura, botellas, bolsas, etc.
+
+
 6. Si rompe algún vidrio, puerta, chapa, mobiliario de baños.
+
 7. En caso de que el evento se realice con escándalo, tal que provoque la queja de uno o
 más condóminos y/o cuando se haga necesaria la intervención de la policía municipal
 para restablecer el orden.
+
 8. Cuando a juicio del administrador o de la mesa directiva el evento contratado por el
 residente - usuario haya alterado considerablemente el orden público.
 Si la garantía no alcanzare a cubrir la totalidad del daño ocasionado por el residente - usuario o
@@ -222,60 +247,74 @@ Consejo Directivo la sanción que deberá́
 Durante el desarrollo de su evento queda estrictamente prohibido a sus invitados estacionar
 vehículos en las áreas jardineadas aledañas a la Casa Club, así...como en los espacios de
 estacionamiento de la casa.
+
 El área donde deberán estacionarlos será́ frente a la casa club o terrenos vacíos únicamente.
 El desacato a esta disposición será́
 sancionado en los mismos
+
 términos del artículo cuarto anterior de este reglamento. Excepcionalmente se permite el ingreso
 de vehículos a los proveedores de servicios que Usted contrate para su evento sólo para dejar o
 retirar mobiliario que en su caso alquile, respetando siempre el área de jardines.
 RECUERDE ESTA DISPOSICIÓN EN PARTICULAR A LAS PERSONAS QUE ASISTAN A SU EVENTO Y
 EVITE SER SANCIONADO. ES RESPONSABILIDAD DE USTED CUIDAR LAS AREAS VERDES DEL SALÓN
 DE USOS MULTIPLES.
+
 SERVICIOS CON QUE CUENTA LA CASA CLUB.
 Para la celebración de su evento el inmueble deberá serle entregado en las siguientes condiciones:
 - Con papel sanitario en los baños.
 - Jabón líquido para manos.
 - Papel para secado de manos.
 - Mobiliario con el que cuente el inmueble al momento de la firma de su contrato.
+
 MOBILIARIO DE ALQUILER.
 Si utiliza mobiliario o cualquier otro servicio de alquiler para su evento deberá ingresarlos a la casa
 Club el mismo día de su evento, no antes. Es obligación y responsabilidad del residente - usuario
 retirarlo al día siguiente y previo a la celebración de otro evento, debiendo acudir a la caseta de
 vigilancia para que le sean proporcionadas las llaves. Contravenir esta disposición tendrá́
  una
+
 sanción económica de 300.00 (TRESCIENTOS PESOS 00/100 MN.) 
 La mesa directiva no se hace responsable del mobiliario de alquiler que utilice el residente -
 usuario, ni por objetos olvidados en la Casa Club, daños y/o accidentes que se susciten durante el
 evento. Ello será́ responsabilidad exclusiva del usuario en turno.
+
 MOBILIARIO DEL SALÓN DE USOS MÚLTIPLES.
 El mobiliario entregado para su evento deberá ser cuidado por el residente-usuario, en la
 inteligencia de que si lo daña estará obligado a reponerlo.
+
 ASADORES
 Queda estrictamente prohibido el uso de asadores en cualquiera de las áreas de la Casa Club.
+
 LAS LLAVES.
 Las llaves podrán recogerlas previa cita con alguno de los miembros de la mesa directiva el día del
 evento, no antes. Acusará recibo haciéndose responsable de las mismas. Una vez terminado su
 evento deberá́
  regresarlas en la caseta de vigilancia. Recuerde que para ello sólo cuenta con una
 tolerancia de 30 MINUTOS.
+
+
 LA LIMPIEZA.
 Al término de su evento el residente-usuario está obligado a entregar el inmueble limpio libre de
 basura mayor tal como botellas, platos, cajas, residuos de comida y piñatas, etcétera. DEBERA
 COLOCAR LA BASURA QUE SE GENERE EN BOLSAS Y DEPOSITARLA EN LOS COMPARTIMENTOS QUE
 SE ENCUENTRAN COLOCADOS PARA ELLO A UN COSTADO DE LA CASA CLUB.
+
 Los objetos que utilice para adornar su evento deberán colocarse sólo en los ventanales con cinta
 adhesiva. Queda prohibido utilizar silicón, cinta, clavos, tachuelas o cualquier tipo de objetos que
 puedan dañar las paredes, desacatar esta disposición dará́
  lugar a hacer efectiva la garantía.
+
 INVITADOS
 Las personas que asistan a su evento serán considerados como “invitados”, la conducta que estos
 desplieguen o cualquier daño al inmueble por ellos causado será responsabilidad del residenteusuario.
 Queda prohibido a sus invitados deambular por el fraccionamiento y/o los cotos.
+
 Se deberá de entregar una lista con los nombres completos de los invitados en caseta. Esto se
 deberá de realizar una hora antes de que su evento de comienzo, puesto que no se le permitirá la
 entrada a personas que no estén en la lista. NO CUMPLIR CON ESTE REQUISITO TENDRÁ UNA
 PENALIZACIÓN DE 200.00 M.N (DOSCIENTOS PESOS 00/100 M.N.), los cuales se descontarán del
 depósito en garantía.
+
 El límite de invitados que podrán asistir a su evento será de 60 personas como máximo. En caso de
 excederse el número de invitados, no les será permitirá la entrada.
 Sobrepasar la capacidad del inmueble implicará, se haga efectivo el depósito en garantía y se
@@ -283,12 +322,14 @@ sancionará al residente-usuario con restricción del uso de la Casa Club durant
 año. 
 HAGA SABER A SUS INVITADOS QUE DEBEN DE RESPETAR LOS LÍMITES DE VELOCIDAD DEL
 FRACCIONAMIENTO.
+
 RUIDO Y MÚSICA
 En atención a que el uso primordial de la Casa Club lo es la sana convivencia, durante su evento
 queda prohibido el ruido en exceso. Por tanto QUEDAN ESTRICTAMENTE PROHIBIDOS LOS
 GRUPOS MUSICALES EN VIVO CONOCIDOS COMO BANDA, CUALQUIERA QUE SEA EL NUMERO DE
 ELEMENTOS. Recuerde que la música y el ruido excesivo es molesto para los condóminos que
 habitan en el fraccionamiento Bosques del Rejón.
+
 La música en vivo deberá de finalizar a las 22:00 horas los días domingo, lunes, martes, miércoles y
 jueves. Para viernes y sábados se tendrá como límite las 02:00 horas.
 ÁREAS VERDES O JARDINES ALEDAÑOS AL SALÓN DE USOS MÚLTIPLES
@@ -297,10 +338,13 @@ fraccionamiento, por tanto, durante su evento deben ser especialmente cuidados p
 televisores, sonido, micrófonos, etc.) fuera de las áreas de la Casa Club. Estos deberán utilizarse
 únicamente dentro del inmueble, quedando estrictamente prohibido colocarlos en el área
 jardineada.
+
 ASUNTOS VARIOS.
 Los casos no previstos en el presente reglamento serán resueltos por la administración y/o por el
 Consejo Directivo, siendo este último la única instancia para poder aplicar sanciones o multas a los
 residentes-usuarios que lo infrinjan.
+
+
 ES IMPORTANTE DESTACAR QUE LOS RESIDENTES USUARIOS DE LA CASA CLUB SON LOS
 RESPONSABLES DE CUMPLIR Y HACER CUMPLIR CON LAS DISPOSICIONES CONTENIDAS EN EL
 PRESENTE REGLAMENTO EN ATENCIÓN A LAS NORMAS DE CONVIVENCIA QUE EN
@@ -399,12 +443,13 @@ accesorio de la palapa.
 """;
           });
         } else {
-          if (idAmen == 5) {
+          if (idAmen == 1) {
             setState(() {
-              pdfText = """ Reglamento de Casa club
+              pdfText = """ Reglamento de la alberca.
 I. Horario
 Lunes cerrado por mantenimiento.
 Martes a domingo de 7:00 a 22:00 hrs.
+
 II. Uso de la alberca.
 El uso de la alberca es exclusivo de los residentes.
 Queda estrictamente prohibido consumir comida en el área de la alberca.
@@ -425,7 +470,7 @@ Queda prohibido fumar dentro de la alberca y en esta área en general.
 Cada residente es responsable de mantener limpia el área de la que está haciendo uso.
 """;
               privacy =
-                  """Queda prohibido usar lenguaje anti sonante y ofensivo, así como juegos bruscos.
+                  """ Queda prohibido usar lenguaje anti sonante y ofensivo, así como juegos bruscos.
 En caso de ocurrir un accidente de cualquier índole, bajo ó no del reglamento, el comité no se
 hace responsable.
 Los usuarios de la alberca están obligados a guardar la debida compostura dentro y fuera de

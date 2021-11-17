@@ -370,10 +370,15 @@ class _PedirServicioState extends State<PedirServicio> {
                         Checkbox(
                           checkColor: Colors.white,
                           value: isChecked,
+                          tristate: true,
                           onChanged: (bool? value) {
-                            setState(() {
-                              isChecked = value!;
-                            });
+                            if (value == true) {
+                              setState(() {
+                                isChecked = value!;
+                                tipoDePago = "Efectivo";
+                              });
+                            }
+
                             if (isChecked2 == true) {
                               setState(() {
                                 isChecked2 = false;
@@ -392,10 +397,15 @@ class _PedirServicioState extends State<PedirServicio> {
                         Checkbox(
                           checkColor: Colors.white,
                           value: isChecked2,
+                          tristate: true,
                           onChanged: (bool? value) {
-                            setState(() {
-                              isChecked2 = value!;
-                            });
+                            if (value == true) {
+                              setState(() {
+                                isChecked2 = value!;
+                                tipoDePago = "Tarjeta";
+                              });
+                            }
+
                             if (isChecked == true) {
                               setState(() {
                                 isChecked = false;
@@ -789,7 +799,7 @@ class _PedirServicioState extends State<PedirServicio> {
             SizedBox(
               height: 15,
             ),
-            Text('Su solicitud se ha mandado con extio')
+            Text('Su solicitud se ha mandado con exito')
           ],
         ),
       ),

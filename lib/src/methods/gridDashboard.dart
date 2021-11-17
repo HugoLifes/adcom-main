@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class GridDashboard extends StatefulWidget {
   final userId;
@@ -27,7 +28,8 @@ class _GridDashboardState extends State<GridDashboard> {
   Items item2 = new Items(
       title: 'Avisos',
       route: '/screen4',
-      icon: Icon(Icons.announcement_rounded, size: 50, color: Colors.blueGrey[700]));
+      icon: Icon(Icons.announcement_rounded,
+          size: 50, color: Colors.blueGrey[700]));
 
   Items item3 = new Items(
       title: 'Proximamente',
@@ -90,86 +92,97 @@ class _GridDashboardState extends State<GridDashboard> {
   List<Items> myList = [];
   @override
   Widget build(BuildContext context) {
-    var size=  MediaQuery.of(context).size;
+    var size = MediaQuery.of(context).size;
     switch (widget.userId) {
       case 1:
-        myList = [
-          item1,
-          item5,
-          item4,
-          item2
-        ];
+        myList = [item1, item5, item4, item2];
 
         break;
       case 2:
         myList = [
-          
           item9,
           item4,
           item5,
           item2,
-          
         ];
 
         break;
       case 3:
         myList = [item8, item9];
         break;
+      case 4:
+        myList = [
+          item9,
+          item4,
+          item5,
+          item2,
+        ];
+        break;
     }
     return AnimationLimiter(
       child: Container(
         child: GridView.count(
-        padding: EdgeInsets.only(left: 16, right: 16, top: size.width/1.2),
-        crossAxisCount: 2,
-        childAspectRatio: 1.1,
-        crossAxisSpacing: 15,
-        mainAxisSpacing: 15,
-        children: myList.map((data) {
-          return AnimationConfiguration.staggeredGrid(
-            columnCount: myList.length,
-            duration: Duration(milliseconds: 375),
-            position: 2,
-            child: ScaleAnimation(
-              scale: 0.5,
-              child: FadeInAnimation(
-                child: InkWell(
-                  onTap: () {
-                    HapticFeedback.mediumImpact();
-                    Navigator.pushNamed(context, data.route!,
-                        arguments: GridDashboard());
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                              color: Colors.grey,
-                              blurRadius: 10,
-                              offset: Offset(0, 5))
-                        ]),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        data.icon!,
-                        SizedBox(
-                          height: 14,
+            padding:
+                EdgeInsets.only(left: 16, right: 16, top: size.width / 1.2),
+            crossAxisCount: 2,
+            childAspectRatio: 1.1,
+            crossAxisSpacing: 15,
+            mainAxisSpacing: 15,
+            children: myList.map((data) {
+              return AnimationConfiguration.staggeredGrid(
+                columnCount: myList.length,
+                duration: Duration(milliseconds: 375),
+                position: 2,
+                child: ScaleAnimation(
+                  scale: 0.5,
+                  child: FadeInAnimation(
+                    child: InkWell(
+                      onTap: () {
+                        HapticFeedback.mediumImpact();
+                        if (widget.userId == 4) {
+                          if (data.route == '/screen5') {
+                            Navigator.pushNamed(context, data.route!,
+                                arguments: GridDashboard());
+                          } else {
+                            Fluttertoast.showToast(msg: 'No tiene acceso');
+                          }
+                        } else {
+                          Navigator.pushNamed(context, data.route!,
+                              arguments: GridDashboard());
+                        }
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.grey,
+                                  blurRadius: 10,
+                                  offset: Offset(0, 5))
+                            ]),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            data.icon!,
+                            SizedBox(
+                              height: 14,
+                            ),
+                            Text(
+                              data.title!,
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600),
+                            ),
+                          ],
                         ),
-                        Text(
-                          data.title!,
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ),
-          );
-        }).toList()),
+              );
+            }).toList()),
       ),
     );
   }

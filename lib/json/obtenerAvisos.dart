@@ -25,17 +25,18 @@ class GetAvisos {
 }
 
 class Datum {
-  Datum({
-    this.aviso,
-    this.tipoAviso,
-    this.fechaAviso,
-    this.archivos,
-  });
+  Datum(
+      {this.aviso,
+      this.tipoAviso,
+      this.fechaAviso,
+      this.archivos,
+      this.comunidades});
 
   String? aviso;
   int? tipoAviso;
   DateTime? fechaAviso;
   List<Archivo>? archivos;
+  String? comunidades;
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
         aviso: json["AVISO"],
@@ -43,6 +44,7 @@ class Datum {
         fechaAviso: DateTime.parse(json["FECHA_AVISO"]),
         archivos: List<Archivo>.from(
             json["ARCHIVOS"].map((x) => Archivo.fromJson(x))),
+        comunidades: json["COMUNIDAD"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -50,6 +52,7 @@ class Datum {
         "TIPO_AVISO": tipoAviso,
         "FECHA_AVISO": fechaAviso!.toIso8601String(),
         "ARCHIVOS": List<dynamic>.from(archivos!.map((x) => x.toJson())),
+        "COMUNIDAD": comunidades,
       };
 }
 

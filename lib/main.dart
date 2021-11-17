@@ -11,15 +11,17 @@ void main() async {
   OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
   OneSignal.shared.setAppId("ea109547-8715-4fc2-aa63-f9afe45349b0");
   //OneSignal.shared.postNotification();
-
+  final status = await OneSignal.shared.getDeviceState();
+  print(status!.userId);
   OneSignal.shared.addTrigger("prompt_ios", "true");
 
-  
+  OneSignal.shared.setNotificationWillShowInForegroundHandler((event) {
+    event.complete(event.notification);
+  });
 
   /*  OneSignal.shared
       .getDeviceState()
       .then((value) => {print('${value!.userId}')}); */
-
 
   runApp(MyApp());
 }

@@ -20,6 +20,8 @@ class LevantarReporte extends StatefulWidget {
   _LevantarReporteState createState() => _LevantarReporteState();
 }
 
+/// Metodo post que obtiene el post los reportes que tiene el usuario
+/// revisrar [GetReportes] para ver el modelo de datos que recive el metodo
 Future<GetReportes?> getReportes() async {
   prefs = await SharedPreferences.getInstance();
   var id = prefs!.getInt('userId');
@@ -44,6 +46,7 @@ class _LevantarReporteState extends State<LevantarReporte> {
   List<DataReporte> myListReversed = [];
   var progress = [];
   List<AvisosCall> comunities = [];
+  List<Map<dynamic, Map>> reversedList5 = [];
 
   /// progreso data
   var maps = <dynamic, Map>{};
@@ -53,6 +56,10 @@ class _LevantarReporteState extends State<LevantarReporte> {
   String? numero;
   String? interior;
   List<String> idComName = [];
+  List<String> evidencia = [];
+  var maps3 = <dynamic, Map>{};
+  var evidencias = <dynamic, dynamic>{};
+  List<Map<dynamic, Map>> superEvidencia = [];
 
   /// datos del progreso
   ///     mapeado dinamico que espera otro mapeado
@@ -156,9 +163,11 @@ class _LevantarReporteState extends State<LevantarReporte> {
         var progress = [];
         //añade los estatus a la lista progress
         cuentas!.data![i].progreso!.forEach((element) {
-          setState(() {
-            progress.add(element.idProgreso);
-          });
+          if (mounted) {
+            setState(() {
+              progress.add(element.idProgreso);
+            });
+          }
         });
         //se mapea la lista progress
 
@@ -183,6 +192,15 @@ class _LevantarReporteState extends State<LevantarReporte> {
           });
         });
 
+        cuentas!.data![i].progreso!.forEach((element) {
+          setState(() {
+            evidencias = {"Evidencias": element.evidencia!.toList()};
+          });
+        });
+
+        maps.addAll({cuentas!.data![i].idReporte: evidencias});
+        superEvidencia.add(maps3);
+
         fDatos = {"Fechas": fechasList};
         fechasMap.addAll({cuentas!.data![i].idReporte: fDatos});
       }
@@ -193,6 +211,7 @@ class _LevantarReporteState extends State<LevantarReporte> {
     reversedList2 = fechasSuperMap.reversed.toList();
     reversedList3 = superMap2.reversed.toList();
     reversedList4 = superMap.reversed.toList();
+    reversedList5 = superEvidencia.reversed.toList();
     reversedList = myList.reversed.toList();
   }
 
@@ -208,18 +227,22 @@ class _LevantarReporteState extends State<LevantarReporte> {
 
   refresh() {
     if (mounted) {
-      if (myList.isNotEmpty) {
-        myList.clear();
-        superMap.clear();
-        superMap2.clear();
-        reversedList.clear();
-        reversedList2.clear();
-        reversedList3.clear();
-        reversedList4.clear();
-        data();
-      } else {
-        data();
-      }
+      setState(() {
+        if (myList.isNotEmpty) {
+          myList.clear();
+          superMap.clear();
+          superMap2.clear();
+          reversedList.clear();
+          reversedList2.clear();
+          reversedList3.clear();
+          reversedList4.clear();
+          reversedList5.clear();
+          comunities.clear();
+          data();
+        } else {
+          data();
+        }
+      });
     }
   }
 
@@ -284,14 +307,17 @@ class _LevantarReporteState extends State<LevantarReporte> {
             padding: EdgeInsets.all(8),
             child: ListTile(
               onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) => ReportEditPage(
-                        report: reversedList[index],
-                        data: listProgreso,
-                        progreso: reversedList4[index],
-                        datos: reversedList3[index],
-                        id: reversedList[index].id,
-                        fechas: reversedList2[index])));
+                Navigator.of(context)
+                    .push(MaterialPageRoute(
+                        builder: (_) => ReportEditPage(
+                            evidencia: reversedList5[index],
+                            report: reversedList[index],
+                            data: listProgreso,
+                            progreso: reversedList4[index],
+                            datos: reversedList3[index],
+                            id: reversedList[index].id,
+                            fechas: reversedList2[index])))
+                    .then((value) => {onGoBack(value)});
               },
               title: Text(
                 '${reversedList[index].descripCorta}',
