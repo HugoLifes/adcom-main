@@ -178,27 +178,35 @@ class _MainMenuState extends State<MainMenu> {
     List<Widget> _widgetOptions = [mainMenuView(size), Services()];
     return Scaffold(
       body: _widgetOptions.elementAt(_selectedIndex),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-              icon: Icon(
-                Icons.home,
-                size: 30,
-              ),
-              label: 'Menu',
-              backgroundColor: Colors.red),
-          BottomNavigationBarItem(
-              icon: Icon(
-                Glyphicon.list,
-                size: 30,
-              ),
-              label: 'Servicios',
-              backgroundColor: Colors.blue)
-        ],
-        elevation: 10,
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.red[900],
-        onTap: onItemTapped,
+      bottomNavigationBar: BottomNavigationBarTheme(
+        data: BottomNavigationBarThemeData(
+            backgroundColor: Colors.white,
+            selectedItemColor: Colors.red.shade900,
+            unselectedItemColor: Colors.black,
+            showUnselectedLabels: true,
+            selectedLabelStyle: TextStyle(color: Colors.red.shade900),
+            elevation: 4),
+        child: BottomNavigationBar(
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.home,
+                  size: 30,
+                ),
+                label: 'Menu',
+                backgroundColor: Colors.red),
+            BottomNavigationBarItem(
+                icon: Icon(
+                  Glyphicon.list,
+                  size: 30,
+                ),
+                label: 'Servicios',
+                backgroundColor: Colors.blue)
+          ],
+          elevation: 10,
+          currentIndex: _selectedIndex,
+          onTap: onItemTapped,
+        ),
       ),
     );
   }

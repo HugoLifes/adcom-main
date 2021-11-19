@@ -218,6 +218,8 @@ class _ResponseSeguimientoState extends State<ResponseSeguimiento> {
     );
   }
 
+
+  /// mensaje que muestra en elejir 
   Future<void> _optionsCamera() {
     return showDialog(
         context: context,
@@ -274,6 +276,8 @@ class _ResponseSeguimientoState extends State<ResponseSeguimiento> {
         });
   }
 
+
+  /// abre la camara y añade fotos
   Future<List<File?>?> openCamera() async {
     var image =
         await _picker.pickImage(source: ImageSource.camera, imageQuality: 40);
@@ -299,6 +303,8 @@ class _ResponseSeguimientoState extends State<ResponseSeguimiento> {
     }
   }
 
+
+  /// toma los archivos seleccionados o fotos
   Future<List<File?>?> filePick() async {
     FilePickerResult? result =
         await FilePicker.platform.pickFiles(allowMultiple: true  type: FileType.any  );
@@ -319,6 +325,8 @@ class _ResponseSeguimientoState extends State<ResponseSeguimiento> {
     }
   }
 
+
+  /// Muestra las imagenes que se estan subiendo
   printImages() {
     return Container(
       padding: EdgeInsets.only(left: 20),
@@ -330,6 +338,8 @@ class _ResponseSeguimientoState extends State<ResponseSeguimiento> {
     );
   }
 
+
+  /// muestra el mensaje del maximo exccedido
   mensaje() => Fluttertoast.showToast(
       msg: "Maximo excedido",
       toastLength: Toast.LENGTH_SHORT,
@@ -339,6 +349,8 @@ class _ResponseSeguimientoState extends State<ResponseSeguimiento> {
       textColor: Colors.black,
       fontSize: 17.0);
 
+
+  /// envia la respuesta
   sendingData2(String titulo, String descrip, List<File> files,
       List<String> newpath) async {
     prefs = await SharedPreferences.getInstance();

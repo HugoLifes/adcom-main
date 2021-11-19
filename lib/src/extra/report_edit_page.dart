@@ -16,6 +16,8 @@ import 'dart:convert';
 import 'package:path/path.dart' as path;
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:photo_view/photo_view_gallery.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:async/src/delegate/stream.dart';
@@ -345,7 +347,7 @@ class _ReportEditPageState extends State<ReportEditPage> {
                           )),
                     ),
                     respuestaView(size),
-                    buildImageEvidencia(),
+                    buildResponseImage(),
                     mostraryDescargarPdF()
                   ],
                 ),
@@ -385,7 +387,7 @@ class _ReportEditPageState extends State<ReportEditPage> {
                           )),
                     ),
                     respuestaView(size),
-                    buildImageEvidencia(),
+                    buildResponseImage(),
                     mostraryDescargarPdF()
                   ],
                 ),
@@ -425,7 +427,7 @@ class _ReportEditPageState extends State<ReportEditPage> {
                           )),
                     ),
                     respuestaView(size),
-                    buildImageEvidencia(),
+                    buildResponseImage(),
                     mostraryDescargarPdF()
                   ],
                 ),
@@ -465,7 +467,7 @@ class _ReportEditPageState extends State<ReportEditPage> {
                           )),
                     ),
                     respuestaView(size),
-                    buildImageEvidencia(),
+                    buildResponseImage(),
                     mostraryDescargarPdF()
                   ],
                 ),
@@ -544,6 +546,80 @@ class _ReportEditPageState extends State<ReportEditPage> {
     }
   }
 
+  buildPhotoView() {
+    return Container(
+      height: 400,
+      margin: EdgeInsets.only(left: 15, right: 15),
+      width: MediaQuery.of(context).size.width,
+      child: PhotoViewGallery.builder(
+        itemCount: widget.report.uri!.length,
+        builder: (context, index) {
+          return PhotoViewGalleryPageOptions(
+            imageProvider: NetworkImage(widget.report.uri![index]),
+            minScale: PhotoViewComputedScale.contained * 0.9,
+            maxScale: PhotoViewComputedScale.covered * 2,
+          );
+        },
+        gaplessPlayback: true,
+        scrollDirection: Axis.horizontal,
+        scrollPhysics: BouncingScrollPhysics(),
+        backgroundDecoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(20)),
+          color: Theme.of(context).canvasColor,
+        ),
+        loadingBuilder: (context, event) => Center(
+          child: Container(
+            width: 30.0,
+            height: 30.0,
+            child: CircularProgressIndicator(
+              backgroundColor: Colors.orange,
+              value: event == null
+                  ? 0
+                  : event.cumulativeBytesLoaded / event.expectedTotalBytes!,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  buildResponseImage() {
+    return Container(
+      height: 400,
+      margin: EdgeInsets.only(left: 15, right: 15),
+      width: MediaQuery.of(context).size.width,
+      child: PhotoViewGallery.builder(
+        itemCount: evidencias.length,
+        builder: (context, index) {
+          return PhotoViewGalleryPageOptions(
+            imageProvider: NetworkImage(evidencias[index]),
+            minScale: PhotoViewComputedScale.contained * 0.9,
+            maxScale: PhotoViewComputedScale.covered * 2,
+          );
+        },
+        gaplessPlayback: true,
+        scrollDirection: Axis.horizontal,
+        scrollPhysics: BouncingScrollPhysics(),
+        backgroundDecoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(20)),
+          color: Theme.of(context).canvasColor,
+        ),
+        loadingBuilder: (context, event) => Center(
+          child: Container(
+            width: 30.0,
+            height: 30.0,
+            child: CircularProgressIndicator(
+              backgroundColor: Colors.orange,
+              value: event == null
+                  ? 0
+                  : event.cumulativeBytesLoaded / event.expectedTotalBytes!,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   /// funcion que constuye la imagen o la cantidad de imagenes
   buildImage() => Row(
         children: List.generate(
@@ -560,46 +636,49 @@ class _ReportEditPageState extends State<ReportEditPage> {
         ),
       );
 
-  buildImageEvidencia() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: List.generate(
-        evidencias.length,
-        (index) {
-          return Container(
-            padding: EdgeInsets.only(left: 20, top: 15),
-            child: FadeInImage.memoryNetwork(
-                width: 120,
-                height: 120,
-                placeholder: kTransparentImage,
-                image: evidencias[index]),
-          );
-        },
-      ),
-    );
-  }
-
   mostraryDescargarPdF() {
-    return Column(
+    return Row(
       children: List.generate(
         evidenciaPdf!.length,
         (index) {
           return Container(
             padding: EdgeInsets.only(left: 30, top: 10),
-            child: InkWell(
-              onTap: () {
-                download2(
-                  evidenciaPdf![index],
-                  evidenciaPdf![index].split('/').last.split('-').last,
-                );
-              },
-              child: Text(
-                evidenciaPdf![index].split('/').last.split('-').last,
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    decoration: TextDecoration.underline),
-              ),
+            child: Column(
+              children: [
+                Container(
+                  child: Text(
+                    'Descargar PDF',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 19,
+                    ),
+                  ),
+                ),
+                InkWell(
+                  onTap: () {
+                    download2(
+                      evidenciaPdf![index],
+                      evidenciaPdf![index].split('/').last.split('-').last,
+                    );
+                  },
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.file_present_rounded,
+                        color: Colors.red,
+                        size: 50,
+                      ),
+                      Text(
+                        evidenciaPdf![index].split('/').last.split('-').last,
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            decoration: TextDecoration.underline),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           );
         },
@@ -608,7 +687,7 @@ class _ReportEditPageState extends State<ReportEditPage> {
   }
 
   ///muestra el titulo del reporte y las imagenes del reporte
-  /// chechar buildImage para cualquier detalle de imagenes
+  /// chechar [buildImage] para cualquier detalle de imagenes
   help() {
     return Container(
       padding: EdgeInsets.only(top: 10, left: 10),
@@ -638,14 +717,12 @@ class _ReportEditPageState extends State<ReportEditPage> {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w300),
               ),
             ),
-            buildImage(),
+            buildPhotoView()
           ],
         ),
       ),
     );
   }
-
-  /// funcion que muesrtra los botones de la camara y la galeria
 
   /// funcion que envia el reporte
   sendingData2(String titulo, String descrip, List<File> files,

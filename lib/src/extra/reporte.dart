@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
-
+import 'dart:math';
+import 'package:adcom/src/extra/report_edit_page.dart' as p;
 import 'package:adcom/json/jsonReporte.dart';
 import 'package:adcom/src/extra/add_reporte.dart';
-import 'package:adcom/src/extra/report_edit_page.dart';
 import 'package:adcom/src/models/event_provider.dart';
 import 'package:adcom/src/pantallas/avisos.dart';
 import 'package:flutter/material.dart';
@@ -82,7 +82,7 @@ class _LevantarReporteState extends State<LevantarReporte> {
   List<String> idComName = [];
   GetReportes? cuentas;
   List<String> evidencia = [];
-
+  List<p.ProgressIndicator> progres = [];
   var idCom;
   var idUser;
 
@@ -135,8 +135,7 @@ class _LevantarReporteState extends State<LevantarReporte> {
     await getComunidades();
 
     for (int i = 0; i < cuentas!.data!.length; i++) {
-      if (userType == 2) {
-        print('aqui?');
+      if (userType == 2 || userType == 4) {
         myList.add(new DataReporte(
             id: cuentas!.data![i].idReporte,
             descripCorta: cuentas!.data![i].descCorta,
@@ -199,7 +198,6 @@ class _LevantarReporteState extends State<LevantarReporte> {
         });
 
         maps3.addAll({cuentas!.data![i].idReporte: evidencias});
-        print(maps3);
       }
       fechasSuperMap.add(fechasMap);
       superEvidencia.add(maps3);
@@ -256,17 +254,19 @@ class _LevantarReporteState extends State<LevantarReporte> {
       ),
       body: reversedList.length == 0
           ? SafeArea(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Presiona + para añadir un nuevo caso',
-                      style: TextStyle(fontSize: 21, color: Colors.black),
+              child: reversedList.isEmpty
+                  ? Center(child: CircularProgressIndicator())
+                  : Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Presiona + para añadir un nuevo caso',
+                            style: TextStyle(fontSize: 21, color: Colors.black),
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
-              ),
             )
           : listview(),
       floatingActionButton: FloatingActionButton(
@@ -302,13 +302,15 @@ class _LevantarReporteState extends State<LevantarReporte> {
         },
         itemCount: reversedList.length,
         itemBuilder: (context, int index) {
+          estatus(index);
+
           return Container(
             padding: EdgeInsets.all(8),
             child: ListTile(
               onTap: () {
                 Navigator.of(context)
                     .push(MaterialPageRoute(
-                        builder: (_) => ReportEditPage(
+                        builder: (_) => p.ReportEditPage(
                             evidencia: reversedList5[index],
                             report: reversedList[index],
                             data: listProgreso,
@@ -330,10 +332,31 @@ class _LevantarReporteState extends State<LevantarReporte> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SizedBox(
-                    width: 160,
-                    child: Text(
-                      '${reversedList[index].desperfecto}',
-                      style: TextStyle(fontSize: 18),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          width: 100,
+                          child: Text(
+                            '${reversedList[index].desperfecto}',
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 18),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                            width: MediaQuery.of(context).size.width * 0.2,
+                            height: 20,
+                            padding: EdgeInsets.only(left: 6, top: 2),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: stepColor(index),
+                            ),
+                            child: Text('${headerText(index)}'))
+                      ],
                     ),
                   ),
                   Column(children: [
@@ -341,9 +364,6 @@ class _LevantarReporteState extends State<LevantarReporte> {
                     Text(
                       '${reversedList[index].fechaRep!.day}/${reversedList[index].fechaRep!.month}/${reversedList[index].fechaRep!.year}',
                       style: TextStyle(fontSize: 18),
-                    ),
-                    SizedBox(
-                      height: 5,
                     ),
                     reversedList[index].comunidad == null
                         ? Text('')
@@ -377,6 +397,56 @@ class _LevantarReporteState extends State<LevantarReporte> {
     var newTime = formarhr.format(reversedList[index].fechaRep!);
 
     return newTime;
+  }
+
+  estatus(int index) {
+    /// recorre el mapeado
+
+    reversedList4[index].forEach((key, value) {
+      if (reversedList[index].id == key) {
+        /// recorre el segundo mapeado
+        value.forEach((key, value) {
+          if (key == 'Progreso') {
+            for (int i = 0; i < value.length; i++) {
+              progres.add(new p.ProgressIndicator(id: value[i]));
+            }
+          }
+        });
+      } else {
+        return;
+      }
+    });
+  }
+
+  Color? stepColor(index) {
+    switch (progres.isEmpty ? 0 : progres.last.id) {
+      case 1:
+        return Colors.yellow;
+      case 2:
+        return Colors.lightGreen[200];
+      case 3:
+        return Colors.lightGreen[300];
+      case 4:
+        return Colors.lightGreen;
+
+      default:
+        return Colors.grey;
+    }
+  }
+
+  String? headerText(index) {
+    switch (progres.isEmpty ? 0 : progres.last.id) {
+      case 1:
+        return 'Revisión';
+      case 2:
+        return 'En proceso';
+      case 3:
+        return 'Respuesta';
+      case 4:
+        return 'Finalizado';
+      default:
+        return 'Enviado';
+    }
   }
 }
 
