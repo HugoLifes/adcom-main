@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:adcom/json/jsonAdeudos.dart';
 import 'package:adcom/json/jsonFinanzas.dart';
 import 'package:adcom/src/extra/historico.dart';
 import 'package:adcom/src/extra/vistaPagos.dart';
+import 'package:adcom/src/methods/exeptions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:adcom/src/extra/opciones_edoCuenta.dart';
 import 'package:adcom/src/extra/servicios.dart';
@@ -11,6 +13,7 @@ import 'package:adcom/src/extra/servicios.dart';
 import 'package:adcom/src/extra/vista_tarjeta.dart';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:glyphicon/glyphicon.dart';
 
 import 'package:http/http.dart' as http;
@@ -29,19 +32,23 @@ class Finanzas extends StatefulWidget {
 
 /// llama a los adeudos basado en el modelo de datos [Accounts]
 Future<Accounts?> getAdeudos() async {
-  prefs = await SharedPreferences.getInstance();
-  var id = prefs!.getInt('userId');
-  print(id);
-  final Uri url = Uri.parse(
-      'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-adeudos');
-  final response = await http.post(url, body: {
-    "params": json.encode({"usuarioId": id.toString()})
-  });
+  try {
+    prefs = await SharedPreferences.getInstance();
+    var id = prefs!.getInt('userId');
+    print(id);
+    final Uri url = Uri.parse(
+        'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-adeudos');
+    final response = await http.post(url, body: {
+      "params": json.encode({"usuarioId": id.toString()})
+    }).timeout(Duration(seconds: 5), onTimeout: () {
+      return http.Response('Error', 500);
+    });
 
-  if (response.statusCode == 200) {
-    var data = response.body;
+    var data = returnResponse(response);
 
     return accountsFromJson(data);
+  } on SocketException {
+    throw FetchDataException('');
   }
 }
 
@@ -70,6 +77,9 @@ class _FinanzasState extends State<Finanzas> {
   List<Deudas> deudas = [];
   List<Deudas> deudas2 = [];
   bool notiene = false;
+  List<Deudas> deudasReverse = [];
+  List<Deudas> deudasReverse2 = [];
+  bool error = false;
 
   /// El init state inicializa funciones cuando abre el boton mis pagos
   @override
@@ -99,8 +109,8 @@ class _FinanzasState extends State<Finanzas> {
     /// apartado del barra de navegacion, son las vistas que se muestran cuando seleccionas
     List<Widget> bodies = [
       mainView(size),
-      pagosRecientes(deudas2, false, deudas2, size),
-      pagosRecientes(deudas, true, deudas, size)
+      pagosRecientes(deudasReverse2, false, deudas2, size),
+      pagosRecientes(deudasReverse, true, deudas, size)
     ];
     return Scaffold(
       appBar: _selectedIndex == 1
@@ -151,9 +161,13 @@ class _FinanzasState extends State<Finanzas> {
                       localList.clear();
                       deudas.clear();
                       deudas2.clear();
-                      data();
+                      data().catchError((e) {
+                        alerta5();
+                      });
                     } else {
-                      data();
+                      data().catchError((e) {
+                        alerta5();
+                      });
                     }
                   });
                 });
@@ -472,8 +486,10 @@ class _FinanzasState extends State<Finanzas> {
     }
   }
 
-  data() async {
-    cuentas = await getAdeudos();
+  Future data() async {
+    cuentas = await getAdeudos().catchError((e) {
+      alerta5();
+    });
     await getNameUser();
     await pagosAcreditados();
 
@@ -638,64 +654,130 @@ class _FinanzasState extends State<Finanzas> {
   ///cumple la funcion de traer lo pagos pendientes
   ///dentro se añade en un arreglo propio [adeudos]
   pagosPendientes() async {
-    await Deudas().getDeudas(0).then((value) => {
-          if (value!.value == 1)
-            {
-              if (value.data!.isNotEmpty)
+    await Deudas()
+        .getDeudas(0)
+        .then((value) => {
+              if (value!.value == 1)
                 {
-                  for (int i = 0; i < value.data!.length; i++)
+                  if (value.data!.isNotEmpty)
                     {
-                      deudas.add(Deudas(
-                          id: value.data![i].idComu,
-                          idResidente: value.data![i].idResidente,
-                          montoCuota: value.data![i].montoCuota,
-                          montoPagoTardio: value.data![i].montoPagoTardio,
-                          totalAdeudo: value.data![i].totadeudo,
-                          idConcepto: value.data![i].idConcepto!.trimLeft(),
-                          mes: value.data![i].mes,
-                          referencia: value.data![i].referencia,
-                          noTiene: false,
-                          descripcion: value.data![i].formaPago,
-                          folio: value.data![i].folio))
+                      for (int i = 0; i < value.data!.length; i++)
+                        {
+                          deudas.add(Deudas(
+                              id: value.data![i].idComu,
+                              idResidente: value.data![i].idResidente,
+                              montoCuota: value.data![i].montoCuota,
+                              montoPagoTardio: value.data![i].montoPagoTardio,
+                              totalAdeudo: value.data![i].totadeudo,
+                              idConcepto: value.data![i].idConcepto!.trimLeft(),
+                              mes: value.data![i].mes,
+                              referencia: value.data![i].referencia,
+                              noTiene: false,
+                              descripcion: value.data![i].formaPago,
+                              folio: value.data![i].folio))
+                        },
+                      deudasReverse = deudas.reversed.toList()
                     }
+                  else
+                    {}
                 }
               else
                 {}
-            }
-          else
-            {}
-        });
+            })
+        .catchError((e) {
+      setState(() {
+        error = true;
+      });
+    });
+    ;
   }
 
   /// hace la funcion de traer los pagos acreditados
-  ///  ///dentro se añade en un arreglo propio [adeudos2]
+  /// dentro se añade en un arreglo propio [adeudos2]
   pagosAcreditados() async {
-    await Deudas().getDeudas(1).then((value) => {
-          if (value!.value == 1)
-            {
-              if (value.data!.isNotEmpty)
+    await Deudas()
+        .getDeudas(1)
+        .then((value) => {
+              if (value!.value == 1)
                 {
-                  for (int i = 0; i < value.data!.length; i++)
+                  if (value.data!.isNotEmpty)
                     {
-                      print('aqui12'),
-                      deudas2.add(Deudas(
-                          id: value.data![i].idComu,
-                          idResidente: value.data![i].idResidente,
-                          montoCuota: value.data![i].montoCuota,
-                          montoPagoTardio: value.data![i].montoPagoTardio,
-                          totalAdeudo: value.data![i].totadeudo,
-                          idConcepto: value.data![i].idConcepto!.trimLeft(),
-                          mes: value.data![i].mes,
-                          referencia: value.data![i].referencia,
-                          noTiene: false,
-                          descripcion: value.data![i].formaPago,
-                          folio: value.data![i].folio))
+                      for (int i = 0; i < value.data!.length; i++)
+                        {
+                          print('aqui12'),
+                          deudas2.add(Deudas(
+                              id: value.data![i].idComu,
+                              idResidente: value.data![i].idResidente,
+                              montoCuota: value.data![i].montoCuota,
+                              montoPagoTardio: value.data![i].montoPagoTardio,
+                              totalAdeudo: value.data![i].totadeudo,
+                              idConcepto: value.data![i].idConcepto!.trimLeft(),
+                              mes: value.data![i].mes,
+                              referencia: value.data![i].referencia,
+                              noTiene: false,
+                              descripcion: value.data![i].formaPago,
+                              folio: value.data![i].folio)),
+                          deudasReverse2 = deudas2.reversed.toList()
+                        }
                     }
+                  else
+                    {}
                 }
-              else
-                {}
-            }
-        });
+            })
+        .catchError((e) {
+      setState(() {
+        error = true;
+      });
+    });
+  }
+
+  alerta5() {
+    Widget okButton = TextButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: Text(
+          'Si, continuar',
+          style: TextStyle(color: Colors.red[900]),
+        ));
+    Widget backButton = TextButton(
+        onPressed: () {
+          Navigator.of(context)
+            ..pop()
+            ..pop();
+        },
+        child: Text(
+          'Regresar',
+          style: TextStyle(color: Colors.orange),
+        ));
+    AlertDialog alert = AlertDialog(
+      actions: [backButton],
+      title: Text(
+        'Atención!',
+        style: TextStyle(
+          fontSize: 25,
+        ),
+      ),
+      content: Container(
+        width: 140,
+        height: 150,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Atencion!',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Text('Ha sucedido un error inesperado, vuelva a intentar')
+          ],
+        ),
+      ),
+    );
+
+    showDialog(context: context, builder: (_) => alert);
   }
 }
 
@@ -787,19 +869,22 @@ class Deudas {
       this.folio,
       this.descripcion});
   Future<AdeudosJ?> getDeudas(int i) async {
-    prefs = await SharedPreferences.getInstance();
-    var id = prefs!.getInt('userId');
-    print('aqui es el getDeuda $id');
-    final Uri url = Uri.parse(
-        'http://187.189.53.8:8081/backend/web/index.php?r=adcom/deudas');
-    final response = await http.post(url, body: {
-      "params": json.encode({"idResidente": id.toString(), "pagoBandera": i})
-    });
-
-    if (response.statusCode == 200) {
-      var data = response.body;
+    try {
+      prefs = await SharedPreferences.getInstance();
+      var id = prefs!.getInt('userId');
+      print('aqui es el getDeuda $id');
+      final Uri url = Uri.parse(
+          'http://187.189.53.8:8081/backend/web/index.php?r=adcom/deudas');
+      final response = await http.post(url, body: {
+        "params": json.encode({"idResidente": id.toString(), "pagoBandera": i})
+      }).timeout(Duration(seconds: 1), onTimeout: () {
+        return http.Response('Error', 500);
+      });
+      var data = returnResponse(response);
 
       return adeudosFromJson(data);
+    } on SocketException catch (e) {
+      throw FetchDataException('$e');
     }
   }
 }

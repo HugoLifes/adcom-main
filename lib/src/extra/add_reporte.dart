@@ -169,7 +169,28 @@ class _AddReporteState extends State<AddReporte> {
       onStepContinue: () {
         setState(() {
           if (this._currentStep < this._stepper()!.length - 1) {
-            this._currentStep = this._currentStep + 1;
+            if (this._currentStep == 0) {
+              if (_formKey.currentState!.validate()) {
+                this._currentStep = this._currentStep + 1;
+              } else {}
+            } else {
+              if (idUser == 0) {
+                if (chosenValue == null) {
+                  Fluttertoast.showToast(
+                      msg: "Elija comunidad",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.CENTER,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.white,
+                      textColor: Colors.black,
+                      fontSize: 17.0);
+                } else {
+                  this._currentStep = this._currentStep + 1;
+                }
+              } else {
+                this._currentStep = this._currentStep + 1;
+              }
+            }
           } else {
             if (images.isEmpty) {
               Fluttertoast.showToast(
@@ -446,56 +467,6 @@ class _AddReporteState extends State<AddReporte> {
   }
 
   // envia las fotos al serv mas toda su informacion que reqiere como los params
-  sendingData(String titulo, String descrip, List<File> file,
-      List<String> newpath) async {
-    try {
-      List<String> filesArr = [];
-      Dio dio = Dio();
-
-      print('here${idCom}');
-      print(idUser.toString());
-
-      for (var item in newsPath) {
-        print('$item');
-        filesArr.add(item.split('/').last);
-      }
-
-      var formdata2 = FormData.fromMap({
-        'params': json.encode({
-          'descripcionCorta': titulo,
-          'descripcionLarga': descrip,
-          'idCom': idCom,
-          'idUsusarioResidente': idUser
-        }),
-        'img[]': [
-          for (int i = 0; i < file.length; i++)
-            await MultipartFile.fromFile(file[i].path,
-                filename: filesArr[i], contentType: MediaType('*', '*'))
-          /*   await MultipartFile.fromFileSync(newsPath[i],
-                filename: filesArr[i], contentType: MediaType('*', '*')) */
-        ]
-      });
-
-      Response response = await dio.post(
-          'http://187.189.53.8:8081/backend/web/index.php?r=adcom/reportes',
-          data: formdata2, onSendProgress: (received, total) {
-        if (total != 1) {
-          print((received / total * 100).toStringAsFixed(0) + '%');
-        }
-      });
-
-      if (response.statusCode == 200) {
-        print('aqui $response');
-      }
-    } on DioError catch (e) {
-      if (e.response!.data == true) {
-        print('aqui1:${e.response!.data.toString()}');
-        return;
-      } else {
-        print('aqui2:${e.response!.data.toString()}');
-      }
-    }
-  }
 
   sendingData2(String titulo, String descrip, List<File> files,
       List<String> newpath) async {
@@ -520,6 +491,11 @@ class _AddReporteState extends State<AddReporte> {
 
       request.files.add(multipartFileSign);
     }
+
+    print(titulo);
+    print(descrip);
+    print(idCom);
+    print(idUser);
 
     print("params - ${json.encode({
           'descripcionCorta': titulo,
@@ -548,7 +524,30 @@ class _AddReporteState extends State<AddReporte> {
 
       return responseDecode;
     } else {
-      print(res.body);
+      if (response.statusCode == 400) {
+        print("Item form is statuscode 400");
+        print(res.body);
+        return Fluttertoast.showToast(
+            msg: "Error en el servidor, intente mas tarde",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      } else {
+        print("Item form is statuscode 500");
+        print(res.body);
+
+        return Fluttertoast.showToast(
+            msg: "Error en el servidor, intente mas tarde",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      }
     }
   }
 
@@ -636,7 +635,29 @@ class _AddReporteState extends State<AddReporte> {
       print(data);
       return tipoAvisoFromJson(data);
     } else {
-      print(response.body);
+      if (response.statusCode == 400) {
+        print("Item form is statuscode 400");
+
+        Fluttertoast.showToast(
+            msg: "Error en el servidor, intente mas tarde",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      } else {
+        print("Item form is statuscode 500");
+
+        Fluttertoast.showToast(
+            msg: "Error en el servidor, intente mas tarde",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      }
     }
   }
 

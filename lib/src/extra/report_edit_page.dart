@@ -3,6 +3,7 @@ import 'package:adcom/json/jsonSiguiemntos.dart';
 import 'package:adcom/src/extra/add_reporte.dart';
 import 'package:adcom/src/extra/reporte.dart';
 import 'package:adcom/src/extra/responderSeguimiento.dart';
+import 'package:adcom/src/methods/exeptions.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -227,7 +228,7 @@ class _ReportEditPageState extends State<ReportEditPage> {
             backgroundColor: Colors.blue,
             leading: CloseButton(),
           ),
-          floatingActionButton: usertype == 4
+          floatingActionButton: usertype == 4 || usertype == 2
               ? FloatingActionButton(
                   onPressed: () {
                     Navigator.push(
@@ -668,12 +669,17 @@ class _ReportEditPageState extends State<ReportEditPage> {
                         color: Colors.red,
                         size: 50,
                       ),
-                      Text(
-                        evidenciaPdf![index].split('/').last.split('-').last,
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            decoration: TextDecoration.underline),
+                      SizedBox(
+                        width: 100,
+                        child: Text(
+                          evidenciaPdf![index].split('/').last.split('-').last,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline),
+                        ),
                       ),
                     ],
                   ),
@@ -727,61 +733,58 @@ class _ReportEditPageState extends State<ReportEditPage> {
   /// funcion que envia el reporte
   sendingData2(String titulo, String descrip, List<File> files,
       List<String> newpath) async {
-    prefs = await SharedPreferences.getInstance();
+    try {
+      prefs = await SharedPreferences.getInstance();
 
-    var userId = prefs!.getInt('userId');
-    // string to uri
-    var uri = Uri.parse(
-        "http://187.189.53.8:8081/backend/web/index.php?r=adcom/registrar-seguimiento");
-    print("image upload URL - $uri");
+      var userId = prefs!.getInt('userId');
+      // string to uri
+      var uri = Uri.parse(
+          "http://187.189.53.8:8081/backend/web/index.php?r=adcom/registrar-seguimiento");
+      print("image upload URL - $uri");
 // create multipart request
-    var request = new http.MultipartRequest("POST", uri);
-    for (var file in files) {
-      String fileName = file.path.split('/').last;
-      var stream = new http.ByteStream(Stream.castFrom(file.openRead()));
+      var request = new http.MultipartRequest("POST", uri);
+      for (var file in files) {
+        String fileName = file.path.split('/').last;
+        var stream = new http.ByteStream(Stream.castFrom(file.openRead()));
 
-      // get file length
+        // get file length
 
-      var length = await file.length(); //imageFile is your image file
-      print("File lenght - $length");
-      print("fileName - $fileName");
-      // multipart that takes file
-      var multipartFileSign = new http.MultipartFile(
-          'archivos[]', stream, length,
-          filename: fileName);
+        var length = await file.length(); //imageFile is your image file
+        print("File lenght - $length");
+        print("fileName - $fileName");
+        // multipart that takes file
+        var multipartFileSign = new http.MultipartFile(
+            'archivos[]', stream, length,
+            filename: fileName);
 
-      request.files.add(multipartFileSign);
-    }
+        request.files.add(multipartFileSign);
+      }
 
-    print(widget.id);
-    print(textController.text);
-    print(userId);
-    print(id);
-    print(widget.idProgreso);
+      print(widget.id);
+      print(textController.text);
+      print(userId);
+      print(id);
+      print(widget.idProgreso);
 
 //adding params
-    request.fields['data'] = json.encode({
-      // Falta mandar idCaso, IdSeguimiento
-      'IdCaso': widget.id,
-      'coment': textController.text,
-      'usuarioId': userId,
-      'idSeguimiento': id,
-    });
+      request.fields['data'] = json.encode({
+        // Falta mandar idCaso, IdSeguimiento
+        'IdCaso': widget.id,
+        'coment': textController.text,
+        'usuarioId': userId,
+        'idSeguimiento': id,
+      });
 
-    //Send
-    var response = await request.send();
+      //Send
+      var response = await request.send();
 
-    print(response.statusCode);
+      print(response.statusCode);
 
-    var res = await http.Response.fromStream(response);
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      print("Item form is statuscode 200");
-      print(res.body);
-      var responseDecode = json.decode(res.body);
+      var res = await http.Response.fromStream(response);
 
-      print(responseDecode);
-    } else {
-      print(res.body);
+      returnResponse(res);
+    } on SocketException {
+      throw BadRequestException('Error de subida');
     }
   }
 
@@ -845,14 +848,15 @@ class idSeguimiento {
   idSeguimiento({this.id});
 
   Future<Seguimiento?> getIdSeguimiento() async {
-    Uri uri = Uri.parse(
-        'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-status-progreso');
-    var response = await http.get(uri);
+    try {
+      Uri uri = Uri.parse(
+          'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-status-progreso');
+      var response = await http.get(uri);
 
-    if (response.statusCode == 200) {
-      return seguimientoFromJson(response.body);
-    } else {
-      print(response.body);
+      var dara = returnResponse(response);
+      return seguimientoFromJson(dara);
+    } on SocketException {
+      throw FetchDataException('Error');
     }
   }
 }

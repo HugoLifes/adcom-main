@@ -1,13 +1,17 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 import 'package:adcom/src/extra/report_edit_page.dart' as p;
 import 'package:adcom/json/jsonReporte.dart';
 import 'package:adcom/src/extra/add_reporte.dart';
+import 'package:adcom/src/methods/exeptions.dart';
 import 'package:adcom/src/models/event_provider.dart';
 import 'package:adcom/src/pantallas/avisos.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -22,20 +26,24 @@ class LevantarReporte extends StatefulWidget {
 }
 
 Future<GetReportes?> getReportes() async {
-  prefs = await SharedPreferences.getInstance();
-  var id = prefs!.getInt('userId');
-  print(id);
-  Uri url = Uri.parse(
-      'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-reportes');
+  try {
+    prefs = await SharedPreferences.getInstance();
+    var id = prefs!.getInt('userId');
+    print(id);
+    Uri url = Uri.parse(
+        'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-reportes');
 
-  final response = await http.post(url, body: {"idResidente": id.toString()});
+    final response = await http
+        .post(url, body: {"idResidente": id.toString()}).timeout(
+            Duration(seconds: 8), onTimeout: () {
+      return http.Response('Timeout', 408);
+    });
 
-  if (response.statusCode == 200) {
-    var data = response.body;
+    var data = returnResponse(response);
 
     return getReportesFromJson(data);
-  } else {
-    print('${response.body}');
+  } on SocketException {
+    throw FetchDataException('');
   }
 }
 
@@ -85,25 +93,26 @@ class _LevantarReporteState extends State<LevantarReporte> {
   List<p.ProgressIndicator> progres = [];
   var idCom;
   var idUser;
-
+  bool error = false;
   var maps3 = <dynamic, Map>{};
   var evidencias = <dynamic, dynamic>{};
-
+  bool siTieneDatos = false;
   List<Map<dynamic, Map>> superEvidencia = [];
 
   /// Activa el guardado en memoria
   addata() async {
     prefs = await SharedPreferences.getInstance();
-
-    setState(() {
-      /// obtiene el id comunidad y la del usuario
-      idCom = prefs!.getInt('idCom');
-      idUser = prefs!.getInt('userId');
-      userType = prefs!.getInt('userType');
-    });
+    if (mounted) {
+      setState(() {
+        /// obtiene el id comunidad y la del usuario
+        idCom = prefs!.getInt('idCom');
+        idUser = prefs!.getInt('userId');
+        userType = prefs!.getInt('userType');
+      });
+    }
   }
 
-  getComunidades() async {
+  Future getComunidades() async {
     AvisosCall().getComunidades().then((value) => {
           for (int i = 0; i < value!.data!.length; i++)
             {
@@ -130,7 +139,9 @@ class _LevantarReporteState extends State<LevantarReporte> {
 
   /// Llama al service y asigna los datos obtenido a una clase
   Future data() async {
-    cuentas = await getReportes();
+    cuentas = await getReportes().catchError((e) {
+      alerta5();
+    });
     await addata();
     await getComunidades();
 
@@ -215,9 +226,14 @@ class _LevantarReporteState extends State<LevantarReporte> {
   void initState() {
     data().then((value) {
       setState(() {
-        listview();
+        if (value!.data!.isNotEmpty) {
+          siTieneDatos = true;
+          listview();
+        }
       });
     });
+
+    /// si da error un fetch
 
     super.initState();
   }
@@ -236,9 +252,13 @@ class _LevantarReporteState extends State<LevantarReporte> {
           reversedList4.clear();
           reversedList5.clear();
           comunities.clear();
-          data();
+          data().catchError((e) {
+            alerta5();
+          });
         } else {
-          data();
+          data().catchError((e) {
+            alerta5();
+          });
         }
       });
     }
@@ -252,23 +272,27 @@ class _LevantarReporteState extends State<LevantarReporte> {
         backgroundColor: Colors.blue,
         title: Text('Reportes'),
       ),
-      body: reversedList.length == 0
-          ? SafeArea(
-              child: reversedList.isEmpty
-                  ? Center(child: CircularProgressIndicator())
-                  : Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Presiona + para añadir un nuevo caso',
-                            style: TextStyle(fontSize: 21, color: Colors.black),
-                          ),
-                        ],
-                      ),
+      body: LoaderOverlay(
+          child: reversedList.length == 0
+              ? SafeArea(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        siTieneDatos == true
+                            ? Text(
+                                'Presiona + para añadir un nuevo caso',
+                                style: TextStyle(
+                                    fontSize: 21, color: Colors.black),
+                              )
+                            : Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                      ],
                     ),
-            )
-          : listview(),
+                  ),
+                )
+              : listview()),
       floatingActionButton: FloatingActionButton(
         elevation: 7,
         onPressed: () => Navigator.of(context)
@@ -447,6 +471,56 @@ class _LevantarReporteState extends State<LevantarReporte> {
       default:
         return 'Enviado';
     }
+  }
+
+  alerta5() {
+    Widget okButton = TextButton(
+        onPressed: () {
+          Navigator.of(context)..pop();
+          data();
+        },
+        child: Text(
+          'Si, continuar',
+          style: TextStyle(color: Colors.red[900]),
+        ));
+    Widget backButton = TextButton(
+        onPressed: () {
+          Navigator.of(context)
+            ..pop()
+            ..pop();
+        },
+        child: Text(
+          'Regresar',
+          style: TextStyle(color: Colors.orange),
+        ));
+    AlertDialog alert = AlertDialog(
+      actions: [backButton, okButton],
+      title: Text(
+        'Atención!',
+        style: TextStyle(
+          fontSize: 25,
+        ),
+      ),
+      content: Container(
+        width: 140,
+        height: 150,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Atencion!',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Text('Ha sucedido un error inesperado, vuelva a intentar')
+          ],
+        ),
+      ),
+    );
+
+    showDialog(context: context, builder: (_) => alert);
   }
 }
 

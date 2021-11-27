@@ -29,7 +29,7 @@ class EventProvider extends ChangeNotifier {
   String _status = '';
   int? idU;
   bool _islogged = false;
-  bool _loading = true;
+  bool _loading = false;
 
   List<Event> get events => _events;
   List<Report> get reports => _reports;
@@ -61,14 +61,13 @@ class EventProvider extends ChangeNotifier {
   }
 
   var userd;
-  void login(user, pass, ctx, TextEditingController tk,
+  Future<void> login(user, pass, ctx, TextEditingController tk,
       TextEditingController tk2) async {
     _loading = false;
     notifyListeners();
 
     try {
       await loginAcces(user, pass).then((value) {
-        _loading = true;
         var userId;
         var post = value;
         if (post!.value == 1) {
@@ -88,9 +87,33 @@ class EventProvider extends ChangeNotifier {
 
           Navigator.pushReplacementNamed(ctx, '/');
         }
+      }).catchError((e) {
+        _status = 'Error de conexión';
+        print('flag2');
+        print(e);
+
+        HapticFeedback.lightImpact();
+        Widget okButton = TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pushNamedAndRemoveUntil('/', (route) => false);
+              tk.clear();
+
+              tk2.clear();
+              notifyListeners();
+            },
+            child: Text('OK'));
+
+        AlertDialog alert = AlertDialog(
+          title: Text('Atencion!'),
+          content: Text('Error 408, Espera larga'),
+          actions: [okButton],
+        );
+
+        showDialog(context: ctx, builder: (_) => alert);
+
+        notifyListeners();
       });
 
-      _loading = true;
       if (userd != null) {
         _islogged = true;
         pref.setBool('isLoggedIn', true);
@@ -100,27 +123,25 @@ class EventProvider extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      {
-        print(e);
-        _loading = false;
-        HapticFeedback.lightImpact();
-        Widget okButton = TextButton(
-            onPressed: () {
-              Navigator.of(ctx).pushNamedAndRemoveUntil('/', (route) => false);
-              tk.clear();
+      print(e.toString());
 
-              tk2.clear();
-            },
-            child: Text('OK'));
+      HapticFeedback.lightImpact();
+      Widget okButton = TextButton(
+          onPressed: () {
+            Navigator.of(ctx).pushNamedAndRemoveUntil('/', (route) => false);
+            tk.clear();
 
-        AlertDialog alert = AlertDialog(
-          title: Text('Atencion!'),
-          content: Text('Sus datos son incorrectos, vuelva a introducirlos'),
-          actions: [okButton],
-        );
+            tk2.clear();
+          },
+          child: Text('OK'));
 
-        showDialog(context: ctx, builder: (_) => alert);
-      }
+      AlertDialog alert = AlertDialog(
+        title: Text('Atencion!'),
+        content: Text('Sus credenciales son incorrectas'),
+        actions: [okButton],
+      );
+
+      showDialog(context: ctx, builder: (_) => alert);
     }
   }
 
@@ -158,6 +179,8 @@ class EventProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  alerta5() {}
+
   void addContacts(Items items) {
     _items.add(items);
 
@@ -179,9 +202,8 @@ class EventProvider extends ChangeNotifier {
     _deudas.clear();
     _items.clear();
     _amenidad.clear();
-    if (_deudas.length == 0) {
-      Navigator.of(ctx).popAndPushNamed('/');
-    }
+    Navigator.of(ctx).pushNamedAndRemoveUntil('/', (route) => false);
+
     notifyListeners();
   }
 

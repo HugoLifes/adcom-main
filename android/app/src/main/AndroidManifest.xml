@@ -18,7 +18,13 @@
         android:label="AdCom"
         android:requestLegacyExternalStorage="true"
         android:usesCleartextTraffic="true"
+        
         android:icon="@mipmap/ic_launcher">
+
+          <provider
+        android:name="androidx.startup.InitializationProvider"
+        android:authorities="${applicationId}.androidx-startup"
+        tools:node="remove" />
 
           <provider
                 android:name="androidx.core.content.FileProvider"
@@ -69,7 +75,7 @@
                  the Android process has started. This theme is visible to the user
                  while the Flutter UI initializes. After that, this theme continues
                  to determine the Window background behind the Flutter UI. -->
-            <meta-data
+             <meta-data
               android:name="io.flutter.embedding.android.NormalTheme"
               android:resource="@style/NormalTheme"
               />
@@ -78,7 +84,7 @@
                  screen fades out. A splash screen is useful to avoid any visual
                  gap between the end of Android's launch screen and the painting of
                  Flutter's first frame. -->
-            <meta-data
+             <meta-data
               android:name="io.flutter.embedding.android.SplashScreenDrawable"
               android:resource="@drawable/launch_background"
               />

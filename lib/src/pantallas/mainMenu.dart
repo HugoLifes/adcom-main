@@ -10,6 +10,7 @@ import 'package:adcom/src/pantallas/loginPage.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:glyphicon/glyphicon.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
@@ -61,7 +62,7 @@ class _MainMenuState extends State<MainMenu> {
   String? pass;
   OSDeviceState? status;
   int? idPrim;
-
+  bool? usuarioIncorrecto = false;
   ConnectivityResult _connectionStatus = ConnectivityResult.none;
   final Connectivity _connectivity = Connectivity();
   late StreamSubscription<ConnectivityResult> _connectivitySubscription;
@@ -141,6 +142,20 @@ class _MainMenuState extends State<MainMenu> {
         var calle = post.infoUsuario == null ? '' : post.infoUsuario!.calle;
         somData(userd, userType, comId, idPrimario, userId, userM, pass,
             comunidad: comunidad, noInterior: noInterior, calle: calle);
+      } else {
+        if (post.message == "Usuario o contraseña incorrecto" &&
+            post.value == 0) {
+          Fluttertoast.showToast(
+              msg: "Usuario o contraseña incorrecto",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: 16.0);
+
+          alerta5();
+        }
       }
     });
     if (prefs!.getBool('EnvioId') == true) {
@@ -174,6 +189,7 @@ class _MainMenuState extends State<MainMenu> {
   @override
   Widget build(BuildContext context) {
     //final args = ModalRoute.of(context)!.settings.arguments as LoginPage;
+
     Size size = MediaQuery.of(context).size;
     List<Widget> _widgetOptions = [mainMenuView(size), Services()];
     return Scaffold(
@@ -209,6 +225,53 @@ class _MainMenuState extends State<MainMenu> {
         ),
       ),
     );
+  }
+
+  alerta5() {
+    Widget okButton = TextButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: Text(
+          'Si, continuar',
+          style: TextStyle(color: Colors.red[900]),
+        ));
+    Widget backButton = TextButton(
+        onPressed: () {
+          Provider.of<EventProvider>(context, listen: false).logOut(context);
+        },
+        child: Text(
+          'Regresar',
+          style: TextStyle(color: Colors.orange),
+        ));
+    AlertDialog alert = AlertDialog(
+      actions: [backButton],
+      title: Text(
+        'Atención!',
+        style: TextStyle(
+          fontSize: 25,
+        ),
+      ),
+      content: Container(
+        width: 140,
+        height: 150,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Atencion!',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Text('Su contraseña ha cambiado')
+          ],
+        ),
+      ),
+    );
+
+    showDialog(context: context, builder: (_) => alert);
   }
 
   Stack mainMenuView(Size size) {
@@ -325,12 +388,35 @@ class SendIdNotification {
         "idUsurioApp": userIdApp,
         "uuid": nuserId,
       })
+    }).timeout(Duration(seconds: 5), onTimeout: () {
+      return http.Response('Timeout', 408);
     });
     print(response.body);
     if (response.statusCode == 200) {
       print('ok');
     } else {
-      print('error');
+      if (response.statusCode == 400) {
+        print("Item form is statuscode 400");
+        Fluttertoast.showToast(
+            msg: "Error en el servidor, intente mas tarde",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      } else {
+        print("Item form is statuscode 500");
+
+        Fluttertoast.showToast(
+            msg: "Error en el servidor, intente mas tarde",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      }
     }
     prefs = await SharedPreferences.getInstance();
     prefs!.setBool('EnvioId', true);

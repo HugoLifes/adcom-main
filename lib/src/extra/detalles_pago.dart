@@ -283,9 +283,27 @@ class _DetallesPagoState extends State<DetallesPago> {
     } on DioError catch (e) {
       if (e.response!.data == true) {
         print('aqui1:${e.response!.data.toString()}');
+        Fluttertoast.showToast(
+            msg: "Error al generar la referencia",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+
         return;
       } else {
         print('aqui2:${e.response!.data.toString()}');
+        Fluttertoast.showToast(
+            msg: "Error al generar la referencia",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+        return;
       }
     }
   }
@@ -615,7 +633,9 @@ class _DetallesPagoState extends State<DetallesPago> {
   alerta() {
     Widget okButton = TextButton(
         onPressed: () {
-          Navigator.of(context)..pop()..pop();
+          Navigator.of(context)
+            ..pop()
+            ..pop();
           //sendingData();
         },
         child: Text(
@@ -660,7 +680,9 @@ class _DetallesPagoState extends State<DetallesPago> {
   alerta2() {
     Widget okButton = TextButton(
         onPressed: () {
-          Navigator.of(context)..pop()..pop();
+          Navigator.of(context)
+            ..pop()
+            ..pop();
           //sendingData();
         },
         child: Text(

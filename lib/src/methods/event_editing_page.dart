@@ -1,4 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:adcom/src/methods/exeptions.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:adcom/json/jsonAmenidadReserva.dart';
 import 'package:adcom/src/extra/reporte.dart';
@@ -37,21 +40,21 @@ class _EventEditingPageState extends State<EventEditingPage> {
   int? idAm;
   bool apartado = false;
   bool maxHoras = false;
-
+  bool error = false;
   Future<ReservaData?> getReserva() async {
-    prefs = await SharedPreferences.getInstance();
+    try {
+      prefs = await SharedPreferences.getInstance();
 
-    Uri uri = Uri.parse(
-        'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-amenidad-reserva');
+      Uri uri = Uri.parse(
+          'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-amenidad-reserva');
 
-    final response = await http.post(uri, body: {"idAmenidad": "${widget.id}"});
-
-    if (response.statusCode == 200) {
-      var data = response.body;
+      final response =
+          await http.post(uri, body: {"idAmenidad": "${widget.id}"});
+      var data = returnResponse(response);
 
       return reservaDataFromJson(data);
-    } else {
-      print('error');
+    } on SocketException {
+      throw FetchDataException();
     }
   }
 
@@ -85,6 +88,10 @@ class _EventEditingPageState extends State<EventEditingPage> {
       fromDate = event.from;
       toDate = event.to;
     }
+
+    if (error == true) {
+      errors();
+    } else {}
   }
 
   @override
@@ -272,6 +279,10 @@ class _EventEditingPageState extends State<EventEditingPage> {
             });
           }
         }
+      }).catchError((e) {
+        setState(() {
+          error = true;
+        });
       });
 
       if (apartado == true) {
@@ -287,6 +298,10 @@ class _EventEditingPageState extends State<EventEditingPage> {
         } */
           ///navegar hacia atras y actualizar
           Navigator.pop(context);
+        }).catchError((e) {
+          setState(() {
+            error = true;
+          });
         });
         return response;
       }
@@ -295,7 +310,7 @@ class _EventEditingPageState extends State<EventEditingPage> {
     }
   }
 
-  sendingData(
+  Future sendingData(
     String titulo,
     DateTime fromDate,
     DateTime to,
@@ -452,6 +467,55 @@ class _EventEditingPageState extends State<EventEditingPage> {
                 ? Text('El maximo de apartado de esta amenidad es de 6 horas')
                 : Text(
                     'Esta amenidad ya se encuentra apartada, favor de seleccionar otra fecha, gracias')
+          ],
+        ),
+      ),
+    );
+
+    showDialog(context: context, builder: (_) => alert);
+  }
+
+  errors() {
+    Widget okButton = TextButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: Text(
+          'Si, continuar',
+          style: TextStyle(color: Colors.red[900]),
+        ));
+    Widget backButton = TextButton(
+        onPressed: () {
+          Navigator.of(context)
+            ..pop()
+            ..pop();
+        },
+        child: Text(
+          'Regresar',
+          style: TextStyle(color: Colors.orange),
+        ));
+    AlertDialog alert = AlertDialog(
+      actions: [backButton],
+      title: Text(
+        'Atención!',
+        style: TextStyle(
+          fontSize: 25,
+        ),
+      ),
+      content: Container(
+        width: 140,
+        height: 150,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Atencion!',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Text('Ha sucedido un error inesperado, vuelva a intentar')
           ],
         ),
       ),

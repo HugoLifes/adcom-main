@@ -110,8 +110,8 @@ class _ResponseSeguimientoState extends State<ResponseSeguimiento> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(left: 20),
-                      child: Text('Instrucciones', style: TextStyle(fontSize: 20)),
+                      padding: const EdgeInsets.only(left: 10),
+                      child: Text('Instrucciones', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold), textAlign: TextAlign.justify,),
                     ),
                    
                       SizedBox(
@@ -119,7 +119,7 @@ class _ResponseSeguimientoState extends State<ResponseSeguimiento> {
                       ),
                        Padding(
                          padding: const EdgeInsets.only(left: 10),
-                         child: Text('Es importante elejir primero los archivos que quiere usar y después las fotos, no olvide asignar un seguimiento de lo contrario no podra\ncontinuar con el mismo.', style: TextStyle(fontSize: 18),),
+                         child: Text('Es importante elegir primero los archivos que quiere usar y después las fotos, no olvide asignar un seguimiento de lo contrario no podra\ncontinuar con el mismo.', style: TextStyle(fontSize: 18),),
                        ),
                   
                   ],
@@ -406,7 +406,30 @@ class _ResponseSeguimientoState extends State<ResponseSeguimiento> {
 
       print(responseDecode);
     } else {
-      print(res.body);
+     if (response.statusCode == 400) {
+        print("Item form is statuscode 400");
+        print(res.body);
+        return Fluttertoast.showToast(
+            msg: "Error en el servidor, intente mas tarde",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      } else {
+        print("Item form is statuscode 500");
+        print(res.body);
+        
+        return Fluttertoast.showToast(
+            msg: "Error en el servidor, intente mas tarde",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      }
     }
   }
 }

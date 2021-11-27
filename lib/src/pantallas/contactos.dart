@@ -1,13 +1,16 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:adcom/json/json.dart';
 import 'package:adcom/src/extra/filter_section.dart';
 import 'package:adcom/src/extra/vistaContactos.dart';
 import 'package:adcom/src/methods/emailDashboard.dart';
+import 'package:adcom/src/methods/exeptions.dart';
 import 'package:adcom/src/models/event_provider.dart';
 import 'package:filter_list/filter_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,20 +26,23 @@ Future<Welcome?> getData() async {
   print('Se esta ejecutando');
 
   prefs = await SharedPreferences.getInstance();
-  var id = prefs!.getInt('id');
 
-  print(id.toString());
+  try {
+    var id = prefs!.getInt('id');
 
-  Uri uri = Uri.parse(
-      'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-directorio');
-  final response = await http.post(uri, body: {
-    "params": json.encode({"usuarioId": id})
-  });
+    print(id.toString());
 
-  if (response.statusCode == 200) {
-    var data = response.body;
+    Uri uri = Uri.parse(
+        'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-directorio');
+    final response = await http.post(uri, body: {
+      "params": json.encode({"usuarioId": id})
+    });
+
+    var data = returnResponse(response);
 
     return welcomeFromJson(data);
+  } on SocketException {
+    throw FetchDataException('');
   }
 }
 
@@ -46,6 +52,8 @@ class _ContactosState extends State<Contactos> {
   TextEditingController? _controller = TextEditingController();
   late Welcome? dt;
   List<Items> myList = [];
+  bool error = false;
+
   @override
   void initState() {
     super.initState();
@@ -288,7 +296,9 @@ class _ContactosState extends State<Contactos> {
       ));
 
   holi() async {
-    dt = await getData();
+    dt = await getData().catchError((onError) {
+      alerta5();
+    });
 
     for (int i = 0; i < dt!.residente!.length; i++) {
       myList.add(new Items(
@@ -317,5 +327,54 @@ class _ContactosState extends State<Contactos> {
         myList;
       });
     }
+  }
+
+  alerta5() {
+    Widget okButton = TextButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: Text(
+          'Si, continuar',
+          style: TextStyle(color: Colors.red[900]),
+        ));
+    Widget backButton = TextButton(
+        onPressed: () {
+          Navigator.of(context)
+            ..pop()
+            ..pop();
+        },
+        child: Text(
+          'Regresar',
+          style: TextStyle(color: Colors.orange),
+        ));
+    AlertDialog alert = AlertDialog(
+      actions: [backButton],
+      title: Text(
+        'Atención!',
+        style: TextStyle(
+          fontSize: 25,
+        ),
+      ),
+      content: Container(
+        width: 140,
+        height: 150,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Atencion!',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Text('Ha sucedido un error inesperado, vuelva a intentar')
+          ],
+        ),
+      ),
+    );
+
+    showDialog(context: context, builder: (_) => alert);
   }
 }

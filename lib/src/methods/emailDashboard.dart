@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:adcom/json/json.dart';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -43,6 +44,30 @@ Future<Welcome?> getData() async {
     var data = response.body;
 
     return welcomeFromJson(data);
+  } else {
+    if (response.statusCode == 400) {
+      print("Item form is statuscode 400");
+
+      Fluttertoast.showToast(
+          msg: "Error en el servidor, intente mas tarde",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    } else {
+      print("Item form is statuscode 500");
+
+      Fluttertoast.showToast(
+          msg: "Error en el servidor, intente mas tarde",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
   }
 }
 

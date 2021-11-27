@@ -5,10 +5,13 @@ import 'package:adcom/json/json-getComunidades.dart';
 import 'package:adcom/json/obtenerAvisos.dart';
 import 'package:adcom/src/extra/dashboard_Avisos.dart';
 import 'package:adcom/src/extra/nuevo_post.dart';
+import 'package:adcom/src/methods/exeptions.dart';
 import 'package:adcom/src/methods/searchBar.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:glyphicon/glyphicon.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:open_file/open_file.dart';
@@ -34,7 +37,7 @@ class _AvisosState extends State<Avisos> {
   List<AvisosUsuario> avisos = [];
   List? links;
   List? name;
-
+  bool error = false;
   List<String> hLinks = [];
   var nombres = <dynamic, dynamic>{};
   var Link = <dynamic, Map>{};
@@ -85,15 +88,6 @@ class _AvisosState extends State<Avisos> {
         .then((value) => {
               if (value!.data!.isNotEmpty)
                 {
-                  for (int i = 0; i < value.data!.length; i++)
-                    {
-                      avisos.add(new AvisosUsuario(
-                          avisos: value.data![i].aviso,
-                          tipoAviso: value.data![i].tipoAviso,
-                          fecha: value.data![i].fechaAviso,
-                          nombreComu: value.data![i].comunidades)),
-                    },
-
                   /// lista para obtener los links de los avisos
                   links = List.generate(
                     value.data!.length,
@@ -102,6 +96,19 @@ class _AvisosState extends State<Avisos> {
                         (index) => value
                             .data![index2].archivos![index].direccionArchivo),
                   ),
+                  for (int i = 0; i < value.data!.length; i++)
+                    {
+                      avisos.add(new AvisosUsuario(
+                        avisos: value.data![i].aviso,
+                        tipoAviso: value.data![i].tipoAviso,
+                        fecha: value.data![i].fechaAviso,
+                        nombreComu: value.data![i].comunidades,
+                        links: List.generate(
+                            value.data![i].archivos!.length,
+                            (index) => value
+                                .data![i].archivos![index].direccionArchivo),
+                      )),
+                    },
 
                   /// lista para los nombres de los archivos
                   name = List.generate(
@@ -111,8 +118,8 @@ class _AvisosState extends State<Avisos> {
                         (index) =>
                             value.data![index2].archivos![index].nombreArchivo),
                   ),
-                  printLinks(),
-                  printNames(),
+
+                  printAvisos(),
                 }
               else
                 {esFalso()}
@@ -135,6 +142,13 @@ class _AvisosState extends State<Avisos> {
     });
   }
 
+  printAvisos() {
+    for (int i = 0; i < avisos.length; i++) {
+      print(avisos[i].avisos);
+      print(avisos[i].links);
+    }
+  }
+
   printLinks() {
     for (int i = 0; i < links!.length; i++) {
       print(links);
@@ -149,7 +163,12 @@ class _AvisosState extends State<Avisos> {
 
   @override
   void initState() {
-    userCheck();
+    userCheck().catchError((e) {
+      setState(() {
+        alerta5();
+      });
+    });
+
     super.initState();
   }
 
@@ -163,7 +182,7 @@ class _AvisosState extends State<Avisos> {
                 ? IconButton(
                     icon: Icon(Icons.search),
                     onPressed: () {
-                      showSearch(
+                      final result = showSearch(
                         context: context,
                         delegate: CustomSearchDelegate(
                             arraySearch: avisos,
@@ -171,6 +190,15 @@ class _AvisosState extends State<Avisos> {
                             links: links!,
                             comunities: comunities),
                       );
+
+                      result.then((value) => {
+                            if (links!.any((element) =>
+                                element.toString().contains(value)))
+                              {
+                                print(value),
+                                download2(value, value.split('/').last),
+                              }
+                          });
                     },
                   )
                 : Container()
@@ -185,85 +213,89 @@ class _AvisosState extends State<Avisos> {
           backgroundColor: Colors.blueGrey[700],
         ),
         resizeToAvoidBottomInset: false,
-        body: Stack(
-          children: [
-            Container(
-              height: size.width / 2.0,
-              decoration: BoxDecoration(color: Colors.blueGrey[700]),
-            ),
-            Container(
-              padding: EdgeInsets.only(
-                  top: size.height / 30, right: size.width / 20),
-              alignment: Alignment.topRight,
-              child: Icon(
-                Icons.announcement_rounded,
-                color: Colors.white,
-                size: size.width / 4.5,
+        body: LoaderOverlay(
+          child: Stack(
+            children: [
+              Container(
+                height: size.width / 2.0,
+                decoration: BoxDecoration(color: Colors.blueGrey[700]),
               ),
-            ),
-            SafeArea(
-                child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: size.width / 50,
-                  ),
-                  Text(
-                    'Comunicados de la comunidad',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: 15),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  SizedBox(
-                    width: size.width / 1.5,
-                    child: Text(
-                      'Enterate de lo que sucede en tu comunidad! Desde recordatorios, alertas, novedades y más.',
-                      style: TextStyle(
-                          color: Colors.white, fontSize: size.width / 19),
+              Container(
+                padding: EdgeInsets.only(
+                    top: size.height / 30, right: size.width / 20),
+                alignment: Alignment.topRight,
+                child: Icon(
+                  Icons.announcement_rounded,
+                  color: Colors.white,
+                  size: size.width / 4.5,
+                ),
+              ),
+              SafeArea(
+                  child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: size.width / 50,
                     ),
-                  ),
-                  avisos.isEmpty
-                      ? Center(
-                          child: itsTrue == false
-                              ? Container(
-                                  padding: const EdgeInsets.only(top: 90),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Image.asset(
-                                        'assets/images/magic.png',
-                                        width: size.width / 1,
-                                        height: 200,
-                                      ),
-                                      Text(
-                                        'Lo sentimos, por el momento no hay avisos',
-                                        style: TextStyle(
-                                          fontSize: size.width / 20,
-                                          color: Colors.blueGrey[700],
+                    Text(
+                      'Comunicados de la comunidad',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          fontSize: 15),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    SizedBox(
+                      width: size.width / 1.5,
+                      child: Text(
+                        'Enterate de lo que sucede en tu comunidad! Desde recordatorios, alertas, novedades y más.',
+                        style: TextStyle(
+                            color: Colors.white, fontSize: size.width / 19),
+                      ),
+                    ),
+                    avisos.isEmpty
+                        ? Center(
+                            child: itsTrue == false
+                                ? Container(
+                                    padding: const EdgeInsets.only(top: 90),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Image.asset(
+                                          'assets/images/magic.png',
+                                          width: size.width / 1,
+                                          height: 200,
                                         ),
-                                        textAlign: TextAlign.justify,
-                                      )
-                                    ],
-                                  ))
-                              : Container(
-                                  padding: EdgeInsets.only(top: size.width / 5),
-                                  child: CircularProgressIndicator()))
-                      : AvisosDashboard(
-                          comunities: comunities,
-                          links: links,
-                          name: name,
-                          avisos: avisos,
-                        )
-                ],
-              ),
-            ))
-          ],
+                                        Text(
+                                          'Lo sentimos, por el momento no hay avisos',
+                                          style: TextStyle(
+                                            fontSize: size.width / 20,
+                                            color: Colors.blueGrey[700],
+                                          ),
+                                          textAlign: TextAlign.justify,
+                                        )
+                                      ],
+                                    ))
+                                : Container(
+                                    padding:
+                                        EdgeInsets.only(top: size.width / 5),
+                                    child: CircularProgressIndicator()))
+                        : AvisosDashboard(
+                            comunities: comunities,
+                            links: links,
+                            name: name,
+                            avisos: avisos,
+                          )
+                  ],
+                ),
+              ))
+            ],
+          ),
         ),
         bottomNavigationBar: typeUser == 2
             ? BottomAppBar(
@@ -317,6 +349,109 @@ class _AvisosState extends State<Avisos> {
       print('El permiso ha cambiado ${changes.jsonRepresentation()}');
     });
   }
+
+  alerta5() {
+    Widget okButton = TextButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: Text(
+          'Si, continuar',
+          style: TextStyle(color: Colors.red[900]),
+        ));
+    Widget backButton = TextButton(
+        onPressed: () {
+          Navigator.of(context)
+            ..pop()
+            ..pop();
+        },
+        child: Text(
+          'Regresar',
+          style: TextStyle(color: Colors.orange),
+        ));
+    AlertDialog alert = AlertDialog(
+      actions: [backButton],
+      title: Text(
+        'Atención!',
+        style: TextStyle(
+          fontSize: 25,
+        ),
+      ),
+      content: Container(
+        width: 140,
+        height: 150,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Atencion!',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Text('Ha sucedido un error inesperado, vuelva a intentar')
+          ],
+        ),
+      ),
+    );
+
+    showDialog(context: context, builder: (_) => alert);
+  }
+
+  Future download2(String url, String names) async {
+    print(url.replaceAll(" ", "%20"));
+    print(names);
+    Dio dio = Dio();
+
+    String savePath = await getPath(names);
+    try {
+      Response response = await dio.get(
+        url,
+        onReceiveProgress: showDownloadProgress,
+        //Received data with List<int>
+        options: Options(
+            responseType: ResponseType.bytes,
+            followRedirects: false,
+            validateStatus: (status) {
+              return status! < 500;
+            }),
+      );
+      print(response.headers);
+      File file = File(savePath);
+      var raf = file.openSync(mode: FileMode.write);
+      // response.data is List<int> type
+      print(response.data);
+      raf.writeFromSync(response.data);
+      await raf.close();
+    } catch (e) {
+      print(e);
+    }
+    await OpenFile.open(savePath);
+  }
+
+  Future<String> getPath(String names) async {
+    Directory path = await getApplicationDocumentsDirectory();
+
+    print(path.path);
+
+    var filePath;
+    names.contains('.pdf');
+    if (names.contains('.pdf') == false) {
+      filePath = path.path + '/' + names + '.pdf';
+    } else {
+      filePath = path.path + '/$names';
+    }
+
+    print('here $filePath');
+    return filePath;
+  }
+
+  void showDownloadProgress(received, total) {
+    if (total != -1) {
+      print((received / total * 100).toStringAsFixed(0) + "%");
+    }
+  }
 }
 
 class AvisosCall {
@@ -346,15 +481,19 @@ class AvisosCall {
       this.ubicacion});
 
   Future<Comunities?> getComunidades() async {
-    Uri url = Uri.parse(
-        "http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-comunities");
+    try {
+      Uri url = Uri.parse(
+          "http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-comunities");
 
-    final response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      var data = response.body;
+      final response =
+          await http.get(url).timeout(Duration(seconds: 10), onTimeout: () {
+        return http.Response('Error', 400);
+      });
+      var data = returnResponse(response);
 
       return comunitiesFromJson(data);
+    } on SocketException {
+      throw FetchDataException('');
     }
   }
 }
@@ -365,6 +504,7 @@ class AvisosUsuario {
   int? tipoAviso;
   DateTime? fecha;
   String? nombreComu;
+  List<dynamic>? links;
 
   AvisosUsuario({
     this.avisos,
@@ -372,17 +512,23 @@ class AvisosUsuario {
     this.tipoAviso,
     this.id,
     this.nombreComu,
+    this.links,
   });
 
   Future<GetAvisos?> getAvisos(int id) async {
-    Uri url = Uri.parse(
-        "http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-avisos-by-residente");
-    final response = await http.post(url, body: {'idCom': id.toString()});
+    try {
+      Uri url = Uri.parse(
+          "http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-avisos-by-residente");
+      var response = await http
+          .post(url, body: {'idCom': id.toString()}).timeout(
+              Duration(seconds: 10), onTimeout: () {
+        return http.Response('Error', 500);
+      });
+      var data = returnResponse(response);
 
-    if (response.statusCode == 200) {
-      var data = response.body;
-      print(data);
       return getAvisosFromJson(data);
+    } on SocketException {
+      throw FetchDataException('');
     }
   }
 }
@@ -442,65 +588,6 @@ class CustomSearchDelegate extends SearchDelegate {
     );
   }
 
-  Future download2(String url, String names) async {
-    print(url.replaceAll(" ", "%20"));
-    print(names);
-    Dio dio = Dio();
-
-    String savePath = await getPath(names);
-    try {
-      Response response = await dio.get(
-        url,
-        onReceiveProgress: showDownloadProgress,
-        //Received data with List<int>
-        options: Options(
-            responseType: ResponseType.bytes,
-            followRedirects: false,
-            validateStatus: (status) {
-              return status! < 500;
-            }),
-      );
-      print(response.headers);
-      File file = File(savePath);
-      var raf = file.openSync(mode: FileMode.write);
-      // response.data is List<int> type
-      print(response.data);
-      raf.writeFromSync(response.data);
-      await raf.close();
-    } catch (e) {
-      print(e);
-    }
-    await OpenFile.open(savePath);
-  }
-
-  Future<String> getPath(String names) async {
-    Directory path = await getApplicationDocumentsDirectory();
-
-    print(path.path);
-
-    var filePath;
-    names.contains('.pdf');
-    if (names.contains('.pdf') == false) {
-      filePath = path.path + '/' + names + '.pdf';
-    } else {
-      filePath = path.path + '/$names';
-    }
-
-    print('here $filePath');
-    return filePath;
-  }
-
-  void showDownloadProgress(received, total) {
-    if (total != -1) {
-      print((received / total * 100).toStringAsFixed(0) + "%");
-    }
-  }
-
-  void dsd(param0, param1) {
-    print(param1);
-    print(param0);
-  }
-
   /// construye posibles sugerencias de busqueda
   @override
   Widget buildSuggestions(BuildContext context) {
@@ -513,7 +600,8 @@ class CustomSearchDelegate extends SearchDelegate {
       itemBuilder: (context, index) {
         return ListTile(
           onTap: () async {
-            await download2(links![index][0], name![index][0]);
+            query = suggestionsList![index].links![0];
+            close(context, query);
           },
           leading: Icon(Glyphicon.newspaper),
           title: RichText(

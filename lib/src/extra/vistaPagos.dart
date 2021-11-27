@@ -205,6 +205,10 @@ class _VistaPagosState extends State<VistaPagos> {
         byteList = bytes.buffer.asUint8List();
       });
     } else if (idCom == 6) {
+      bytes = await rootBundle.load('assets/images/lomas.jpeg');
+      setState(() {
+        byteList = bytes.buffer.asUint8List();
+      });
     } else if (idCom == 10) {
       bytes = await rootBundle.load('assets/images/natura.jpg');
       setState(() {
