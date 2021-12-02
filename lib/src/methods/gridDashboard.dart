@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
+import 'package:adcom/src/models/event_provider.dart';
+import 'package:provider/provider.dart';
 class GridDashboard extends StatefulWidget {
   final userId;
   GridDashboard({this.userId});
@@ -89,13 +90,22 @@ class _GridDashboardState extends State<GridDashboard> {
       color: Colors.greenAccent[700],
     ),
   );
+  Items item10 = new Items(
+    route: 'LOGOUT',
+    title: 'LogOut',
+    icon: Icon(
+      Icons.exit_to_app,
+      size: 50,
+      color: Colors.greenAccent[700],
+    ),
+  );
   List<Items> myList = [];
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     switch (widget.userId) {
       case 1:
-        myList = [item1, item5, item4, item2];
+        myList = [item1, item5, item4, item2,item10];
 
         break;
       case 2:
@@ -104,6 +114,7 @@ class _GridDashboardState extends State<GridDashboard> {
           item4,
           item5,
           item2,
+          item10
         ];
 
         break;
@@ -116,6 +127,7 @@ class _GridDashboardState extends State<GridDashboard> {
           item4,
           item5,
           item2,
+          item10
         ];
         break;
     }
@@ -139,7 +151,10 @@ class _GridDashboardState extends State<GridDashboard> {
                     child: InkWell(
                       onTap: () {
                         HapticFeedback.mediumImpact();
-                        if (widget.userId == 4) {
+                        if(data.route == 'LOGOUT'){
+                          Provider.of<EventProvider>(context, listen:false).logOut(context);
+                        }else{
+                           if (widget.userId == 4) {
                           if (data.route == '/screen5') {
                             Navigator.pushNamed(context, data.route!,
                                 arguments: GridDashboard());
@@ -149,6 +164,7 @@ class _GridDashboardState extends State<GridDashboard> {
                         } else {
                           Navigator.pushNamed(context, data.route!,
                               arguments: GridDashboard());
+                        }
                         }
                       },
                       child: Container(

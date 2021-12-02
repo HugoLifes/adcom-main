@@ -36,9 +36,11 @@ class Posting {
         idResidente: json["ID_RESIDENTE"],
         usuario: json["USUARIO"],
         nombreResidente: json["NombreResidente"],
-        infoUsuario: json["infoUsuario"].isEmpty
+        infoUsuario: json["infoUsuario"] == null
             ? null
-            : InfoUsuario.fromJson(json["infoUsuario"]),
+            : json["infoUsuario"].isEmpty
+                ? null
+                : InfoUsuario.fromJson(json["infoUsuario"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -50,7 +52,9 @@ class Posting {
         "ID_RESIDENTE": idResidente,
         "USUARIO": usuario,
         "NombreResidente": nombreResidente,
-        "infoUsuario": infoUsuario == [].isEmpty ? null : infoUsuario!.toJson(),
+        "infoUsuario": infoUsuario == [].isEmpty || infoUsuario == null
+            ? null
+            : infoUsuario!.toJson(),
       };
 }
 

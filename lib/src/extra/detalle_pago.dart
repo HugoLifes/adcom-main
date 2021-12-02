@@ -283,9 +283,27 @@ class _DetallesPagoState extends State<DetallesPago> {
     } on DioError catch (e) {
       if (e.response!.data == true) {
         print('aqui1:${e.response!.data.toString()}');
+        Fluttertoast.showToast(
+            msg: "Error al generar la referencia",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+
         return;
       } else {
         print('aqui2:${e.response!.data.toString()}');
+        Fluttertoast.showToast(
+            msg: "Error al generar la referencia",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+        return;
       }
     }
   }
@@ -653,7 +671,7 @@ class _DetallesPagoState extends State<DetallesPago> {
       ),
     );
 
-    showDialog(context: context, builder: (_) => alert);
+    showDialog(context: context, builder: (_) => alert, barrierDismissible: false);
   }
 
   ///alerta  que sale cuando se ha generado una referencia de pago y se intenta otra
@@ -698,7 +716,7 @@ class _DetallesPagoState extends State<DetallesPago> {
       ),
     );
 
-    showDialog(context: context, builder: (_) => alert);
+    showDialog(context: context, builder: (_) => alert, barrierDismissible: false);
   }
 
   sacarMesDeAtrazo() async {

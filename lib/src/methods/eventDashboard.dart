@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:adcom/json/jsonAmenidades.dart';
 import 'package:adcom/src/extra/eventos.dart';
+import 'package:adcom/src/methods/exeptions.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,22 +29,26 @@ dataOff2(id2, perfil) async {
 }
 
 Future<Places?> amenidades() async {
-  prefs = await SharedPreferences.getInstance();
-  var id = prefs!.getInt('idPrimario');
-  print('?$id');
+  try {
+    prefs = await SharedPreferences.getInstance();
+    var id = prefs!.getInt('idPrimario');
+    print('?$id');
 
-  final Uri url = Uri.parse(
-      'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-amenidades');
-  final response = await http.post(url, body: {
-    "params": json.encode({"usuarioId": id})
-  });
+    final Uri url = Uri.parse(
+        'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-amenidades');
+    final response = await http.post(url, body: {
+      "params": json.encode({"usuarioId": id})
+    }).timeout(Duration(seconds: 8), onTimeout: () {
+      return http.Response('TimeOut', 408);
+    });
 
-  if (response.statusCode == 200) {
-    var data = response.body;
+    var data = returnResponse(response);
 
     print(data);
 
     return placesFromJson(data);
+  } on SocketException {
+    throw FetchDataException('Time out');
   }
 }
 

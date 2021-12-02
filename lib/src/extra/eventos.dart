@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:adcom/json/jsonAmenidadReserva.dart';
 import 'package:adcom/src/extra/reglamento.dart';
 import 'package:adcom/src/methods/eventDashboard.dart';
 import 'package:adcom/src/methods/event_editing_page.dart';
+import 'package:adcom/src/methods/exeptions.dart';
 import 'package:adcom/src/methods/task_widget.dart';
 import 'package:adcom/src/models/event.dart';
 import 'package:adcom/src/models/event_data_source.dart';
@@ -360,7 +362,7 @@ class _EventWeeklyState extends State<EventWeekly> {
       ),
     );
 
-    showDialog(context: context, builder: (_) => alert);
+    showDialog(context: context, builder: (_) => alert, barrierDismissible: false);
   }
 }
 
@@ -379,19 +381,19 @@ class Calendario extends StatefulWidget {
 }
 
 Future<ReservaData?> getReserva({id}) async {
-  prefs = await SharedPreferences.getInstance();
+  try {
+    prefs = await SharedPreferences.getInstance();
 
-  Uri uri = Uri.parse(
-      'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-amenidad-reserva');
+    Uri uri = Uri.parse(
+        'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-amenidad-reserva');
 
-  final response = await http.post(uri, body: {"idAmenidad": "${id}"});
+    final response = await http.post(uri, body: {"idAmenidad": "${id}"});
 
-  if (response.statusCode == 200) {
-    var data = response.body;
+    var data = returnResponse(response);
 
     return reservaDataFromJson(data);
-  } else {
-    print('error');
+  } on SocketException {
+    throw FetchDataException('Error conection');
   }
 }
 

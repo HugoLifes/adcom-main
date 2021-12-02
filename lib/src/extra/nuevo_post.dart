@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:adcom/src/methods/exeptions.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -426,19 +427,26 @@ class _MakeNewPostState extends State<MakeNewPost> {
         return;
       } else {
         print('aqui2:${e.response!.data.toString()}');
+        return;
       }
     }
   }
 
   Future<TipoAviso?> getTipoAviso() async {
-    final Uri url = Uri.parse(
-        'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-tipo-aviso');
-    final response = await http.post(url, body: {"idCom": idCom.toString()});
+    try {
+      final Uri url = Uri.parse(
+          'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-tipo-aviso');
+      final response = await http
+          .post(url, body: {"idCom": idCom.toString()}).timeout(
+              Duration(seconds: 9), onTimeout: () {
+        return http.Response('Timeout', 408);
+      });
 
-    if (response.statusCode == 200) {
-      var data = response.body;
+      var data = returnResponse(response);
       print(data);
       return tipoAvisoFromJson(data);
+    } on SocketException {
+      throw FetchDataException('');
     }
   }
 }

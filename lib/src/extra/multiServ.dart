@@ -1,30 +1,49 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:adcom/json/jsonProveedores.dart';
 import 'package:adcom/src/extra/pedirServicio.dart';
 import 'package:adcom/src/extra/servicios.dart';
+import 'package:adcom/src/methods/exeptions.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:glyphicon/glyphicon.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// ya cargue los datos
 ///
 class MultiServicios extends StatefulWidget {
   final int? service;
-  MultiServicios({Key? key, this.service}) : super(key: key);
+  List<DatosProveedor>? datosP = [];
+  List<dynamic>? unidad = [];
+  List<dynamic>? name = [];
+  List<dynamic>? seleccionado = [];
+  MultiServicios(
+      {Key? key,
+      this.service,
+      this.datosP,
+      this.unidad,
+      this.name,
+      this.seleccionado})
+      : super(key: key);
 
   @override
   _MultiServiciosState createState() => _MultiServiciosState();
 }
 
+SharedPreferences? prefs;
 Future<Proveedores?> getProv() async {
-  Uri url = Uri.parse(
-      "http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-proveedores");
+  try {
+    Uri url = Uri.parse(
+        "http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-proveedores");
 
-  final response = await http.get(url);
-
-  if (response.statusCode == 200) {
-    var data = response.body;
-    print(data);
+    final response = await http.get(url);
+    var data = returnResponse(response);
     return proveedoresFromJson(data);
+  } on SocketException {
+    throw FetchDataException('Hubo un problema');
   }
 }
 
@@ -33,9 +52,15 @@ class _MultiServiciosState extends State<MultiServicios> {
   List<Servicios> serv = [];
   Proveedores? prov;
   bool loading = true;
+  String? fi;
+  String? ff;
 
-  data() async {
-    prov = await getProv();
+  Future data() async {
+    prefs = await SharedPreferences.getInstance();
+
+    prov = await getProv().catchError((e) {
+      alerta5();
+    });
 
     if (prov!.data!.isNotEmpty) {
       for (int i = 0; i < prov!.data!.length; i++) {
@@ -52,9 +77,11 @@ class _MultiServiciosState extends State<MultiServicios> {
       }
     }
 
-    setState(() {
-      loading = false;
-    });
+    if (mounted) {
+      setState(() {
+        loading = false;
+      });
+    }
   }
 
   @override
@@ -91,9 +118,13 @@ class _MultiServiciosState extends State<MultiServicios> {
                     if (serv.isNotEmpty) {
                       serv.clear();
 
-                      data();
+                      data().catchError((e) {
+                        alerta5();
+                      });
                     } else {
-                      data();
+                      data().catchError((e) {
+                        alerta5();
+                      });
                     }
                   });
                 });
@@ -105,7 +136,7 @@ class _MultiServiciosState extends State<MultiServicios> {
                       color: Colors.grey[350],
                     );
                   },
-                  itemCount: serv.length,
+                  itemCount: widget.datosP!.length,
                   itemBuilder: (_, int index) {
                     return InkWell(
                       onTap: () {
@@ -119,12 +150,18 @@ class _MultiServiciosState extends State<MultiServicios> {
                               textColor: Colors.black,
                               fontSize: 17.0);
                         } else {
+                          /// Aqui se llama a la funcion que se encarga de pedir el servicio
                           Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (_) => PedirServicio(
                                         servicio: serv[index],
                                         service: index,
+                                        //datosProveedor: widget.datosP![index],
+                                        url: widget.unidad![index],
+                                        name: widget.name![index],
+                                        seleccionado:
+                                            widget.seleccionado![index],
                                       )));
                         }
                       },
@@ -132,14 +169,19 @@ class _MultiServiciosState extends State<MultiServicios> {
                         padding: EdgeInsets.only(top: 15, left: 10),
                         child: Column(
                           children: [
-                            tipodeFoto(index),
+                            Container(
+                              height: 100,
+                              width: 100,
+                              child: Image.network(
+                                  widget.datosP![index].rutaLogo!),
+                            ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Column(
                                   children: [
                                     Text(
-                                      '${serv[index].compania!.trimRight()}',
+                                      '${widget.datosP![index].compania!.trimRight()}',
                                       style: TextStyle(
                                           fontSize: 17,
                                           fontWeight: FontWeight.bold),
@@ -149,14 +191,20 @@ class _MultiServiciosState extends State<MultiServicios> {
                                     ),
                                     SizedBox(
                                         width: size.width / 1.5,
-                                        height: 50,
+                                        height: 30,
                                         child: Text(
-                                          '${serv[index].diaAtencion!.trimRight()}',
+                                          '${widget.datosP![index].diasAtencion!.trimRight()}',
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                               fontSize: 13,
                                               fontWeight: FontWeight.w600),
-                                        ))
+                                        )),
+                                    Text(
+                                      '${timeFormater(widget.datosP![index].horarioInicio!, widget.datosP![index].horarioFin!)}',
+                                      style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600),
+                                    )
                                   ],
                                 ),
                               ],
@@ -168,6 +216,19 @@ class _MultiServiciosState extends State<MultiServicios> {
                   }),
             ),
     );
+  }
+
+  timeFormater(String ini, String fin) {
+    DateFormat fInit = DateFormat("hh:mm");
+    var inputDate = fInit.parse(ini);
+
+    DateFormat fFin = DateFormat("HH:mm");
+    var inputDate2 = fFin.parse(fin);
+
+    ff = DateFormat("hh:mm").format(inputDate2);
+    fi = DateFormat("hh:mm").format(inputDate);
+
+    return '$fi am - $ff pm';
   }
 
   tipodeFoto(index) {
@@ -234,6 +295,53 @@ class _MultiServiciosState extends State<MultiServicios> {
         break;
       default:
     }
+  }
+
+  alerta5() {
+    Widget okButton = TextButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: Text(
+          'Si, continuar',
+          style: TextStyle(color: Colors.red[900]),
+        ));
+    Widget backButton = TextButton(
+        onPressed: () {
+          Navigator.of(context)..pop()..pop();
+        },
+        child: Text(
+          'Regresar',
+          style: TextStyle(color: Colors.orange),
+        ));
+    AlertDialog alert = AlertDialog(
+      actions: [backButton],
+      title: Text(
+        'Atención!',
+        style: TextStyle(
+          fontSize: 25,
+        ),
+      ),
+      content: Container(
+        width: 140,
+        height: 150,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Atencion!',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Text('Ha sucedido un error inesperado, vuelva a intentar')
+          ],
+        ),
+      ),
+    );
+
+    showDialog(context: context, builder: (_) => alert, barrierDismissible: false);
   }
 }
 

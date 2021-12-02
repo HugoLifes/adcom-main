@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:adcom/json/tipoAvisot.dart';
 import 'package:adcom/src/extra/nuevo_post.dart';
+import 'package:adcom/src/methods/exeptions.dart';
 import 'package:adcom/src/pantallas/avisos.dart';
 import 'package:camera/camera.dart';
 import 'package:dio/dio.dart';
@@ -67,6 +68,8 @@ class _AddReporteState extends State<AddReporte> {
   List<TipoAvisoS>? avisos = [];
   List<String>? idComName = [];
 
+  List<StepState> _listState = [];
+
   Future sendId() async {
     for (int i = 0; i < widget.comunities!.length; i++) {
       if (chosenValue == widget.comunities![i].nombreComu) {
@@ -101,6 +104,12 @@ class _AddReporteState extends State<AddReporte> {
   void initState() {
     super.initState();
     addata();
+    _listState = [
+      StepState.indexed,
+      StepState.editing,
+      StepState.complete,
+      StepState.disabled,
+    ];
   }
 
   @override
@@ -160,7 +169,28 @@ class _AddReporteState extends State<AddReporte> {
       onStepContinue: () {
         setState(() {
           if (this._currentStep < this._stepper()!.length - 1) {
-            this._currentStep = this._currentStep + 1;
+            if (this._currentStep == 0) {
+              if (_formKey.currentState!.validate()) {
+                this._currentStep = this._currentStep + 1;
+              } else {}
+            } else {
+              if (idUser == 0) {
+                if (chosenValue == null) {
+                  Fluttertoast.showToast(
+                      msg: "Elija comunidad",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.CENTER,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.white,
+                      textColor: Colors.black,
+                      fontSize: 17.0);
+                } else {
+                  this._currentStep = this._currentStep + 1;
+                }
+              } else {
+                this._currentStep = this._currentStep + 1;
+              }
+            }
           } else {
             if (images.isEmpty) {
               Fluttertoast.showToast(
@@ -191,11 +221,11 @@ class _AddReporteState extends State<AddReporte> {
 
 //caracteristica  de cada step
   List<Step>? _stepper() {
-    List<Step> _steps = [
+    List<Step> _steps = <Step>[
       Step(
           title: Text('Nombre del reporte'),
           isActive: _currentStep >= 0,
-          state: StepState.complete,
+          state: _currentStep == 0 ? titleController.text.isEmpty? _listState[3] : _listState[3] : _currentStep > 0 ?  _listState[2]: _listState[0],
           content: Column(
             children: [
               Form(
@@ -207,7 +237,7 @@ class _AddReporteState extends State<AddReporte> {
       Step(
           title: Text('Descripcion del incidente'),
           isActive: _currentStep >= 1,
-          state: StepState.disabled,
+          state: _currentStep == 1 ?  _listState[1] : _currentStep > 1 ?  _listState[2]: _listState[3],
           content: Column(
             children: [
               Form(
@@ -284,7 +314,7 @@ class _AddReporteState extends State<AddReporte> {
                   ],
                 )
               : buildImage(),
-          state: StepState.disabled,
+          state: _currentStep == 2 ?  _listState[1] : _currentStep > 2 ?  _listState[2]: _listState[3],
           isActive: _currentStep >= 2)
     ];
     return _steps;
@@ -432,62 +462,10 @@ class _AddReporteState extends State<AddReporte> {
       ),
     );
 
-    showDialog(context: context, builder: (_) => alert);
+    showDialog(context: context, builder: (_) => alert, barrierDismissible: false);
   }
 
-  // envia las fotos al serv mas toda su informacion que reqiere como los params
-  sendingData(String titulo, String descrip, List<File> file,
-      List<String> newpath) async {
-    try {
-      List<String> filesArr = [];
-      Dio dio = Dio();
-
-      print('here${idCom}');
-      print(idUser.toString());
-
-      for (var item in newsPath) {
-        print('$item');
-        filesArr.add(item.split('/').last);
-      }
-
-      var formdata2 = FormData.fromMap({
-        'params': json.encode({
-          'descripcionCorta': titulo,
-          'descripcionLarga': descrip,
-          'idCom': idCom,
-          'idUsusarioResidente': idUser
-        }),
-        'img[]': [
-          for (int i = 0; i < file.length; i++)
-            await MultipartFile.fromFile(file[i].path,
-                filename: filesArr[i], contentType: MediaType('media', '*'))
-          /*   await MultipartFile.fromFileSync(newsPath[i],
-                filename: filesArr[i], contentType: MediaType('*', '*')) */
-        ]
-      });
-
-      Response response = await dio.post(
-          'http://187.189.53.8:8081/backend/web/index.php?r=adcom/reportes',
-          data: formdata2, onSendProgress: (received, total) {
-        if (total != 1) {
-          print((received / total * 100).toStringAsFixed(0) + '%');
-        }
-      });
-
-      if (response.statusCode == 200) {
-        print('aqui $response');
-      }
-    } on DioError catch (e) {
-      if (e.response!.data == true) {
-        print('aqui1:${e.response!.data.toString()}');
-        return;
-      } else {
-        print('aqui2:${e.response!.data.toString()}');
-      }
-    }
-  }
-
-  sendingData2(String titulo, String descrip, List<File> files,
+  Future sendingData2(String titulo, String descrip, List<File> files,
       List<String> newpath) async {
     // string to uri
     var uri = Uri.parse(
@@ -523,7 +501,10 @@ class _AddReporteState extends State<AddReporte> {
 
     print(response.statusCode);
 
-    var res = await http.Response.fromStream(response);
+    var res = await http.Response.fromStream(response)
+        .timeout(Duration(seconds: 8), onTimeout: () {
+      return http.Response('Timeout', 408);
+    });
     if (response.statusCode == 200 || response.statusCode == 201) {
       print("Item form is statuscode 200");
       print(res.body);
@@ -594,32 +575,38 @@ class _AddReporteState extends State<AddReporte> {
       final Response? response = await sendingData2(titleController.text,
               descriptionController.text, images, newsPath)
           .then((value) {
-        Navigator.of(context).pop();
-
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(
-          'Su reporte se ha realizado con exito!',
-          style: TextStyle(fontSize: 19),
-        )));
-      });
+            Navigator.of(context).pop();
+          })
+          .whenComplete(() => {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(
+                  'Su reporte se ha realizado con exito!',
+                  style: TextStyle(fontSize: 19),
+                )))
+              })
+          .catchError((e) {});
 
       return response;
     }
   }
 
   Future<TipoAviso?> getTipoAviso() async {
-    print(idCom);
-    print(idUser);
-    final Uri url = Uri.parse(
-        'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-tipo-aviso');
-    final response = await http.post(url, body: {"idCom": idCom.toString()});
+    try {
+      print(idCom);
+      print(idUser);
+      final Uri url = Uri.parse(
+          'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-tipo-aviso');
+      final response = await http
+          .post(url, body: {"idCom": idCom.toString()}).timeout(
+              Duration(seconds: 8), onTimeout: () {
+        return http.Response('Timeout', 408);
+      });
 
-    if (response.statusCode == 200) {
-      var data = response.body;
+      var data = returnResponse(response);
       print(data);
       return tipoAvisoFromJson(data);
-    } else {
-      print(response.body);
+    } on SocketException {
+      throw FetchDataException('Something wrong');
     }
   }
 

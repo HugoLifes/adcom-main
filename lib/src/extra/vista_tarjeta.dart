@@ -316,7 +316,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
       actions: [okButton],
     );
 
-    showDialog(context: context, builder: (_) => alert);
+    showDialog(context: context, builder: (_) => alert, barrierDismissible: false);
   }
 
   data() async {

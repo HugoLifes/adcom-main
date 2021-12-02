@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:adcom/src/methods/exeptions.dart';
 import 'package:http/http.dart' as http;
 import 'package:adcom/json/jsonAmenidadReserva.dart';
 import 'package:adcom/src/extra/reporte.dart';
@@ -37,21 +39,26 @@ class _EventEditingPageState extends State<EventEditingPage> {
   int? idAm;
   bool apartado = false;
   bool maxHoras = false;
+  bool error = false;
 
   Future<ReservaData?> getReserva() async {
-    prefs = await SharedPreferences.getInstance();
+    try {
+      prefs = await SharedPreferences.getInstance();
 
-    Uri uri = Uri.parse(
-        'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-amenidad-reserva');
+      Uri uri = Uri.parse(
+          'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-amenidad-reserva');
 
-    final response = await http.post(uri, body: {"idAmenidad": "${widget.id}"});
+      final response = await http
+          .post(uri, body: {"idAmenidad": "${widget.id}"}).timeout(
+              Duration(seconds: 8), onTimeout: () {
+        return http.Response('Timeout', 408);
+      });
 
-    if (response.statusCode == 200) {
-      var data = response.body;
+      var data = returnResponse(response);
 
       return reservaDataFromJson(data);
-    } else {
-      print('error');
+    } on SocketException {
+      throw FetchDataException('Error server conection');
     }
   }
 
@@ -272,6 +279,8 @@ class _EventEditingPageState extends State<EventEditingPage> {
             });
           }
         }
+      }).catchError((e) {
+        errors();
       });
 
       if (apartado == true) {
@@ -287,6 +296,8 @@ class _EventEditingPageState extends State<EventEditingPage> {
         } */
           ///navegar hacia atras y actualizar
           Navigator.pop(context);
+        }).catchError((e) {
+          errors();
         });
         return response;
       }
@@ -295,7 +306,7 @@ class _EventEditingPageState extends State<EventEditingPage> {
     }
   }
 
-  sendingData(
+  Future sendingData(
     String titulo,
     DateTime fromDate,
     DateTime to,
@@ -457,7 +468,54 @@ class _EventEditingPageState extends State<EventEditingPage> {
       ),
     );
 
-    showDialog(context: context, builder: (_) => alert);
+    showDialog(context: context, builder: (_) => alert, barrierDismissible: false);
+  }
+
+  errors() {
+    Widget okButton = TextButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: Text(
+          'Si, continuar',
+          style: TextStyle(color: Colors.red[900]),
+        ));
+    Widget backButton = TextButton(
+        onPressed: () {
+          Navigator.of(context)..pop()..pop();
+        },
+        child: Text(
+          'Regresar',
+          style: TextStyle(color: Colors.orange),
+        ));
+    AlertDialog alert = AlertDialog(
+      actions: [backButton],
+      title: Text(
+        'Atención!',
+        style: TextStyle(
+          fontSize: 25,
+        ),
+      ),
+      content: Container(
+        width: 140,
+        height: 150,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Atencion!',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Text('Existio un error o la espera fue larga')
+          ],
+        ),
+      ),
+    );
+
+    showDialog(context: context, builder: (_) => alert, barrierDismissible: false);
   }
 }
 

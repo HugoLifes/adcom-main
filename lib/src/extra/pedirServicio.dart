@@ -1,14 +1,18 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:adcom/json/jsonCheck.dart';
 import 'package:adcom/json/jsonCorre.dart';
 import 'package:adcom/src/extra/multiServ.dart';
+import 'package:adcom/src/extra/servicios.dart';
 import 'package:adcom/src/methods/event_editing_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:glyphicon/glyphicon.dart';
 import 'package:intl/intl.dart';
+import 'package:printing/printing.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -17,8 +21,21 @@ SharedPreferences? prefs;
 // ignore: must_be_immutable
 class PedirServicio extends StatefulWidget {
   final int? service;
+  DatosProveedor? datosProveedor;
+  List<dynamic>? url;
   Servicios? servicio;
-  PedirServicio({Key? key, this.service, this.servicio}) : super(key: key);
+  List<dynamic>? name;
+
+  List<dynamic>? seleccionado = [];
+  PedirServicio(
+      {Key? key,
+      this.service,
+      this.servicio,
+      this.datosProveedor,
+      this.url,
+      this.seleccionado,
+      this.name})
+      : super(key: key);
 
   @override
   _PedirServicioState createState() => _PedirServicioState();
@@ -50,6 +67,8 @@ class _PedirServicioState extends State<PedirServicio> {
   var calle;
   bool isChecked = false;
   bool isChecked2 = false;
+  int? selectindex;
+  bool tanqueLleno = false;
 
   getDt() async {
     prefs = await SharedPreferences.getInstance();
@@ -67,7 +86,7 @@ class _PedirServicioState extends State<PedirServicio> {
       });
       print('comu:${comu}');
       print('idResidente:${idRe}');
-      print('${widget.servicio!.idproveedor!}');
+      print('id proveeror${widget.servicio!.idproveedor!}');
       print(calle);
     }
 
@@ -78,13 +97,21 @@ class _PedirServicioState extends State<PedirServicio> {
     } else {}
   }
 
+  printUrl() {
+    for (int i = 0; i < widget.url!.length; i++) {
+      print(widget.url![i]);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     getDt();
+    imprimir();
     select = false;
     select2 = false;
     select3 = false;
+    printUrl();
     fromDate = DateTime.now();
     toDate = DateTime.now().add(Duration(hours: 2));
   }
@@ -124,7 +151,6 @@ class _PedirServicioState extends State<PedirServicio> {
   Stepper stepper() {
     return Stepper(
       steps: _stepper()!,
-      physics: ClampingScrollPhysics(),
       currentStep: this._currentStep,
       onStepTapped: (step) {
         setState(() {
@@ -135,6 +161,8 @@ class _PedirServicioState extends State<PedirServicio> {
         setState(() {
           if (this._currentStep < this._stepper()!.length - 1) {
             /// chequea la posicion del dateTime para hacer la llamada de disponibilidad
+            ///
+            ///
             if (this._currentStep == 3) {
               var currenTime =
                   DateTime(fromDate.year, fromDate.month, fromDate.day);
@@ -155,17 +183,28 @@ class _PedirServicioState extends State<PedirServicio> {
               /// chequea si hay un metodo de pago
               if (this._currentStep == 2) {
                 if ((isChecked || isChecked2) == false) {
-                  alerta4();
+                  alerta4('Seleccione un metodo de pago');
                 } else {
-                  setState(() {
-                    this._currentStep = this._currentStep + 1;
-                  });
+                  if (tanqueLleno != true) {
+                    if (_formKey3.currentState!.validate()) {
+                      setState(() {
+                        this._currentStep = this._currentStep + 1;
+                      });
+                      FocusScope.of(context).unfocus();
+                    } else {
+                      alerta4('Complete los campos');
+                    }
+                  } else {
+                    setState(() {
+                      this._currentStep = this._currentStep + 1;
+                    });
+                    FocusScope.of(context).unfocus();
+                  }
                 }
               } else {
                 /// chequea si hay imagenes seleccionadas
                 if (this._currentStep == 1) {
-                  if ((select! || select2! || select3!) == false &&
-                      descripCompra.text.isEmpty) {
+                  if (eleccion == null && descripCompra.text.isEmpty) {
                     alerta5();
                   } else {
                     setState(() {
@@ -173,14 +212,36 @@ class _PedirServicioState extends State<PedirServicio> {
                     });
                   }
                 } else {
-                  setState(() {
-                    this._currentStep = this._currentStep + 1;
-                  });
+                  if (this._currentStep == 0) {
+                    if (_formKey2.currentState!.validate()) {
+                      setState(() {
+                        this._currentStep = this._currentStep + 1;
+                      });
+                    } else {
+                      Fluttertoast.showToast(
+                          msg: "Campo vacio",
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.CENTER,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: Colors.white,
+                          textColor: Colors.black,
+                          fontSize: 17.0);
+                    }
+                  }
                 }
               }
             }
           } else {
             context.loaderOverlay.show();
+
+            if (cantidadController.text == null ||
+                cantidadController.text == "h") {
+              setState(() {
+                cantidadController.text = eleccion!;
+              });
+            }
+
+            print(widget.servicio!.idproveedor!);
             EnviarCorreo()
                 .sendCorreo(
                     idRe!,
@@ -194,21 +255,43 @@ class _PedirServicioState extends State<PedirServicio> {
                     context)
                 .then((value) => {
                       if (value!.value == 1)
-                        {context.loaderOverlay.hide(), alerta3()}
-                    });
+                        {
+                          context.loaderOverlay.hide(),
+                          alerta3(),
+                        }
+                      else
+                        {print('${value.value}')}
+                    })
+                .catchError((e) {
+              context.loaderOverlay.hide();
+            });
           }
         });
       },
       onStepCancel: () {
         setState(() {
           if (this._currentStep > 0) {
-            this._currentStep = this._currentStep - 1;
+            if (this._currentStep == 2) {
+              setState(() {
+                isChecked = false;
+                isChecked2 = false;
+                cantidadController.text = "";
+              });
+              FocusScope.of(context).unfocus();
+              this._currentStep = this._currentStep - 1;
+            } else {
+              this._currentStep = this._currentStep - 1;
+            }
           } else {
             this._currentStep = 0;
           }
         });
       },
     );
+  }
+
+  imprimir() {
+    print(widget.url![0]);
   }
 
   /// stepper que muesta al entrar a la pagina para pedir servicios
@@ -259,78 +342,49 @@ class _PedirServicioState extends State<PedirServicio> {
             title: Text('Tipo de tanque'),
             isActive: _currentStep >= 1,
             state: StepState.disabled,
-            content: Container(
-                //padding: EdgeInsets.only(top: 10, right: 190),
-                child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                InkWell(
-                  onTap: () {
-                    setState(() {
-                      eleccion = '30kg';
-                      select = true;
-                      select2 = false;
-                      select3 = false;
-                    });
-                  },
-                  child: Container(
-                      width: 90,
-                      height: 90,
-                      decoration: BoxDecoration(
-                          border: Border.all(
-                              color: select == true
-                                  ? Colors.red
-                                  : Colors.transparent,
-                              width: 2.0)),
-                      child: Image.asset(
-                        'assets/images/30kg.png',
-                        fit: BoxFit.contain,
-                      )),
-                ),
-                InkWell(
-                  onTap: () {
-                    setState(() {
-                      eleccion = '45kg';
-                      select = false;
-                      select2 = true;
-                      select3 = false;
-                    });
-                  },
-                  child: Container(
-                      width: 90,
-                      height: 90,
-                      decoration: BoxDecoration(
-                          border: Border.all(
-                              color: select2 == true
-                                  ? Colors.red
-                                  : Colors.transparent,
-                              width: 2.0)),
-                      child: Image.asset('assets/images/45kg.png',
-                          fit: BoxFit.contain)),
-                ),
-                InkWell(
-                  onTap: () {
-                    setState(() {
-                      eleccion = 'Estacionario';
-                      select = false;
-                      select2 = false;
-                      select3 = true;
-                    });
-                  },
-                  child: Container(
-                      width: 90,
-                      height: 90,
-                      decoration: BoxDecoration(
-                          border: Border.all(
-                              color: select3 == true
-                                  ? Colors.red
-                                  : Colors.transparent,
-                              width: 2.0)),
-                      child: Image.asset('assets/images/estacionario.png',
-                          fit: BoxFit.contain)),
-                )
-              ],
-            )));
+            content: ListView.builder(
+                itemCount: widget.url!.length,
+                addAutomaticKeepAlives: true,
+                shrinkWrap: true,
+                itemBuilder: (_, index) {
+                  return InkWell(
+                    onTap: () {
+                      setState(() {
+                        selectindex = index;
+                        eleccion = widget.name![index].toString().toLowerCase();
+                      });
+
+                      if (eleccion == 'tanque 30') {
+                        setState(() {
+                          tanqueLleno = true;
+                        });
+                      } else if (eleccion == 'tanque 45') {
+                        setState(() {
+                          tanqueLleno = true;
+                        });
+                      } else if (eleccion == 'tanque estacionario' ||
+                          eleccion == 'estacionario') {
+                        setState(() {
+                          tanqueLleno = false;
+                        });
+                      }
+                      print(eleccion);
+                    },
+                    child: ListTile(
+                      title: Container(
+                          width: 90,
+                          height: 90,
+                          decoration: BoxDecoration(
+                              border: Border.all(
+                                  color: selectindex == index
+                                      ? Colors.red
+                                      : Colors.transparent,
+                                  width: 2.0)),
+                          child: Image.network(widget.url![index])),
+                    ),
+                  );
+                }));
+
       case 2:
         return Step(
             title: Text('Comente su pedido'),
@@ -349,77 +403,80 @@ class _PedirServicioState extends State<PedirServicio> {
     }
   }
 
+  /// step que muestra los tipos de pago
   Step? caracteristicasTipoPago() {
     switch (widget.servicio!.idTipoProveedor) {
       case 1:
         return Step(
-            title: Text('Tipo de pago'),
+            title: Text('Tipo de pago y Cantidad a cargar'),
             content: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Form(
-                  key: _formKey3,
-                  child: buildCantidad(),
-                ),
-                Column(
-                  ///tipoDePago = "Efectivo";
-                  children: [
-                    Row(
-                      children: [
-                        Text('Efectivo'),
-                        Checkbox(
-                          checkColor: Colors.white,
-                          value: isChecked,
-                          tristate: true,
-                          onChanged: (bool? value) {
-                            if (value == true) {
-                              setState(() {
-                                isChecked = value!;
-                                tipoDePago = "Efectivo";
-                              });
-                            }
+                tanqueLleno != true
+                    ? Form(
+                        key: _formKey3,
+                        child: buildCantidad(),
+                      )
+                    : Row(
+                        ///tipoDePago = "Efectivo";
+                        children: [
+                          Row(
+                            children: [
+                              Text('Efectivo'),
+                              Checkbox(
+                                checkColor: Colors.white,
+                                tristate: true,
+                                value: isChecked,
+                                onChanged: (bool? value) {
+                                  if (value == true) {
+                                    setState(() {
+                                      isChecked = value!;
+                                      tipoDePago = "Efectivo";
+                                    });
+                                  }
 
-                            if (isChecked2 == true) {
-                              setState(() {
-                                isChecked2 = false;
-                                isChecked = value!;
-                                tipoDePago = "Efectivo";
-                              });
-                            }
-                            print('$tipoDePago');
-                          },
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Text('Tarjeta  '),
-                        Checkbox(
-                          checkColor: Colors.white,
-                          value: isChecked2,
-                          tristate: true,
-                          onChanged: (bool? value) {
-                            if (value == true) {
-                              setState(() {
-                                isChecked2 = value!;
-                                tipoDePago = "Tarjeta";
-                              });
-                            }
+                                  if (isChecked2 == true) {
+                                    setState(() {
+                                      isChecked2 = false;
+                                      isChecked = value!;
+                                      tipoDePago = "Efectivo";
+                                    });
+                                  }
+                                  print('$tipoDePago');
+                                },
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Text('Tarjeta  '),
+                              Checkbox(
+                                checkColor: Colors.white,
+                                value: isChecked2,
+                                tristate: true,
+                                onChanged: (bool? value) {
+                                  if (value == true) {
+                                    setState(() {
+                                      isChecked2 = value!;
+                                      tipoDePago = "Tarjeta";
+                                    });
+                                  }
 
-                            if (isChecked == true) {
-                              setState(() {
-                                isChecked = false;
-                                isChecked2 = value!;
-                                tipoDePago = "Tarjeta";
-                              });
-                              print('$tipoDePago');
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                                  if (isChecked == true) {
+                                    setState(() {
+                                      isChecked = false;
+                                      isChecked2 = value!;
+                                      tipoDePago = "Tarjeta";
+                                    });
+                                    print('$tipoDePago');
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                tanqueLleno != true ? camposTipoPago() : Container(),
               ],
             ),
             state: StepState.disabled,
@@ -439,17 +496,21 @@ class _PedirServicioState extends State<PedirServicio> {
                         Checkbox(
                           checkColor: Colors.white,
                           value: isChecked,
-                          onChanged: (bool? value) {
+                          onChanged: (value) {
+                            print('$value');
                             setState(() {
                               isChecked = value!;
                             });
-                            if (isChecked2 == true) {
+                            if (isChecked == true) {
                               setState(() {
-                                isChecked2 = false;
-                                isChecked = value!;
                                 tipoDePago = "Efectivo";
                               });
+                            } else {
+                              setState(() {
+                                tipoDePago = "";
+                              });
                             }
+                            print(isChecked.toString());
                             print('$tipoDePago');
                           },
                         ),
@@ -465,14 +526,16 @@ class _PedirServicioState extends State<PedirServicio> {
                             setState(() {
                               isChecked2 = value!;
                             });
-                            if (isChecked == true) {
+                            if (isChecked2 == true) {
                               setState(() {
-                                isChecked = false;
-                                isChecked2 = value!;
                                 tipoDePago = "Tarjeta";
                               });
-                              print('$tipoDePago');
+                            } else {
+                              setState(() {
+                                tipoDePago = "";
+                              });
                             }
+                            print('$tipoDePago');
                           },
                         ),
                       ],
@@ -487,9 +550,77 @@ class _PedirServicioState extends State<PedirServicio> {
     }
   }
 
+  /// step que muestra los campos de pago
+  Column camposTipoPago() {
+    return Column(
+      ///tipoDePago = "Efectivo";
+      children: [
+        Row(
+          children: [
+            Text('Efectivo'),
+            Checkbox(
+              checkColor: Colors.white,
+              tristate: true,
+              value: isChecked,
+              onChanged: (bool? value) {
+                if (value == true) {
+                  setState(() {
+                    isChecked = value!;
+                    tipoDePago = "Efectivo";
+                  });
+                }
+
+                if (isChecked2 == true) {
+                  setState(() {
+                    isChecked2 = false;
+                    isChecked = value!;
+                    tipoDePago = "Efectivo";
+                  });
+                }
+                print('$tipoDePago');
+              },
+            ),
+          ],
+        ),
+        Row(
+          children: [
+            Text('Tarjeta  '),
+            Checkbox(
+              checkColor: Colors.white,
+              value: isChecked2,
+              tristate: true,
+              onChanged: (bool? value) {
+                if (value == true) {
+                  setState(() {
+                    isChecked2 = value!;
+                    tipoDePago = "Tarjeta";
+                  });
+                }
+
+                if (isChecked == true) {
+                  setState(() {
+                    isChecked = false;
+                    isChecked2 = value!;
+                    tipoDePago = "Tarjeta";
+                  });
+                  print('$tipoDePago');
+                }
+              },
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  String _formatNumber(String s) =>
+      NumberFormat.decimalPattern('en').format(int.parse(s));
+  String get _currency =>
+      NumberFormat.compactSimpleCurrency(locale: 'en').currencySymbol;
+
   /// inserta la cantindad de dinero que quiere el usuario
   buildCantidad() => Container(
-        width: 180,
+        width: 200,
         child: TextFormField(
           keyboardType: TextInputType.number,
           cursorColor: Colors.black,
@@ -502,9 +633,17 @@ class _PedirServicioState extends State<PedirServicio> {
               ? 'Este campo no puede estar vacio'
               : null,
           decoration: InputDecoration(
+              prefixText: _currency,
               icon: Icon(Glyphicon.cash),
               border: UnderlineInputBorder(),
               hintText: 'Monto en pesos'),
+          onChanged: (v) {
+            v = '${_formatNumber(v.replaceAll(',', ''))}';
+            cantidadController.value = TextEditingValue(
+              text: v,
+              selection: TextSelection.collapsed(offset: v.length),
+            );
+          },
         ),
       );
 
@@ -702,13 +841,13 @@ class _PedirServicioState extends State<PedirServicio> {
               height: 15,
             ),
             Text(
-                'Este dia, el gas no tiene prioridad en este fraccionamiento, esto podría hacer que demore un poco mas, le pedimos que sea paciente.')
+                'Este día, el gas no tiene prioridad en este fraccionamiento, esto podría hacer que demore un poco más, le pedimos que sea paciente.')
           ],
         ),
       ),
     );
 
-    showDialog(context: context, builder: (_) => alert);
+    showDialog(context: context, builder: (_) => alert, barrierDismissible: false);
   }
 
   alerta2() {
@@ -758,7 +897,7 @@ class _PedirServicioState extends State<PedirServicio> {
       ),
     );
 
-    showDialog(context: context, builder: (_) => alert);
+    showDialog(context: context, builder: (_) => alert, barrierDismissible: false);
   }
 
   alerta3() {
@@ -779,7 +918,7 @@ class _PedirServicioState extends State<PedirServicio> {
           style: TextStyle(color: Colors.orange),
         ));
     AlertDialog alert = AlertDialog(
-      actions: [okButton, backButton],
+      actions: [okButton],
       title: Text(
         'Atención!',
         style: TextStyle(
@@ -804,11 +943,12 @@ class _PedirServicioState extends State<PedirServicio> {
         ),
       ),
     );
+    
 
-    showDialog(context: context, builder: (_) => alert);
+    showDialog(context: context, builder: (_) => alert, barrierDismissible: false);
   }
 
-  alerta4() {
+  alerta4(String mensaje) {
     Widget okButton = TextButton(
         onPressed: () {
           setState(() {
@@ -849,13 +989,13 @@ class _PedirServicioState extends State<PedirServicio> {
             SizedBox(
               height: 15,
             ),
-            Text('Seleccione un metodo de pago')
+            Text('$mensaje')
           ],
         ),
       ),
     );
 
-    showDialog(context: context, builder: (_) => alert);
+    showDialog(context: context, builder: (_) => alert, barrierDismissible: false);
   }
 
   alerta5() {
@@ -904,9 +1044,10 @@ class _PedirServicioState extends State<PedirServicio> {
         ),
       ),
     );
-
-    showDialog(context: context, builder: (_) => alert);
+    
+    showDialog(context: context, builder: (_) => alert, barrierDismissible: false);
   }
+  
 }
 
 class Checkeo {
@@ -925,7 +1066,36 @@ class Checkeo {
       print(data);
       return checkFromJson(data);
     } else {
-      print(response.body);
+      if (response.statusCode == 400) {
+        Fluttertoast.showToast(
+            msg: "Error al generar la referencia",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      } else {
+        if (response.statusCode == 500) {
+          Fluttertoast.showToast(
+              msg: "Error en el servidor",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: 16.0);
+        } else {
+          Fluttertoast.showToast(
+              msg: "Error desconocido",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: 16.0);
+        }
+      }
     }
   }
 }
@@ -949,9 +1119,14 @@ class EnviarCorreo {
 
     // pass the UTC time here
 
+    print(eleccion);
+    print(idRe);
+    print(id);
+    print('here $cantidad');
     print(goDate);
     print(newDate);
     print(tipoPago);
+    print(coments);
     Uri url = Uri.parse(
         "http://187.189.53.8:8080/AdcomBackend/backend/web/index.php?r=adcom/envio-correo-servicio");
 
@@ -963,9 +1138,11 @@ class EnviarCorreo {
         "formaPago": tipoPago,
         "cantidadARecargar": "\$ ${cantidad}",
         "horarioDePreferencia":
-            "Fecha:${newDate}  Hora: ${fromhr} a ${goDate} ",
+            "Fecha: ${newDate}  Hora: ${fromhr} a ${goDate} ",
         "comentarios": coments
       })
+    }).timeout(const Duration(seconds: 10), onTimeout: () {
+      return http.Response('Error', 408);
     });
     if (response.statusCode == 200) {
       var data = response.body;
@@ -973,7 +1150,36 @@ class EnviarCorreo {
 
       return correoFromJson(data);
     } else {
-      print(response);
+      if (response.statusCode == 400) {
+        Fluttertoast.showToast(
+            msg: "Error al generar la referencia",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      } else {
+        if (response.statusCode == 500) {
+          Fluttertoast.showToast(
+              msg: "Error en el servidor",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: 16.0);
+        } else {
+          Fluttertoast.showToast(
+              msg: "Error desconocido",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.CENTER,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: 16.0);
+        }
+      }
     }
   }
 }

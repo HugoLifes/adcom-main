@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
-
+import 'dart:math';
+import 'package:adcom/src/extra/report_edit_page.dart';
 import 'package:adcom/json/jsonAmenidades.dart';
 import 'package:adcom/src/extra/servicios.dart';
 import 'package:http/http.dart' as http;
@@ -8,11 +9,12 @@ import 'package:adcom/src/methods/gridDashboard.dart';
 import 'package:adcom/src/pantallas/loginPage.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:glyphicon/glyphicon.dart';
-
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:adcom/src/models/event_provider.dart';
 SharedPreferences? prefs;
 
 class MainMenu extends StatefulWidget {
@@ -60,6 +62,7 @@ class _MainMenuState extends State<MainMenu> {
   String? pass;
   OSDeviceState? statusOneSignal;
   int? idPrim;
+  bool? usuarioIncorrecto = false;
 
   /// obtiene en memoria el tipo de usuario y el nombre de usuario
   userName() async {
@@ -98,6 +101,7 @@ class _MainMenuState extends State<MainMenu> {
     print(pass);
     print(idPrim);
 
+    /// Llamado a la funcion [loginAccess]
     loginAcces(userM!, pass!).then((value) {
       var userId;
       var post = value;
@@ -116,6 +120,12 @@ class _MainMenuState extends State<MainMenu> {
         var calle = post.infoUsuario == null ? '' : post.infoUsuario!.calle;
         somData(userd, userType, comId, idPrimario, userId, userM, pass,
             comunidad: comunidad, noInterior: noInterior, calle: calle);
+      } else {
+        if (post.message == "Usuario o contraseña incorrecto" &&
+            post.value == 0) {
+          Fluttertoast.showToast(msg: 'Usuario o contraseña incorrecto');
+          alerta5();
+        }
       }
     });
     if (prefs!.getBool('EnvioId') == true) {
@@ -177,6 +187,10 @@ class _MainMenuState extends State<MainMenu> {
             ],
           ),
         ),
+        
+      
+        
+        
         Container(
             padding:
                 EdgeInsets.only(top: size.height * .18, right: size.width / 18),
@@ -252,6 +266,45 @@ class _MainMenuState extends State<MainMenu> {
     );
   }
 
+  alerta5() {
+    Widget okButton = TextButton(
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+      child: Text(
+        'Si, continuar',
+        style: TextStyle(color: Colors.red[900]),
+      ),
+    );
+    Widget backButton = TextButton(
+      onPressed: () {},
+      child: Text('Atras', style: TextStyle(color: Colors.orange)),
+    );
+
+    AlertDialog alert = AlertDialog(
+      actions: [backButton],
+      title: Text(
+        'Atencion!',
+        style: TextStyle(fontSize: 25),
+      ),
+      content: Container(
+        width: 140,
+        height: 150,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Atencion!'),
+            SizedBox(
+              height: 15,
+            ),
+            Text('Su contraseña ha cambiado')
+          ],
+        ),
+      ),
+    );
+    showDialog(context: context, builder: (_) => alert, barrierDismissible: false);
+  }
+
   String greeting() {
     var hour = DateTime.now().hour;
     if (hour < 12) {
@@ -275,12 +328,23 @@ class SendIdNotification {
         "idUsurioApp": userIdApp,
         "uuid": nuserId,
       })
+    }).timeout(Duration(seconds: 5), onTimeout: () {
+      return http.Response('Timeout', 408);
     });
     print(response.body);
     if (response.statusCode == 200) {
       print('ok');
     } else {
-      print('error');
+      if (response.statusCode == 400) {
+        print('Item form is status code 400');
+        Fluttertoast.showToast(
+            msg: 'Excedido en el servicio', toastLength: Toast.LENGTH_SHORT);
+      } else {
+        print('Item form is status code 500');
+        Fluttertoast.showToast(
+            msg: 'Error en el servidor, intente mas tarde',
+            toastLength: Toast.LENGTH_SHORT);
+      }
     }
     prefs = await SharedPreferences.getInstance();
     prefs!.setBool('EnvioId', true);

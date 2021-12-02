@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class EventProvider extends ChangeNotifier {
   final List<Event> _events = [];
@@ -29,7 +30,7 @@ class EventProvider extends ChangeNotifier {
   String _status = '';
   int? idU;
   bool _islogged = false;
-  bool _loading = true;
+  bool _loading = false;
 
   List<Event> get events => _events;
   List<Report> get reports => _reports;
@@ -61,61 +62,72 @@ class EventProvider extends ChangeNotifier {
   }
 
   var userd;
-  void login(user, pass, ctx, TextEditingController tk, TextEditingController tk2) async {
+  Future<void> login(user, pass, ctx, TextEditingController tk,
+      TextEditingController tk2) async {
     _loading = false;
     notifyListeners();
 
-    try{
-    await loginAcces(user, pass).then((value) {
-      _loading = true;
-      var userId;
-      var post = value;
-      if (post!.value == 1) {
-        var idPrimario = post.id;
-        userId = post.idResidente;
-        var comId = post.idCom;
-        userd = post.nombreResidente;
-        var userType = post.idPerfil;
-        var comunidad = post.infoUsuario == null? '' :post.infoUsuario!.comunidad;
-        var noInterno = post.infoUsuario == null? '' : post.infoUsuario!.noInterior;
-        var calle = post.infoUsuario == null ? '' : post.infoUsuario!.calle;
-        somData(userd, userType, comId, idPrimario, userId, user, pass,
+    try {
+      await loginAcces(user, pass).then((value) {
+        var userId;
+        var post = value;
+        if (post!.value == 1) {
+          var idPrimario = post.id;
+          userId = post.idResidente;
+          var comId = post.idCom;
+          userd = post.nombreResidente;
+          var userType = post.idPerfil;
+          var comunidad =
+              post.infoUsuario == null ? '' : post.infoUsuario!.comunidad;
+          var noInterno =
+              post.infoUsuario == null ? '' : post.infoUsuario!.noInterior;
+          var calle = post.infoUsuario == null ? '' : post.infoUsuario!.calle;
+          somData(userd, userType, comId, idPrimario, userId, user, pass,
               comunidad: comunidad, noInterior: noInterno, calle: calle);
-      
-        Navigator.pushReplacementNamed(ctx, '/');
-      }
-    });
 
-    _loading = true;
-    if (userd != null) {
-      _islogged = true;
-      pref.setBool('isLoggedIn', true);
-      notifyListeners();
-    } else {
-      _loading = false;
-      _islogged = false;
-      notifyListeners();
-    }
-    }catch(e){
-      _loading = false;
-      HapticFeedback.lightImpact();
-      {
-    Widget okButton = TextButton(
-        onPressed: () {
+          Navigator.pushReplacementNamed(ctx, '/');
+        } else if (post.value == 0) {
           Navigator.of(ctx).pushNamedAndRemoveUntil('/', (route) => false);
           tk.clear();
           tk2.clear();
-        },
-        child: Text('OK'));
+          notifyListeners();
+          Fluttertoast.showToast(
+              msg: 'Usuario o contraseña incorrecta',
+              toastLength: Toast.LENGTH_LONG,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 2,
+              fontSize: 19.0);
+        }
+      });
 
-    AlertDialog alert = AlertDialog(
-      title: Text('Atencion!'),
-      content: Text('Usuario o contraseña incorrectos, intente de nuevo'),
-      actions: [okButton],
-    );
+      if (userd != null) {
+        _islogged = true;
+        pref.setBool('isLoggedIn', true);
+        notifyListeners();
+      } else {
+        _loading = false;
+        _islogged = false;
+        notifyListeners();
+      }
+    } catch (e) {
+      HapticFeedback.lightImpact();
+      {
+        Widget okButton = TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pushNamedAndRemoveUntil('/', (route) => false);
+              tk.clear();
+              tk2.clear();
+            },
+            child: Text('OK'));
 
-    showDialog(context: ctx, builder: (_) => alert);
-  }
+        AlertDialog alert = AlertDialog(
+          title: Text('Atencion!'),
+          content: Text('Intento de conexion fallido : 408'),
+          actions: [okButton],
+        );
+
+        showDialog(context: ctx, builder: (_) => alert);
+      }
     }
   }
 
@@ -130,7 +142,6 @@ class EventProvider extends ChangeNotifier {
       _loading = false;
       notifyListeners();
     }
-  
   }
 
   void addDataRep(DataReporte datarep) {
@@ -175,7 +186,8 @@ class EventProvider extends ChangeNotifier {
     _items.clear();
     _amenidad.clear();
     if (_deudas.length == 0) {
-      Navigator.of(ctx).popAndPushNamed('/');
+      Navigator.of(ctx)
+          .restorablePushNamedAndRemoveUntil('/', (route) => false);
     }
     notifyListeners();
   }

@@ -90,18 +90,18 @@ class _VistaPagosState extends State<VistaPagos> {
                         ? Fluttertoast.showToast(
                             msg: "Pagado",
                             toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.CENTER,
-                            timeInSecForIosWeb: 1,
-                            backgroundColor: Colors.white,
-                            textColor: Colors.black,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 2,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
                             fontSize: 17.0)
                         : Fluttertoast.showToast(
                             msg: "Deuda más atrazo",
                             toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.CENTER,
-                            timeInSecForIosWeb: 1,
-                            backgroundColor: Colors.white,
-                            textColor: Colors.black,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 2,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
                             fontSize: 17.0);
                   },
                   child: Row(
@@ -205,6 +205,10 @@ class _VistaPagosState extends State<VistaPagos> {
         byteList = bytes.buffer.asUint8List();
       });
     } else if (idCom == 6) {
+      bytes = await rootBundle.load('assets/images/lomas.jpeg');
+      setState(() {
+        byteList = bytes.buffer.asUint8List();
+      });
     } else if (idCom == 10) {
       bytes = await rootBundle.load('assets/images/natura.jpg');
       setState(() {

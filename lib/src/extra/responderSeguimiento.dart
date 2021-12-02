@@ -111,7 +111,7 @@ class _ResponseSeguimientoState extends State<ResponseSeguimiento> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(left: 20),
-                      child: Text('Instrucciones', style: TextStyle(fontSize: 20)),
+                      child: Text('Instrucciones', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold , ),textAlign: TextAlign.justify,),
                     ),
                    
                       SizedBox(
@@ -119,7 +119,7 @@ class _ResponseSeguimientoState extends State<ResponseSeguimiento> {
                       ),
                        Padding(
                          padding: const EdgeInsets.only(left: 10),
-                         child: Text('Es importante elejir primero los archivos que quiere usar y después las fotos, no olvide asignar un seguimiento de lo contrario no podra\ncontinuar con el mismo.', style: TextStyle(fontSize: 18),),
+                         child: Text('Es importante elegir primero los archivos que quiere usar y después las fotos, no olvide asignar un seguimiento de lo contrario no podra\ncontinuar con el mismo.', style: TextStyle(fontSize: 18),),
                        ),
                   
                   ],
@@ -339,7 +339,7 @@ class _ResponseSeguimientoState extends State<ResponseSeguimiento> {
       textColor: Colors.black,
       fontSize: 17.0);
 
-  sendingData2(String titulo, String descrip, List<File> files,
+  Future sendingData2(String titulo, String descrip, List<File> files,
       List<String> newpath) async {
     prefs = await SharedPreferences.getInstance();
 
