@@ -206,7 +206,7 @@ class _PedirServicioState extends State<PedirServicio> {
               } else {
                 /// chequea si hay imagenes seleccionadas
                 if (this._currentStep == 1) {
-                  if (eleccion == "" && descripCompra.text.isEmpty) {
+                  if (eleccion == null && descripCompra.text.isEmpty) {
                     alerta5();
                   } else {
                     setState(() {
@@ -850,7 +850,8 @@ class _PedirServicioState extends State<PedirServicio> {
       ),
     );
 
-    showDialog(context: context, builder: (_) => alert);
+    showDialog(
+        context: context, builder: (_) => alert, barrierDismissible: false);
   }
 
   alerta2() {
@@ -900,7 +901,8 @@ class _PedirServicioState extends State<PedirServicio> {
       ),
     );
 
-    showDialog(context: context, builder: (_) => alert);
+    showDialog(
+        context: context, builder: (_) => alert, barrierDismissible: false);
   }
 
   alerta3() {
@@ -923,7 +925,7 @@ class _PedirServicioState extends State<PedirServicio> {
           style: TextStyle(color: Colors.orange),
         ));
     AlertDialog alert = AlertDialog(
-      actions: [okButton, backButton],
+      actions: [okButton],
       title: Text(
         'Atención!',
         style: TextStyle(
@@ -949,7 +951,8 @@ class _PedirServicioState extends State<PedirServicio> {
       ),
     );
 
-    showDialog(context: context, builder: (_) => alert);
+    showDialog(
+        context: context, builder: (_) => alert, barrierDismissible: false);
   }
 
   alerta4(String mensaje) {
@@ -999,7 +1002,8 @@ class _PedirServicioState extends State<PedirServicio> {
       ),
     );
 
-    showDialog(context: context, builder: (_) => alert);
+    showDialog(
+        context: context, builder: (_) => alert, barrierDismissible: false);
   }
 
   alerta5() {
@@ -1049,7 +1053,8 @@ class _PedirServicioState extends State<PedirServicio> {
       ),
     );
 
-    showDialog(context: context, builder: (_) => alert);
+    showDialog(
+        context: context, builder: (_) => alert, barrierDismissible: false);
   }
 }
 

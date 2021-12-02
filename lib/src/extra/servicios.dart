@@ -88,6 +88,8 @@ class _ServicesState extends State<Services> {
               value.data![index].productos!.length, (index2) => false));
 
       printLinks();
+    }).catchError((e) {
+      alerta5();
     });
   }
 
@@ -133,7 +135,7 @@ class _ServicesState extends State<Services> {
                 } else {
                   if (error == true) {
                     Fluttertoast.showToast(
-                        msg: 'Error al cargar los datos',
+                        msg: 'Respuesta del servidor larga: 408',
                         toastLength: Toast.LENGTH_SHORT,
                         gravity: ToastGravity.BOTTOM,
                         timeInSecForIosWeb: 2,
@@ -286,7 +288,10 @@ class DatosProveedor {
       Uri uri = Uri.parse(
           'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-datos-provedores-by-com');
 
-      var response = await http.post(uri, body: {'idCom': '5'});
+      var response = await http.post(uri, body: {'idCom': '5'}).timeout(
+          Duration(seconds: 8), onTimeout: () {
+        return http.Response('Timeout', 408);
+      });
       var data = returnResponse(response);
       return seguimientoFromJson(data);
     } on SocketException {

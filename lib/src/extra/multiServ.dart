@@ -15,6 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// ya cargue los datos
 ///
 
+// ignore: must_be_immutable
 class MultiServicios extends StatefulWidget {
   final int? service;
   List<DatosProveedor>? datosP = [];
@@ -40,7 +41,10 @@ Future<Proveedores?> getProv() async {
     Uri url = Uri.parse(
         "http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-proveedores");
 
-    final response = await http.get(url);
+    final response =
+        await http.get(url).timeout(Duration(seconds: 8), onTimeout: () {
+      return http.Response('Request Timeout', 408);
+    });
     var data = returnResponse(response);
     return proveedoresFromJson(data);
   } on SocketException {
@@ -120,11 +124,11 @@ class _MultiServiciosState extends State<MultiServicios> {
                       serv.clear();
 
                       data().catchError((e) {
-                        alerta5();
+                        print(e);
                       });
                     } else {
                       data().catchError((e) {
-                        alerta5();
+                        print(e);
                       });
                     }
                   });
@@ -338,13 +342,15 @@ class _MultiServiciosState extends State<MultiServicios> {
             SizedBox(
               height: 15,
             ),
-            Text('Ha sucedido un error inesperado, vuelva a intentar')
+            Text('Respuesta del servidor larga: 408')
           ],
         ),
       ),
     );
 
-    showDialog(context: context, builder: (_) => alert);
+    if (mounted) {
+      showDialog(context: context, builder: (_) => alert);
+    }
   }
 }
 
