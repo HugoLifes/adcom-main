@@ -40,9 +40,11 @@ Future<Places?> idso() async {
         'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-amenidades');
     final response = await http.post(url, body: {
       "params": json.encode({"usuarioId": id})
+    }).timeout(Duration(seconds: 8), onTimeout: () {
+      return http.Response('Timeout', 408);
     });
 
-    var data = response.body;
+    var data = returnResponse(response);
     print(data);
 
     return placesFromJson(data);
@@ -55,7 +57,9 @@ class _AmenidadesState extends State<Amenidades> {
   var id;
   gtData() async {
     try {
-      var places = (await idso())!;
+      var places = (await idso().catchError((e) {
+        alerta5();
+      }))!;
 
       final provider = Provider.of<EventProvider>(context, listen: false);
       for (int i = 0; i < places.data!.length; i++) {
@@ -149,5 +153,54 @@ class _AmenidadesState extends State<Amenidades> {
         ),
       ),
     );
+  }
+
+  alerta5() {
+    Widget okButton = TextButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: Text(
+          'Si, continuar',
+          style: TextStyle(color: Colors.red[900]),
+        ));
+    Widget backButton = TextButton(
+        onPressed: () {
+          Navigator.of(context)
+            ..pop()
+            ..pop();
+        },
+        child: Text(
+          'Regresar',
+          style: TextStyle(color: Colors.orange),
+        ));
+    AlertDialog alert = AlertDialog(
+      actions: [backButton],
+      title: Text(
+        'Atención!',
+        style: TextStyle(
+          fontSize: 25,
+        ),
+      ),
+      content: Container(
+        width: 140,
+        height: 150,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Atencion!',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Text('Tiempo de espera largo, error 408, timeout serv')
+          ],
+        ),
+      ),
+    );
+
+    showDialog(context: context, builder: (_) => alert);
   }
 }
