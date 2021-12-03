@@ -13,6 +13,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class EventProvider extends ChangeNotifier {
@@ -66,64 +67,44 @@ class EventProvider extends ChangeNotifier {
     _loading = false;
     notifyListeners();
 
-    try {
-      await loginAcces(user, pass).then((value) {
-        var userId;
-        var post = value;
-        if (post!.value == 1) {
-          var idPrimario = post.id;
-          userId = post.idResidente;
-          var comId = post.idCom;
-          userd = post.nombreResidente;
-          var userType = post.idPerfil;
+    await loginAcces(user, pass).then((value) {
+      var userId;
+      var post = value;
+      if (post!.value == 1) {
+        var idPrimario = post.id;
+        userId = post.idResidente;
+        var comId = post.idCom;
+        userd = post.nombreResidente;
+        var userType = post.idPerfil;
 
-          var comunidad =
-              post.infoUsuario == null ? '' : post.infoUsuario!.comunidad;
-          var noInterior =
-              post.infoUsuario == null ? '' : post.infoUsuario!.noInterior;
-          var calle = post.infoUsuario == null ? '' : post.infoUsuario!.calle;
-          somData(userd, userType, comId, idPrimario, userId, user, pass,
-              comunidad: comunidad, noInterior: noInterior, calle: calle);
+        var comunidad =
+            post.infoUsuario == null ? '' : post.infoUsuario!.comunidad;
+        var noInterior =
+            post.infoUsuario == null ? '' : post.infoUsuario!.noInterior;
+        var calle = post.infoUsuario == null ? '' : post.infoUsuario!.calle;
+        somData(userd, userType, comId, idPrimario, userId, user, pass,
+            comunidad: comunidad, noInterior: noInterior, calle: calle);
 
-          Navigator.pushReplacementNamed(ctx, '/');
-        }
-      }).catchError((e) {
-        _status = 'Error de conexión';
-        print('flag2');
-        print(e);
+        Navigator.pushReplacementNamed(ctx, '/');
+      } else if (post.value == 0) {
+        Navigator.of(ctx).pushNamedAndRemoveUntil('/', (route) => false);
+        tk.clear();
 
-        HapticFeedback.lightImpact();
-        Widget okButton = TextButton(
-            onPressed: () {
-              Navigator.of(ctx).pushNamedAndRemoveUntil('/', (route) => false);
-              tk.clear();
-
-              tk2.clear();
-              notifyListeners();
-            },
-            child: Text('OK'));
-
-        AlertDialog alert = AlertDialog(
-          title: Text('Atencion!'),
-          content: Text('Error 408, Espera larga'),
-          actions: [okButton],
-        );
-
-        showDialog(context: ctx, builder: (_) => alert);
-
+        tk2.clear();
         notifyListeners();
-      });
-
-      if (userd != null) {
-        _islogged = true;
-        pref.setBool('isLoggedIn', true);
-        notifyListeners();
-      } else {
-        _islogged = false;
-        notifyListeners();
+        Fluttertoast.showToast(
+            msg: "Usuario o contraseña incorrectos",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 2,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 19.0);
       }
-    } catch (e) {
-      print(e.toString());
+    }).catchError((e) {
+      _status = 'Error de conexión';
+      print('flag2');
+      print('here: $e');
 
       HapticFeedback.lightImpact();
       Widget okButton = TextButton(
@@ -132,16 +113,28 @@ class EventProvider extends ChangeNotifier {
             tk.clear();
 
             tk2.clear();
+            notifyListeners();
           },
           child: Text('OK'));
 
       AlertDialog alert = AlertDialog(
         title: Text('Atencion!'),
-        content: Text('Sus credenciales son incorrectas'),
+        content: Text('Error 408, Espera larga'),
         actions: [okButton],
       );
 
       showDialog(context: ctx, builder: (_) => alert);
+
+      notifyListeners();
+    });
+
+    if (userd != null) {
+      _islogged = true;
+      pref.setBool('isLoggedIn', true);
+      notifyListeners();
+    } else {
+      _islogged = false;
+      notifyListeners();
     }
   }
 

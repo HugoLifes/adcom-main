@@ -66,6 +66,8 @@ class _AddReporteState extends State<AddReporte> {
   List<String> type = [];
   List<TipoAvisoS>? avisos = [];
   List<String>? idComName = [];
+  int? _current;
+  List<StepState> _listState = [];
   getCameras() async {
     await Permission.camera.request();
     await Permission.storage.request();
@@ -107,9 +109,18 @@ class _AddReporteState extends State<AddReporte> {
 
   @override
   void initState() {
-    super.initState();
     addata();
+    _current = 0;
+
+    /// Lista que maneja estados de los pasos
+    _listState = [
+      StepState.indexed,
+      StepState.editing,
+      StepState.complete,
+      StepState.disabled,
+    ];
     getCameras();
+    super.initState();
   }
 
   @override
@@ -172,7 +183,7 @@ class _AddReporteState extends State<AddReporte> {
             if (this._currentStep == 0) {
               if (_formKey.currentState!.validate()) {
                 this._currentStep = this._currentStep + 1;
-              } else {}
+              }
             } else {
               if (idUser == 0) {
                 if (chosenValue == null) {
@@ -221,11 +232,17 @@ class _AddReporteState extends State<AddReporte> {
 
 //caracteristica  de cada step
   List<Step>? _stepper() {
-    List<Step> _steps = [
+    List<Step> _steps = <Step>[
       Step(
           title: Text('Nombre del reporte'),
           isActive: _currentStep >= 0,
-          state: StepState.complete,
+          state: _currentStep == 0
+              ? titleController.text.isEmpty
+                  ? _listState[3]
+                  : _listState[2]
+              : _currentStep > 0
+                  ? _listState[2]
+                  : _listState[0],
           content: Column(
             children: [
               Form(
@@ -237,7 +254,11 @@ class _AddReporteState extends State<AddReporte> {
       Step(
           title: Text('Descripcion del incidente'),
           isActive: _currentStep >= 1,
-          state: StepState.disabled,
+          state: _currentStep == 1
+              ? _listState[1]
+              : _currentStep > 1
+                  ? _listState[2]
+                  : _listState[3],
           content: Column(
             children: [
               Form(
@@ -314,7 +335,11 @@ class _AddReporteState extends State<AddReporte> {
                   ],
                 )
               : buildImage(),
-          state: StepState.disabled,
+          state: _currentStep == 2
+              ? _listState[1]
+              : _currentStep > 2
+                  ? _listState[2]
+                  : _listState[3],
           isActive: _currentStep >= 2)
     ];
     return _steps;
@@ -551,6 +576,7 @@ class _AddReporteState extends State<AddReporte> {
     }
   }
 
+  /// funcion que abre la camara
   Future<void> _optionsCamera() {
     return showDialog(
         context: context,
@@ -583,6 +609,7 @@ class _AddReporteState extends State<AddReporte> {
         });
   }
 
+  /// funcion que construye las fotos
   buildImage() => GridView.builder(
         shrinkWrap: true,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -596,6 +623,7 @@ class _AddReporteState extends State<AddReporte> {
         },
       );
 
+  /// el save form hace la validacion de que todo este bien antes de enviar los datos
   Future saveForm() async {
     final isValid = _formKey.currentState!.validate();
     final isValid2 = _formKey2.currentState!.validate();
@@ -623,6 +651,7 @@ class _AddReporteState extends State<AddReporte> {
     }
   }
 
+  /// obtiene el tipo de aviso en el caso de ser administrador o supervisor
   Future<TipoAviso?> getTipoAviso() async {
     print(idCom);
     print(idUser);

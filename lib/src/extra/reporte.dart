@@ -98,6 +98,10 @@ class _LevantarReporteState extends State<LevantarReporte> {
   var evidencias = <dynamic, dynamic>{};
   bool siTieneDatos = false;
   List<Map<dynamic, Map>> superEvidencia = [];
+  var datosProgres;
+  var fechasList;
+  bool llamado = false;
+  List<dynamic> her = [];
 
   /// Activa el guardado en memoria
   addata() async {
@@ -148,26 +152,40 @@ class _LevantarReporteState extends State<LevantarReporte> {
     for (int i = 0; i < cuentas!.data!.length; i++) {
       if (userType == 2 || userType == 4) {
         myList.add(new DataReporte(
-            id: cuentas!.data![i].idReporte,
-            descripCorta: cuentas!.data![i].descCorta,
-            desperfecto: cuentas!.data![i].descDesperfecto,
-            fechaRep: cuentas!.data![i].fechaRep,
-            uri: cuentas!.data![i].evidencia!.toList(),
-            comunidad: cuentas!.data![i].comunidad!.trimRight(),
-            numero: cuentas!.data![i].numero!.trimRight(),
-            interior: cuentas!.data![i].interior!.trimRight()));
+          id: cuentas!.data![i].idReporte,
+          descripCorta: cuentas!.data![i].descCorta,
+          desperfecto: cuentas!.data![i].descDesperfecto,
+          fechaRep: cuentas!.data![i].fechaRep,
+          uri: cuentas!.data![i].evidencia!.toList(),
+          comunidad: cuentas!.data![i].comunidad!.trimRight(),
+          numero: cuentas!.data![i].numero!.trimRight(),
+          interior: cuentas!.data![i].interior!.trimRight(),
+          progreso: List.generate(
+              cuentas!.data!.length,
+              (index) => List.generate(
+                  cuentas!.data![index].progreso!.length,
+                  (index2) =>
+                      cuentas!.data![index].progreso![index2].idProgreso)),
+        ));
       } else {
         myList.add(new DataReporte(
-            id: cuentas!.data![i].idReporte,
-            descripCorta: cuentas!.data![i].descCorta,
-            desperfecto: cuentas!.data![i].descDesperfecto,
-            fechaRep: cuentas!.data![i].fechaRep,
-            uri: cuentas!.data![i].evidencia!.toList()));
+          id: cuentas!.data![i].idReporte,
+          descripCorta: cuentas!.data![i].descCorta,
+          desperfecto: cuentas!.data![i].descDesperfecto,
+          fechaRep: cuentas!.data![i].fechaRep,
+          uri: cuentas!.data![i].evidencia!.toList(),
+          progreso: List.generate(
+              cuentas!.data!.length,
+              (index) => List.generate(
+                  cuentas!.data![index].progreso!.length,
+                  (index2) =>
+                      cuentas!.data![index].progreso![index2].idProgreso)),
+        ));
       }
 
       for (int j = 0; j < cuentas!.data![i].progreso!.length; j++) {
         //mapeado del estatus asgigando id
-        var progress = [];
+        progress = [];
         //añade los estatus a la lista progress
         cuentas!.data![i].progreso!.forEach((element) {
           if (mounted) {
@@ -183,7 +201,7 @@ class _LevantarReporteState extends State<LevantarReporte> {
         //mapeado
         maps.addAll({cuentas!.data![i].idReporte: progreso});
 
-        var datosProgres = [];
+        datosProgres = [];
         cuentas!.data![i].progreso!.forEach((element) {
           setState(() {
             datosProgres.add(element.comentario);
@@ -192,7 +210,7 @@ class _LevantarReporteState extends State<LevantarReporte> {
         datos = {"Datos": datosProgres};
         maps2.addAll({cuentas!.data![i].idReporte: datos});
 
-        var fechasList = [];
+        fechasList = [];
         cuentas!.data![i].progreso!.forEach((element) {
           setState(() {
             fechasList.add(element.fechaSeg);
@@ -215,6 +233,7 @@ class _LevantarReporteState extends State<LevantarReporte> {
       superMap2.add(maps2);
       superMap.add(maps);
     }
+
     reversedList2 = fechasSuperMap.reversed.toList();
     reversedList3 = superMap2.reversed.toList();
     reversedList4 = superMap.reversed.toList();
@@ -226,10 +245,8 @@ class _LevantarReporteState extends State<LevantarReporte> {
   void initState() {
     data().then((value) {
       setState(() {
-        if (value!.data!.isNotEmpty) {
-          siTieneDatos = true;
-          listview();
-        }
+        siTieneDatos = true;
+        listview();
       });
     });
 
@@ -242,7 +259,14 @@ class _LevantarReporteState extends State<LevantarReporte> {
     if (mounted) {
       setState(() {
         if (myList.isNotEmpty) {
+          progreso.clear();
+          progress.clear();
+
+          evidencias.clear();
+          datos.clear();
+          fechasMap.clear();
           myList.clear();
+          superEvidencia.clear();
           fechasSuperMap.clear();
           superMap.clear();
           superMap2.clear();
@@ -252,6 +276,10 @@ class _LevantarReporteState extends State<LevantarReporte> {
           reversedList4.clear();
           reversedList5.clear();
           comunities.clear();
+          maps3.clear();
+          maps2.clear();
+          maps.clear();
+
           data().catchError((e) {
             alerta5();
           });
@@ -324,10 +352,11 @@ class _LevantarReporteState extends State<LevantarReporte> {
             color: Colors.grey[350],
           );
         },
+        addAutomaticKeepAlives: false,
+        addRepaintBoundaries: false,
         itemCount: reversedList.length,
         itemBuilder: (context, int index) {
           estatus(index);
-
           return Container(
             padding: EdgeInsets.all(8),
             child: ListTile(
@@ -425,7 +454,6 @@ class _LevantarReporteState extends State<LevantarReporte> {
 
   estatus(int index) {
     /// recorre el mapeado
-
     reversedList4[index].forEach((key, value) {
       if (reversedList[index].id == key) {
         /// recorre el segundo mapeado
@@ -443,6 +471,7 @@ class _LevantarReporteState extends State<LevantarReporte> {
   }
 
   Color? stepColor(index) {
+    print(progres.last.id);
     switch (progres.isEmpty ? 0 : progres.last.id) {
       case 1:
         return Colors.yellow;
@@ -477,7 +506,6 @@ class _LevantarReporteState extends State<LevantarReporte> {
     Widget okButton = TextButton(
         onPressed: () {
           Navigator.of(context)..pop();
-          data();
         },
         child: Text(
           'Si, continuar',
@@ -520,7 +548,9 @@ class _LevantarReporteState extends State<LevantarReporte> {
       ),
     );
 
-    showDialog(context: context, builder: (_) => alert);
+    if (mounted) {
+      showDialog(context: context, builder: (_) => alert);
+    }
   }
 }
 
@@ -558,4 +588,14 @@ class DataReporte {
       this.comunidad,
       this.interior,
       this.numero});
+
+  @override
+  String toString() {
+    return ' progreso: $progreso,';
+  }
+}
+
+class Progresoid {
+  int? id;
+  Progresoid({this.id});
 }

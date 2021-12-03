@@ -14,7 +14,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 SharedPreferences? prefs;
 
+// ignore: must_be_immutable
 class VistaPagos extends StatefulWidget {
+  bool landScape = false;
   Deudas? deudas;
   Users? users;
   String? userName;
@@ -30,6 +32,7 @@ class VistaPagos extends StatefulWidget {
       this.userName,
       this.notiene,
       this.esPendiente,
+      this.landScape = false,
       this.deudasList})
       : super(key: key);
 
@@ -245,7 +248,7 @@ class _VistaPagosState extends State<VistaPagos> {
               text: 'Sub Total',
               style:
                   pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
-          pw.SizedBox(width: 50),
+          pw.SizedBox(width: 30),
           pw.Paragraph(
               text: '\$${widget.deudas!.montoCuota}',
               style:

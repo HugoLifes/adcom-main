@@ -13,10 +13,12 @@ import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
 class VistaTarjeta extends StatefulWidget {
+  bool landScape = false;
   List<DatosCuenta>? newList = [];
   List<DatosCuenta>? refP = [];
   String? bandera;
-  VistaTarjeta({Key? key, this.newList, this.refP, this.bandera})
+  VistaTarjeta(
+      {Key? key, this.newList, this.refP, this.bandera, this.landScape = false})
       : super(key: key);
 
   @override
@@ -49,18 +51,14 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
 
   @override
   Widget build(BuildContext context) {
-    var size = MediaQuery.of(context).size;
-    var size2 = MediaQuery.of(context).size.width;
-
     return Container(
       width: MediaQuery.of(context).size.width,
-      height: 220,
+      height: widget.landScape ? 200 : 220,
       decoration: BoxDecoration(boxShadow: [
         BoxShadow(color: Colors.grey, blurRadius: 6, offset: Offset(0, 1))
       ], color: estadodepagoColor(), borderRadius: BorderRadius.circular(10)),
       child: Padding(
-        padding:
-            const EdgeInsets.only(left: 13, right: 13, top: 13, bottom: 20),
+        padding: EdgeInsets.only(left: 13, right: 13, top: 13, bottom: 20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [

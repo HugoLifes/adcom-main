@@ -1,16 +1,19 @@
 import 'package:adcom/json/jsonAmenidades.dart';
 import 'package:adcom/src/methods/eventDashboard.dart';
+import 'package:adcom/src/models/event_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 SharedPreferences? prefs;
 
 class GridDashboard extends StatefulWidget {
   final userId;
-  GridDashboard({this.userId});
+  bool? landscape = false;
+  GridDashboard({this.userId, this.landscape});
   @override
   _GridDashboardState createState() => _GridDashboardState();
 }
@@ -94,34 +97,33 @@ class _GridDashboardState extends State<GridDashboard> {
       color: Colors.greenAccent[700],
     ),
   );
+  Items it10 = new Items(
+    route: 'LOGOUT',
+    title: 'Logout',
+    icon: Icon(
+      Icons.exit_to_app,
+      size: 50,
+      color: Colors.greenAccent[700],
+    ),
+  );
   List<Items> myList = [];
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     switch (widget.userId) {
       case 1:
-        myList = [item1, item5, item4, item2];
+        myList = [item1, item5, item4, item2, it10];
 
         break;
       case 2:
-        myList = [
-          item9,
-          item4,
-          item5,
-          item2,
-        ];
+        myList = [item9, item4, item5, item2, it10];
 
         break;
       case 3:
         myList = [item8, item9];
         break;
       case 4:
-        myList = [
-          item9,
-          item4,
-          item5,
-          item2,
-        ];
+        myList = [item9, item4, item5, item2, it10];
         break;
     }
     return AnimationLimiter(
@@ -130,9 +132,9 @@ class _GridDashboardState extends State<GridDashboard> {
             padding:
                 EdgeInsets.only(left: 16, right: 16, top: size.height / 2.5),
             crossAxisCount: 2,
-            childAspectRatio: 1.1,
-            crossAxisSpacing: 15,
-            mainAxisSpacing: 12,
+            childAspectRatio: widget.landscape == true ? 3.0 : 1.1,
+            crossAxisSpacing: widget.landscape == true ? 16 : 15,
+            mainAxisSpacing: 16,
             children: myList.map((data) {
               return AnimationConfiguration.staggeredGrid(
                 columnCount: myList.length,
@@ -144,16 +146,21 @@ class _GridDashboardState extends State<GridDashboard> {
                     child: InkWell(
                       onTap: () {
                         HapticFeedback.mediumImpact();
-                        if (widget.userId == 4) {
-                          if (data.route == '/screen5') {
+                        if (data.route == "LOGOUT") {
+                          Provider.of<EventProvider>(context, listen: false)
+                              .logOut(context);
+                        } else {
+                          if (widget.userId == 4) {
+                            if (data.route == '/screen5') {
+                              Navigator.pushNamed(context, data.route!,
+                                  arguments: GridDashboard());
+                            } else {
+                              Fluttertoast.showToast(msg: "No tiene acceso");
+                            }
+                          } else {
                             Navigator.pushNamed(context, data.route!,
                                 arguments: GridDashboard());
-                          } else {
-                            Fluttertoast.showToast(msg: "No tiene acceso");
                           }
-                        } else {
-                          Navigator.pushNamed(context, data.route!,
-                              arguments: GridDashboard());
                         }
                       },
                       child: Container(

@@ -24,6 +24,8 @@ class CheckInternet {
           break;
       }
     });
+    await Future.delayed(Duration(seconds: 30));
+    await listener!.cancel();
     return await DataConnectionChecker().connectionStatus;
   }
 

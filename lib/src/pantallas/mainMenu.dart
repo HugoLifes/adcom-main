@@ -186,7 +186,7 @@ class _MainMenuState extends State<MainMenu> {
   @override
   void dispose() {
     _connectivitySubscription.cancel();
-
+    CheckInternet().listener!.cancel();
     super.dispose();
   }
 

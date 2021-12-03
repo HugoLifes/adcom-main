@@ -1,4 +1,5 @@
 import 'package:adcom/app.dart';
+import 'package:flutter/services.dart';
 
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,7 @@ void main() async {
     // Display Notification, pass null param for not displaying the notification
     event.complete(event.notification);
   });
+
 // The promptForPushNotificationsWithUserResponse function will show the iOS push notification prompt. We recommend removing the following code and instead using an In-App Message to prompt for notification permission
   /* OneSignal.shared.promptUserForPushNotificationPermission().then((accepted) {
     print("Accepted permission: $accepted");

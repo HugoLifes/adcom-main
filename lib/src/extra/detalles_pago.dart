@@ -60,197 +60,206 @@ class _DetallesPagoState extends State<DetallesPago> {
     var size = MediaQuery.of(context).size;
     var size2 = MediaQuery.of(context).size.width;
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Detalles de pago'),
-        backgroundColor: Colors.lightGreen[700],
-      ),
-      body: Container(
-        child: Column(
-          children: [
-            Container(
-              height: size.height * .16,
-              alignment: Alignment.center,
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.lightGreen[700],
-                borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(20),
-                    bottomRight: Radius.circular(20)),
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.grey, blurRadius: 10, offset: Offset(1, 0))
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    padding: EdgeInsets.only(left: 20, top: 10),
-                    child: SizedBox(
-                      width: size.width / 2,
-                      height: 100,
-                      child: Text(
-                        'Elije lo que decidas pagar y genera tu referencia maestra.',
-                        style: TextStyle(
-                            fontSize: size.height / 40,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white),
-                        textAlign: TextAlign.justify,
-                      ),
+        appBar: AppBar(
+          title: Text('Detalles de pago'),
+          backgroundColor: Colors.lightGreen[700],
+        ),
+        body: OrientationBuilder(builder: (ctx, ori) {
+          if (ori == Orientation.portrait) {
+            return mainMenu(size, size2);
+          } else {
+            return mainMenu(size, size2, landScape: true);
+          }
+        }));
+  }
+
+  Container mainMenu(Size size, double size2, {landScape = false}) {
+    return Container(
+      child: Column(
+        children: [
+          Container(
+            height: size.height * .16,
+            alignment: Alignment.center,
+            padding: EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.lightGreen[700],
+              borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(20),
+                  bottomRight: Radius.circular(20)),
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.grey, blurRadius: 10, offset: Offset(1, 0))
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: EdgeInsets.only(left: 20, top: 10),
+                  child: SizedBox(
+                    width: size.width / 2,
+                    height: 100,
+                    child: Text(
+                      'Elije lo que decidas pagar y genera tu referencia maestra.',
+                      style: TextStyle(
+                          fontSize: landScape == true ? 16 : size.height / 40,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white),
+                      textAlign: TextAlign.justify,
                     ),
                   ),
-                  Container(
-                    padding: EdgeInsets.only(right: size.width / 9),
-                    child: Icon(Glyphicon.check2_square,
-                        size: size.width / 6, color: Colors.white),
-                  )
-                ],
-              ),
+                ),
+                Container(
+                  padding: EdgeInsets.only(right: size.width / 9),
+                  child: Icon(Glyphicon.check2_square,
+                      size: landScape == true ? 50 : size.width / 6,
+                      color: Colors.white),
+                )
+              ],
             ),
-            SizedBox(
-              height: size.height / 50,
-            ),
-            Text(
-              'Elija su pago',
-              style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Flexible(
-              child: Container(
-                padding: EdgeInsets.only(left: 10, top: 10, right: 10),
-                child: CheckboxListTile(
-                  tileColor: Colors.lightGreen[300],
-                  value: checkedAll,
-                  title: Text(
-                    'Pago anual ó pago restante ',
-                    style: TextStyle(fontWeight: FontWeight.w500),
-                  ),
-                  onChanged: (v) {
-                    if (pa == true) {
+          ),
+          SizedBox(
+            height: size.height / 50,
+          ),
+          Text(
+            'Elija su pago',
+            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          Flexible(
+            child: Container(
+              padding: EdgeInsets.only(left: 10, top: 10, right: 10),
+              child: CheckboxListTile(
+                tileColor: Colors.lightGreen[300],
+                value: checkedAll,
+                title: Text(
+                  'Pago anual ó pago restante ',
+                  style: TextStyle(fontWeight: FontWeight.w500),
+                ),
+                onChanged: (v) {
+                  if (pa == true) {
+                  } else {
+                    if (v == true) {
+                      setState(() {
+                        checkedAll = v!;
+                      });
                     } else {
-                      if (v == true) {
+                      setState(() {
+                        contadorTotal = 0.0;
                         setState(() {
                           checkedAll = v!;
                         });
-                      } else {
-                        setState(() {
-                          contadorTotal = 0.0;
-                          setState(() {
-                            checkedAll = v!;
-                          });
-                        });
-                      }
-                      pagarTodo();
-                      if (contadorTotal != 0.0) {
-                        showButton();
-                      }
+                      });
                     }
-                  },
-                  controlAffinity: ListTileControlAffinity.platform,
-                  activeColor: Colors.lightGreen[700],
-                  checkColor: Colors.white,
+                    pagarTodo();
+                    if (contadorTotal != 0.0) {
+                      showButton();
+                    }
+                  }
+                },
+                controlAffinity: ListTileControlAffinity.platform,
+                activeColor: Colors.lightGreen[700],
+                checkColor: Colors.white,
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Container(
+              padding: EdgeInsets.only(left: 15),
+              alignment: Alignment.centerLeft,
+              child: Text('Pago individual',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600))),
+          Divider(
+            color: Colors.grey,
+          ),
+          mesesView(size2),
+          Divider(
+            color: Colors.grey,
+          ),
+          /*  Container(
+            padding: EdgeInsets.only(left: 10),
+            child: Row(
+              children: [
+                Checkbox(
+                    activeColor: Colors.lightGreen[700],
+                    value: usarSaldo,
+                    onChanged: (v) {
+                      setState(() {
+                        usarSaldo = v!;
+                      });
+                    }),
+                Text(
+                  '¿Usar saldo a favor?',
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-              ),
+                SizedBox(
+                  width: size.width / 23,
+                ),
+                usarSaldo == true
+                    ? Text('Saldo',
+                        style: TextStyle(
+                            fontSize: 19, fontWeight: FontWeight.bold))
+                    : Text(''),
+                SizedBox(
+                  width: size.width / 26,
+                ),
+                usarSaldo == true ? Text('\$ 200 MXN') : Text('')
+              ],
             ),
-            SizedBox(
-              height: 20,
-            ),
-            Container(
-                padding: EdgeInsets.only(left: 15),
-                alignment: Alignment.centerLeft,
-                child: Text('Pago individual',
-                    style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.w600))),
-            Divider(
-              color: Colors.grey,
-            ),
-            mesesView(size2),
-            Divider(
-              color: Colors.grey,
-            ),
-            /*  Container(
-              padding: EdgeInsets.only(left: 10),
-              child: Row(
-                children: [
-                  Checkbox(
-                      activeColor: Colors.lightGreen[700],
-                      value: usarSaldo,
-                      onChanged: (v) {
-                        setState(() {
-                          usarSaldo = v!;
-                        });
-                      }),
-                  Text(
-                    '¿Usar saldo a favor?',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(
-                    width: size.width / 23,
-                  ),
-                  usarSaldo == true
-                      ? Text('Saldo',
-                          style: TextStyle(
-                              fontSize: 19, fontWeight: FontWeight.bold))
-                      : Text(''),
-                  SizedBox(
-                    width: size.width / 26,
-                  ),
-                  usarSaldo == true ? Text('\$ 200 MXN') : Text('')
-                ],
-              ),
-            ) */
-            pa == false
-                ? Row(
-                    children: [
-                      Container(
-                          padding: EdgeInsets.only(left: 190, top: 0),
-                          child: Row(
-                            children: [
-                              Text(
-                                'Total',
-                                style: TextStyle(
-                                    fontSize: 25, fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(
-                                width: size.width / 26,
-                              ),
-                              checkedAll == true
-                                  ? Text(
-                                      '${numberFormat.format(contadorTotal)}.00 MXN',
-                                      style: TextStyle(fontSize: 19))
-                                  : Text(
-                                      ///contador
-                                      '\$ ${numberFormat.format(contador)}.00 MXN',
-                                      style: TextStyle(fontSize: 19),
-                                    ),
-                              SizedBox(
-                                height: size.height / 20,
-                              )
-                            ],
-                          ))
-                    ],
-                  )
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                          width: size.width / 1.5,
-                          child: Text(
-                            'Si ya tiene una referencia no podra generar otra, hasta que venza o realice el pago.',
-                            style: TextStyle(fontSize: 18),
-                            textAlign: TextAlign.justify,
-                          )),
-                      SizedBox(
-                        height: size.height / 10,
-                      )
-                    ],
-                  ),
-            showButton(),
-            payButton()
-          ],
-        ),
+          ) */
+          pa == false
+              ? Row(
+                  children: [
+                    Container(
+                        padding: EdgeInsets.only(left: 190, top: 0),
+                        child: Row(
+                          children: [
+                            Text(
+                              'Total',
+                              style: TextStyle(
+                                  fontSize: 25, fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(
+                              width: size.width / 26,
+                            ),
+                            checkedAll == true
+                                ? Text(
+                                    '${numberFormat.format(contadorTotal)}.00 MXN',
+                                    style: TextStyle(fontSize: 19))
+                                : Text(
+                                    ///contador
+                                    '\$ ${numberFormat.format(contador)}.00 MXN',
+                                    style: TextStyle(fontSize: 19),
+                                  ),
+                            SizedBox(
+                              height: size.height / 20,
+                            )
+                          ],
+                        ))
+                  ],
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                        width: size.width / 1.5,
+                        child: Text(
+                          'Si ya tiene una referencia no podra generar otra, hasta que venza o realice el pago.',
+                          style: TextStyle(fontSize: 18),
+                          textAlign: TextAlign.justify,
+                        )),
+                    SizedBox(
+                      height: size.height / 10,
+                    )
+                  ],
+                ),
+          showButton(),
+          payButton()
+        ],
       ),
     );
   }

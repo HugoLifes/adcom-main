@@ -205,9 +205,19 @@ class _LoginPageState extends State<LoginPage> {
                                 context.loaderOverlay.show();
                                 Provider.of<EventProvider>(context,
                                         listen: false)
-                                    .login(user, pass, context, tk, tk2)
-                                    .whenComplete(
-                                        () => context.loaderOverlay.hide());
+                                    .login(
+                                      user,
+                                      pass,
+                                      context,
+                                      tk,
+                                      tk2,
+                                    )
+                                    .whenComplete(() => {
+                                          if (mounted)
+                                            {
+                                              context.loaderOverlay.hide(),
+                                            }
+                                        });
                               } catch (e) {
                                 HapticFeedback.heavyImpact();
                                 alerta5();
@@ -337,7 +347,8 @@ Future<Posting?> loginAcces(String user, String pass) async {
     print(postingFromJson(data).message);
     return postingFromJson(data);
   } on SocketException {
-    throw FetchDataException('Error 408');
+    print('flag2');
+    throw FetchDataException('error');
   }
 }
 
