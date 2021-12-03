@@ -47,7 +47,8 @@ class _ServicesState extends State<Services> {
   List<dynamic> name = [];
   List<dynamic> seleccionado = [];
   List<DatosProveedor> datos = [];
-
+  bool cargado = false;
+  bool mostrar = false;
   var idCom;
   var userType;
   bool user = false;
@@ -69,7 +70,9 @@ class _ServicesState extends State<Services> {
           compania: value.data![i].compania,
         ));
       }
-
+      setState(() {
+        cargado = true;
+      });
       unidad = List.generate(
           value.data!.length,
           (index) => List.generate(
@@ -89,6 +92,9 @@ class _ServicesState extends State<Services> {
 
       printLinks();
     }).catchError((e) {
+      setState(() {
+        mostrar = true;
+      });
       alerta5();
     });
   }
@@ -118,78 +124,101 @@ class _ServicesState extends State<Services> {
         ),
       ),
       body: SafeArea(
-        child: ListView.builder(
-          itemCount: servicios.length,
-          itemBuilder: (_, int index) {
-            return InkWell(
-              onTap: () {
-                if (userType == 2) {
-                  Fluttertoast.showToast(
-                      msg: 'Tipo de usuario no permitido',
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.BOTTOM,
-                      timeInSecForIosWeb: 2,
-                      backgroundColor: Colors.red,
-                      textColor: Colors.white,
-                      fontSize: 16.0);
-                } else {
-                  if (error == true) {
-                    Fluttertoast.showToast(
-                        msg: 'Respuesta del servidor larga: 408',
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM,
-                        timeInSecForIosWeb: 2,
-                        backgroundColor: Colors.red,
-                        textColor: Colors.white,
-                        fontSize: 16.0);
-                  } else {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (_) => MultiServicios(
-                              service: servicios[index].tipoDeServ,
-                              datosP: datos,
-                              unidad: unidad,
-                              name: name,
-                              seleccionado: seleccionado,
-                            )));
-                  }
-                }
-              },
-              child: Container(
-                  padding: EdgeInsets.only(left: 10, top: 16),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Container(
-
-                          ///Image.asset('assets/images/k19.png', width: 110)
-                          child: servicios[index].image),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 15),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
+        child: cargado == false
+            ? mostrar == false
+                ? Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/images/zzz.png',
+                          height: 200,
+                          width: 200,
+                          //fit: BoxFit.contain,
+                        ),
+                        Text(
+                          'El servidor ha tardado en responder: 408',
+                          style: TextStyle(fontSize: 20),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  )
+            : ListView.builder(
+                itemCount: servicios.length,
+                itemBuilder: (_, int index) {
+                  return InkWell(
+                    onTap: () {
+                      if (userType == 2) {
+                        Fluttertoast.showToast(
+                            msg: 'Tipo de usuario no permitido',
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 2,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                            fontSize: 16.0);
+                      } else {
+                        if (error == true) {
+                          Fluttertoast.showToast(
+                              msg: 'Respuesta del servidor larga: 408',
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.BOTTOM,
+                              timeInSecForIosWeb: 2,
+                              backgroundColor: Colors.red,
+                              textColor: Colors.white,
+                              fontSize: 16.0);
+                        } else {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (_) => MultiServicios(
+                                    service: servicios[index].tipoDeServ,
+                                    datosP: datos,
+                                    unidad: unidad,
+                                    name: name,
+                                    seleccionado: seleccionado,
+                                  )));
+                        }
+                      }
+                    },
+                    child: Container(
+                        padding: EdgeInsets.only(left: 10, top: 16),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            SizedBox(
-                              child: Text(
-                                'Servicios',
-                                style: TextStyle(fontSize: 18),
+                            Container(
+
+                                ///Image.asset('assets/images/k19.png', width: 110)
+                                child: servicios[index].image),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 15),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    child: Text(
+                                      'Servicios',
+                                      style: TextStyle(fontSize: 18),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text(
+                                    servicios[index].horario!,
+                                    style: TextStyle(fontSize: 16),
+                                  )
+                                ],
                               ),
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Text(
-                              servicios[index].horario!,
-                              style: TextStyle(fontSize: 16),
                             )
                           ],
-                        ),
-                      )
-                    ],
-                  )),
-            );
-          },
-        ),
+                        )),
+                  );
+                },
+              ),
       ),
     );
   }
