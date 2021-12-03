@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:adcom/json/jsonAmenidades.dart';
 import 'package:adcom/src/extra/servicios.dart';
+import 'package:adcom/src/methods/checkInternet.dart';
 import 'package:adcom/src/methods/eventDashboard.dart';
 import 'package:adcom/src/methods/gridDashboard.dart';
 import 'package:adcom/src/models/event_provider.dart';
@@ -62,6 +63,7 @@ class _MainMenuState extends State<MainMenu> {
   String? pass;
   OSDeviceState? status;
   int? idPrim;
+  bool landScape = false;
   bool? usuarioIncorrecto = false;
   ConnectivityResult _connectionStatus = ConnectivityResult.none;
   final Connectivity _connectivity = Connectivity();
@@ -167,6 +169,7 @@ class _MainMenuState extends State<MainMenu> {
   @override
   void initState() {
     super.initState();
+    CheckInternet().checkConnection(context);
     OneSignal.shared
         .setNotificationOpenedHandler((OSNotificationOpenedResult result) {
       // Will be called whenever a notification is opened/button pressed.
@@ -183,6 +186,7 @@ class _MainMenuState extends State<MainMenu> {
   @override
   void dispose() {
     _connectivitySubscription.cancel();
+
     super.dispose();
   }
 
@@ -192,8 +196,20 @@ class _MainMenuState extends State<MainMenu> {
 
     Size size = MediaQuery.of(context).size;
     List<Widget> _widgetOptions = [mainMenuView(size), Services()];
+    List<Widget> _widgetOptionsLandScape = [
+      mainMenuView(size, landscape: true),
+      Services()
+    ];
     return Scaffold(
-      body: _widgetOptions.elementAt(_selectedIndex),
+      body: OrientationBuilder(
+        builder: (context, orientation) {
+          if (orientation == Orientation.portrait) {
+            return _widgetOptions.elementAt(_selectedIndex);
+          } else {
+            return _widgetOptionsLandScape.elementAt(_selectedIndex);
+          }
+        },
+      ),
       bottomNavigationBar: BottomNavigationBarTheme(
         data: BottomNavigationBarThemeData(
             backgroundColor: Colors.white,
@@ -217,7 +233,7 @@ class _MainMenuState extends State<MainMenu> {
                   size: 30,
                 ),
                 label: 'Servicios',
-                backgroundColor: Colors.blue)
+                backgroundColor: Colors.blue),
           ],
           elevation: 10,
           currentIndex: _selectedIndex,
@@ -274,11 +290,11 @@ class _MainMenuState extends State<MainMenu> {
     showDialog(context: context, builder: (_) => alert);
   }
 
-  Stack mainMenuView(Size size) {
+  Stack mainMenuView(Size size, {bool landscape = false}) {
     return Stack(
       children: [
         Container(
-          height: size.height * .35,
+          height: landScape == true ? size.height * .31 : size.height * .35,
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(
@@ -291,12 +307,13 @@ class _MainMenuState extends State<MainMenu> {
           ),
         ),
         Container(
-            padding:
-                EdgeInsets.only(top: size.height * .18, right: size.width / 18),
+            padding: EdgeInsets.only(
+                top: landscape == true ? size.height * .10 : size.height * .18,
+                right: size.width / 18),
             alignment: Alignment.topRight,
             child: Image.asset(
               'assets/images/AdCom3.png',
-              width: size.width * .38,
+              width: landscape == true ? size.width * .14 : size.width * .38,
             )),
         SafeArea(
           child: Padding(
@@ -309,43 +326,86 @@ class _MainMenuState extends State<MainMenu> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Column(
-                        children: [
-                          SizedBox(
-                            width: size.height / 3.5,
-                            height: size.width / 2.0,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      landscape == true
+                          ? Row(
                               children: [
-                                user == null || user == ''
-                                    ? Text('¡${greeting()}!',
+                                SizedBox(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      user == null || user == ''
+                                          ? Text('¡${greeting()}!',
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontFamily: 'Roboto',
+                                                  fontSize: 35,
+                                                  fontWeight: FontWeight.w700))
+                                          : Text(
+                                              '¡${greeting()}!',
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontFamily: 'Roboto',
+                                                  fontSize: 17,
+                                                  fontWeight: FontWeight.w700),
+                                            ),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Text(
+                                        '${user == null || user == '' ? '' : user}',
                                         style: TextStyle(
                                             color: Colors.black,
                                             fontFamily: 'Roboto',
-                                            fontSize: 35,
-                                            fontWeight: FontWeight.w700))
-                                    : Text(
-                                        '¡${greeting()}!',
-                                        style: TextStyle(
-                                            color: Colors.black,
-                                            fontFamily: 'Roboto',
-                                            fontSize: 17,
+                                            fontSize: size.width / 30,
                                             fontWeight: FontWeight.w700),
                                       ),
-                                Text(
-                                  '${user == null || user == '' ? '' : user}',
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontFamily: 'Roboto',
-                                      fontSize: size.width / 10.5,
-                                      fontWeight: FontWeight.w700),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            )
+                          : Column(
+                              children: [
+                                SizedBox(
+                                  width: size.height / 3.5,
+                                  height: size.width / 2.0,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      user == null || user == ''
+                                          ? Text('¡${greeting()}!',
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontFamily: 'Roboto',
+                                                  fontSize: 35,
+                                                  fontWeight: FontWeight.w700))
+                                          : Text(
+                                              '¡${greeting()}!',
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontFamily: 'Roboto',
+                                                  fontSize: 17,
+                                                  fontWeight: FontWeight.w700),
+                                            ),
+                                      Text(
+                                        '${user == null || user == '' ? '' : user}',
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontFamily: 'Roboto',
+                                            fontSize: size.width / 10.5,
+                                            fontWeight: FontWeight.w700),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
-                          ),
-                        ],
-                      ),
                       SizedBox(
                         width: size.width / 70,
                       ), //no mover
@@ -360,6 +420,7 @@ class _MainMenuState extends State<MainMenu> {
         ),
         GridDashboard(
           userId: userType,
+          landscape: landscape,
         )
       ],
     );
