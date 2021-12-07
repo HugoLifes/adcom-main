@@ -50,6 +50,7 @@ dependencies:
   flutter_staggered_animations: ^1.0.0
   url_launcher: ^6.0.9
   pdf: ^3.4.2
+  data_connection_checker_tv: ^0.3.5-nullsafety
   open_file: ^3.2.1
   syncfusion_flutter_pdfviewer: ^19.2.47-beta
   fluttertoast: ^8.0.7

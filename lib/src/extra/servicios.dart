@@ -41,11 +41,13 @@ class _ServicesState extends State<Services> {
           color: Colors.red[700],
         )),
   ];
+  
   List<dynamic> unidad = [];
   List<dynamic> name = [];
   List<dynamic> seleccionado = [];
   List<DatosProveedor> datos = [];
-
+  bool cargado = false;
+  bool mostrar = false;
   var idCom;
   var userType;
   bool user = false;
@@ -68,6 +70,10 @@ class _ServicesState extends State<Services> {
         ));
       }
 
+      setState((){
+        cargado = true;
+      });
+
       unidad = List.generate(
           value.data!.length,
           (index) => List.generate(
@@ -86,9 +92,15 @@ class _ServicesState extends State<Services> {
               value.data![index].productos!.length, (index2) => false));
 
       printLinks();
+    }).catchError((e){
+      setState((){
+        mostrar = true;
+      });
+      alerta5();
     });
   }
-
+    /// terminar integracion del gatito cuando hay error de conexion
+    ///  ver el codigo en git kraken
   @override
   void initState() {
     super.initState();
@@ -114,7 +126,29 @@ class _ServicesState extends State<Services> {
         ),
       ),
       body: SafeArea(
-        child: ListView.builder(
+        child: cargado == false ?
+          mostrar == false ? Center(
+            child: CircularProgressIndicator()
+          ) : Center(
+            child: Column(
+              mainAxisAlignment : MainAxisAlignment.center,
+              children:[
+                Text(
+                  'Zzz',
+                  style: TextStyle(fontSize:20),
+                  textAlign: TextAlign.center,
+                ),
+                Image.asset('assets/images/zzz.png', height: 200, width:200),
+                Text(
+                  'El servidor ha tardado en responder: 408',
+                  style: TextStyle(fontSize:20),
+                  textAlign: TextAlign.center,
+                ),
+              ]
+            )
+          )
+        
+         :ListView.builder(
           itemCount: servicios.length,
           itemBuilder: (_, int index) {
             return InkWell(
@@ -284,7 +318,9 @@ class DatosProveedor {
       Uri uri = Uri.parse(
           'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-datos-provedores-by-com');
 
-      var response = await http.post(uri, body: {'idCom': '5'});
+      var response = await http.post(uri, body: {'idCom': '5'}).timeout(Duration(seconds: 8), onTimeout:(){
+        return http.Response('Timeout', 408);
+      });
       var data = returnResponse(response);
       return seguimientoFromJson(data);
     } on SocketException {
