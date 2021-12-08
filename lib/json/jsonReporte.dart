@@ -69,11 +69,13 @@ class Datum {
       evidencia: json["EVIDENCIA"] == null
           ? null
           : List<String>.from(json["EVIDENCIA"].map((x) => x)),
-      progreso: json["PROGRESO"] == null
-          ? null
+      progreso: json["PROGRESO"] == null || json["PROGRESO"].length == 0
+          ? List<Progreso>.from(json["PROGRESO"].map((x) => 0))
           : List<Progreso>.from(
               json["PROGRESO"].map((x) => Progreso.fromJson(x))),
-      idReporte: json["ID_REPORTE"] == null ? null : json["ID_REPORTE"],
+      idReporte: json["ID_REPORTE"] == null && json["ID_REPORTE"] == [].isEmpty
+          ? 0
+          : json["ID_REPORTE"],
       comunidad: json["COMUNIDAD"] == null ? null : json["COMUNIDAD"],
       numero: json["NUMERO"] == null ? null : json["NUMERO"],
       interior: json["INTERIOR"] == null ? null : json["INTERIOR"]);
@@ -85,10 +87,11 @@ class Datum {
         "EVIDENCIA": evidencia == null
             ? null
             : List<dynamic>.from(evidencia!.map((x) => x)),
-        "PROGRESO": progreso == null
-            ? null
+        "PROGRESO": progreso == null || progreso!.isEmpty
+            ? List<dynamic>.from(progreso!.map((x) => 0))
             : List<dynamic>.from(progreso!.map((x) => x.toJson())),
-        "ID_REPORTE": idReporte == null ? null : idReporte,
+        "ID_REPORTE":
+            idReporte == null || idReporte == [].isEmpty ? 0 : idReporte,
         "COMUNIDAD": comunidad == null ? null : comunidad,
         "NUMERO": numero == null ? null : numero,
         "INTERIOR": interior == null ? null : interior,

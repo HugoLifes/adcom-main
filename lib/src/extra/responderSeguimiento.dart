@@ -32,104 +32,228 @@ class _ResponseSeguimientoState extends State<ResponseSeguimiento> {
   List<File> images = [];
   String? chosenValue;
   int? id;
-
+  int _currentStep = 0;
   var _picker = ImagePicker();
+   List<StepState> _listState = [];
+
+
+  @override
+  void initState() {
+    _listState = [
+      StepState.indexed,
+      StepState.editing,
+      StepState.complete,
+      StepState.disabled,
+    ];
+    super.initState();
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Responder Seguimiento'),
       ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: () {
-          if (_formKey.currentState!.validate()) {
-            if (chosenValue != null) {
-              context.loaderOverlay.show();
-              sendingData2(textController.text, widget.id.toString(), images,
-                      newsPath!)
-                  .then((value) {
-                context.loaderOverlay.hide();
-                Navigator.of(context).pop();
+      
+      body: LoaderOverlay(
+        child: stepper()
+      ),
+    );
+  }
+
+  Container atencion() {
+    return Container(
+              padding: EdgeInsets.only(top: 50),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 10),
+                    child: Text('Instrucciones', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold), textAlign: TextAlign.justify,),
+                  ),
+                 
+                    SizedBox(
+                      height: 10,
+                    ),
+                     Padding(
+                       padding: const EdgeInsets.only(left: 10),
+                       child: Text('Es importante elegir primero los archivos que quiere usar y después las fotos, no olvide asignar un seguimiento de lo contrario no podra\ncontinuar con el mismo.', style: TextStyle(fontSize: 18),),
+                     ),
+                
+                ],
+              ),
+            );
+  }
+
+
+
+  Stepper stepper() {
+    return Stepper(
+      steps: _stepper()!,
+      physics: ClampingScrollPhysics(),
+      currentStep: this._currentStep,
+      onStepTapped: (step) {
+        setState(() {
+          this._currentStep = step;
+        });
+      },
+      onStepContinue: () {
+        setState(() {
+          if (this._currentStep < this._stepper()!.length - 1) {
+            
+          if(_currentStep == 0){
+            if(_formKey.currentState!.validate()) {
+              setState(() {
+                FocusScope.of(context).unfocus();
+                  this._currentStep = this._currentStep + 1;
               });
-            } else {
+            
+            }else{
+              
+            }
+          }else{
+            if(_currentStep == 1){
+                if(images.isEmpty){
+                  Fluttertoast.showToast(
+                    msg: 'No hay imagenes',
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.BOTTOM,);
+
+                }else{
+                  
+                  this._currentStep = this._currentStep + 1;
+                }
+              }else{
+                if(_currentStep == 2){
+                  if(chosenValue
+                  != null){  
+                  
+
+                  }else{
+                    Fluttertoast.showToast(
+                      msg: 'Elija un seguimiento',
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                      fontSize: 16.0);
+                  }
+                }
+              }
+          }
+          }else{
+            if(chosenValue != null){
+              enviar();
+            }else{
               Fluttertoast.showToast(
-                  msg: 'Elija un seguimiento',
-                  toastLength: Toast.LENGTH_SHORT,
-                  gravity: ToastGravity.BOTTOM,
-                  timeInSecForIosWeb: 1,
-                  backgroundColor: Colors.red,
-                  textColor: Colors.white,
-                  fontSize: 16.0);
+                      msg: 'Elija un seguimiento',
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.BOTTOM,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.red,
+                      textColor: Colors.white,
+                      fontSize: 16.0);
             }
           }
-        },
-      ),
-      body: LoaderOverlay(
-        child: Container(
-          padding: EdgeInsets.only(top: 30),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        });
+      },
+      onStepCancel: () {
+        setState(() {
+          if (this._currentStep > 0) {
+            this._currentStep = this._currentStep - 1;
+          } else {
+            this._currentStep = 0;
+          }
+        });
+      },
+    );
+  } 
+
+   List<Step>? _stepper() {
+    List<Step> _steps = <Step>[
+      Step(
+          title: Text('Respuesta'),
+          isActive: _currentStep >= 0,
+          state: _currentStep == 0
+              ? textController.text.isEmpty
+                  ? _listState[3]
+                  : _listState[2]
+              : _currentStep > 0
+                  ? _listState[2]
+                  : _listState[0],
+          content: Row(
             children: [
-             
-                  textBoxResponse(),
-               
-              SizedBox(
-                height: 15,
-              ),
-              InkWell(
-                onTap: () {
-                  _optionsCamera();
-                },
-                child: Container(
-                    padding: EdgeInsets.only(left: 20),
-                    child: Row(
-                      children: [
-                        Icon(Glyphicon.file_plus_fill),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Text(
-                          'Sube un archivo',
-                          style: TextStyle(),
-                        ),
-                      ],
-                    )),
-              ),
-              elejirSeguiminto(),
-              SizedBox(
-                height: 5,
-              ),
-              printImages(),
-              SizedBox(
-                height: 15,
-              ),
+              Form(
+                    key: _formKey,
+                    child:  textBoxResponse()),
               Container(
-                padding: EdgeInsets.only(top: 50),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10),
-                      child: Text('Instrucciones', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold), textAlign: TextAlign.justify,),
-                    ),
-                   
-                      SizedBox(
-                        height: 10,
-                      ),
-                       Padding(
-                         padding: const EdgeInsets.only(left: 10),
-                         child: Text('Es importante elegir primero los archivos que quiere usar y después las fotos, no olvide asignar un seguimiento de lo contrario no podra\ncontinuar con el mismo.', style: TextStyle(fontSize: 18),),
-                       ),
-                  
-                  ],
+                //padding: EdgeInsets.only(right:15),
+                child: IconButton(
+                  icon: Icon(Glyphicon.question),
+                  onPressed: () {
+                    alerta5();
+                  },
+                  iconSize:45,
+                  color: Colors.red,
                 ),
               )
             ],
+          )),
+      Step(
+          title: Text('Sube algunas fotos o archivos'),
+          isActive: _currentStep >= 1,
+          state: _currentStep == 1
+              ? _listState[1]
+              : _currentStep > 1
+                  ? _listState[2]
+                  : _listState[3],
+          content: Column(
+            children: [
+              InkWell(
+                    onTap: () {
+                      _optionsCamera();
+                    },
+                    child: Container(
+                        padding: EdgeInsets.only(left: 20),
+                        child: Row(
+                          children: [
+                            Icon(Glyphicon.file_plus_fill),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Text(
+                              'Sube un archivo',
+                              style: TextStyle(),
+                            ),
+                          ],
+                        )),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  printImages(),
+            ],
+          ), ),
+      Step(
+          title: Text('Sube algunas fotos'),
+          content: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+            elejirSeguiminto(),
+            
+            
+            ],
           ),
-        ),
-      ),
-    );
+          state:_currentStep == 2
+              ? _listState[1]
+              : _currentStep > 1
+                  ? _listState[2]
+                  : _listState[3],
+          isActive: _currentStep >= 2)
+    ];
+    return _steps;
   }
 
   newFiles() {
@@ -143,7 +267,7 @@ class _ResponseSeguimientoState extends State<ResponseSeguimiento> {
 
   elejirSeguiminto() {
     return Container(
-      padding: EdgeInsets.only(left: 20),
+      alignment: Alignment.centerLeft,
       child: DropdownButton<String>(
         elevation: 6,
         value: chosenValue,
@@ -197,22 +321,21 @@ class _ResponseSeguimientoState extends State<ResponseSeguimiento> {
 
   textBoxResponse() {
     return Container(
-      padding: EdgeInsets.only(left: 20, right: 80),
-      height: 60,
-      child: Form(
-        key: _formKey,
-        child: TextFormField(
-          controller: textController,
-          maxLines: 200,
-          validator: (title) => title != null && title.isEmpty
-              ? 'Este campo no puede estar vacio'
-              : null,
-          decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            labelText: 'Escribe tu respuesta',
+      padding: EdgeInsets.only( right: 45),
+      height: 80,
+
+      width: MediaQuery.of(context).size.width/1.6,
+      child: TextFormField(
+        controller: textController,
+        maxLines: 200,
+        validator: (title) => title != null && title.isEmpty
+            ? 'Este campo no puede estar vacio'
+            : null,
+        decoration: InputDecoration(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
           ),
+          labelText: 'Escribe tu respuesta',
         ),
       ),
     );
@@ -432,4 +555,110 @@ class _ResponseSeguimientoState extends State<ResponseSeguimiento> {
       }
     }
   }
+
+
+  enviar() {
+    Widget okButton = TextButton(
+        onPressed: () {
+          context.loaderOverlay.show();
+              sendingData2(textController.text, widget.id.toString(), images,
+                      newsPath!)
+                  .then((value) {
+                context.loaderOverlay.hide();
+                Navigator.of(context)..pop()..pop();
+              });
+        },
+        child: Text(
+          'Si, continuar',
+          style: TextStyle(color: Colors.red[900]),
+        ));
+    Widget backButton = TextButton(
+        onPressed: () {
+          Navigator.of(context)
+            ..pop()
+            ;
+        },
+        child: Text(
+          'Regresar',
+          style: TextStyle(color: Colors.orange),
+        ));
+    AlertDialog alert = AlertDialog(
+      actions: [backButton, okButton],
+      title: Text(
+        'Atención!',
+        style: TextStyle(
+          fontSize: 25,
+        ),
+      ),
+      content: Container(
+        width: 200,
+        height: 200,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Adcom informa',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Text('Su respuesta sera enviada y estos cambios no se pueden deshacer, recomendamos checar la informacion', style: TextStyle(fontSize: 18),),
+          ],
+        ),
+      ),
+    );
+
+    showDialog(context: context, builder: (_) => alert);
+  }
+
+  alerta5() {
+    Widget okButton = TextButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: Text(
+          'Si, continuar',
+          style: TextStyle(color: Colors.red[900]),
+        ));
+    Widget backButton = TextButton(
+        onPressed: () {
+          Navigator.of(context)
+            ..pop()
+            ;
+        },
+        child: Text(
+          'Regresar',
+          style: TextStyle(color: Colors.orange),
+        ));
+    AlertDialog alert = AlertDialog(
+      actions: [backButton],
+      title: Text(
+        'Atención!',
+        style: TextStyle(
+          fontSize: 25,
+        ),
+      ),
+      content: Container(
+        width: 200,
+        height: 200,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Adcom informa',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Text('Es importante elegir primero los archivos que quiere usar y después las fotos, no olvide asignar un seguimiento de lo contrario no podra\ncontinuar con el mismo.', style: TextStyle(fontSize: 18),),
+          ],
+        ),
+      ),
+    );
+
+    showDialog(context: context, builder: (_) => alert);
+  }
+
 }

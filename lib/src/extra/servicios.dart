@@ -200,7 +200,7 @@ class _ServicesState extends State<Services> {
                                 children: [
                                   SizedBox(
                                     child: Text(
-                                      'Servicios',
+                                      'Servicios para el hogar',
                                       style: TextStyle(fontSize: 18),
                                     ),
                                   ),
@@ -318,7 +318,7 @@ class DatosProveedor {
           'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-datos-provedores-by-com');
 
       var response = await http.post(uri, body: {'idCom': '5'}).timeout(
-          Duration(seconds: 8), onTimeout: () {
+          Duration(seconds: 6), onTimeout: () {
         return http.Response('Timeout', 408);
       });
       var data = returnResponse(response);

@@ -7,6 +7,7 @@ import 'package:adcom/src/models/event_provider.dart';
 import 'package:adcom/src/pantallas/finanzas.dart';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import 'package:provider/provider.dart';
@@ -68,6 +69,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    /// Muestra el monto principal de la cuenta
                     Text(
                       'Monto de cuota',
                       style: TextStyle(
@@ -87,10 +89,13 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
                     )
                   ],
                 ),
+
+                /// Navegacion hacia la referencia
                 Container(
                   height: 30,
                   child: OutlinedButton(
                     onPressed: () {
+                      HapticFeedback.lightImpact();
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (_) => RefView(
                                 refP: widget.refP,
@@ -131,6 +136,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
               children: [
                 OutlinedButton(
                   onPressed: () {
+                    HapticFeedback.lightImpact();
                     _showModalSheet();
                   },
                   child: Text(
@@ -143,8 +149,12 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
                 ),
                 //Text('|', style: TextStyle(color: Colors.white, fontSize: 15)),
 
+                //
+                //
+                ///Seccion de detalles de pago
                 OutlinedButton(
                   onPressed: () {
+                    HapticFeedback.lightImpact();
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (_) => DetallesPago(
                               list: widget.newList!,
@@ -199,7 +209,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
                         Row(
                           children: [
                             Text(
-                              'Proximamente',
+                              '\$ 0.00 MXN',
                               style: TextStyle(fontSize: 30),
                             ),
                           ],
@@ -321,6 +331,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
     showDialog(context: context, builder: (_) => alert);
   }
 
+  /// funcion que llama y toma los datos del service
   data() async {
     cuentas = await getAdeudos();
 

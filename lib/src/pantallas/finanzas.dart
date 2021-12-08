@@ -309,7 +309,7 @@ class _FinanzasState extends State<Finanzas> {
   /// esta funcion se usa para crear el pdf
   /// pasa el ultimo mes pagado,
   /// no retrona valor
-  ultimoMes() async {
+  Future ultimoMes() async {
     int? mesPagado;
     double cuota;
     double monto;
@@ -509,6 +509,7 @@ class _FinanzasState extends State<Finanzas> {
     }
   }
 
+  /// toma los datos del service y los asigna a la lista
   Future data() async {
     cuentas = await getAdeudos().catchError((e) {
       alerta5();
@@ -582,7 +583,12 @@ class _FinanzasState extends State<Finanzas> {
         }
       });
     }
-    await ultimoMes();
+    await ultimoMes().then((value) => {
+          setState(() {
+            deudas;
+            deudas2;
+          })
+        });
     await pagosPendientes();
     if (itsTrue == false) {
     } else {
@@ -645,7 +651,7 @@ class _FinanzasState extends State<Finanzas> {
                         padding: EdgeInsets.all(12),
                         child: VistaPagos(
                           landScape: landScape,
-                          users: users[index],
+                          users: esPendiente == true ? null : users[index],
                           deudas: deudas[index],
                           datosUsuario: datosUsuario,
                           userName: userName,

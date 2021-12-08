@@ -13,12 +13,12 @@ class CheckInternet {
     listener = DataConnectionChecker().onStatusChange.listen((status) {
       switch (status) {
         case DataConnectionStatus.connected:
-          InternetStatus = "Whoop! Estas conectado a internet";
+          InternetStatus = "Uju!";
           contentmessage = "Tienes conexion, ahora puedes navegar";
           _showDialog(InternetStatus, contentmessage, context);
           break;
         case DataConnectionStatus.disconnected:
-          InternetStatus = "Oh no! No tienes conexion a internet";
+          InternetStatus = "Oh no!";
           contentmessage = "Porfavor conectate a internet para navegar";
           _showDialog(InternetStatus, contentmessage, context);
           break;

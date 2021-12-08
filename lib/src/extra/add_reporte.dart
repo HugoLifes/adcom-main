@@ -68,6 +68,7 @@ class _AddReporteState extends State<AddReporte> {
   List<String>? idComName = [];
   int? _current;
   List<StepState> _listState = [];
+  List<dynamic> placeHoldersAdds = [];
   getCameras() async {
     await Permission.camera.request();
     await Permission.storage.request();
@@ -156,13 +157,12 @@ class _AddReporteState extends State<AddReporte> {
         //
         // Boton que abre la camara
 
-        floatingActionButton: FloatingActionButton(
-            backgroundColor: Colors.blue,
-            child: Icon(Icons.camera),
-            onPressed: () => {
-                  HapticFeedback.lightImpact(),
-                  images.length == 3 ? mensaje() : _optionsCamera(),
-                }),
+        floatingActionButton: _currentStep != 2
+            ? null
+            : FloatingActionButton(
+                backgroundColor: Colors.blue,
+                child: Icon(Icons.send),
+                onPressed: () => {alerta()}),
       ),
     );
   }
@@ -313,28 +313,197 @@ class _AddReporteState extends State<AddReporte> {
           )),
       Step(
           title: Text('Sube algunas fotos'),
-          content: images.isEmpty
-              ? Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('Presiona en',
-                        style: TextStyle(
-                          fontSize: 17,
-                        )),
-                    SizedBox(
-                      width: 2,
-                    ),
-                    Icon(Icons.camera, size: 21),
-                    SizedBox(
-                      width: 2,
-                    ),
-                    Text(
-                      'para añadir fotos',
-                      style: TextStyle(fontSize: 17),
-                    )
-                  ],
-                )
-              : buildImage(),
+          content: Container(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                images.isEmpty
+                    ? Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        width: 100,
+                        height: 100,
+                        padding: EdgeInsets.all(5),
+                        child: IconButton(
+                          icon: Icon(Icons.add),
+                          onPressed: () {
+                            _optionsCamera();
+                          },
+                        ),
+                      )
+                    : Flexible(
+                        child: Stack(
+                          children: [
+                            Container(
+                              margin: EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.grey[300],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.file(
+                                  images[0],
+                                  fit: BoxFit.cover,
+                                  width: 100,
+                                  height: 150,
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              top: 0,
+                              right: 0,
+                              child: GestureDetector(
+                                child: Container(
+                                  padding: EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Icon(
+                                    Icons.delete,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    images.removeAt(0);
+                                    newsPath.removeAt(0);
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                images.length < 2
+                    ? Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        width: 100,
+                        height: 100,
+                        padding: EdgeInsets.all(5),
+                        child: IconButton(
+                          icon: Icon(Icons.add),
+                          onPressed: () {
+                            _optionsCamera();
+                          },
+                        ),
+                      )
+                    : Flexible(
+                        child: Stack(
+                          children: [
+                            Container(
+                              margin: EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.grey[300],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.file(
+                                  images[1],
+                                  fit: BoxFit.cover,
+                                  width: 100,
+                                  height: 150,
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              top: 0,
+                              right: 0,
+                              child: GestureDetector(
+                                child: Container(
+                                  padding: EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Icon(
+                                    Icons.delete,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    images.removeAt(1);
+                                    newsPath.removeAt(1);
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                images.length < 3
+                    ? Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        width: 100,
+                        height: 100,
+                        padding: EdgeInsets.all(5),
+                        child: IconButton(
+                          icon: Icon(Icons.add),
+                          onPressed: () {
+                            _optionsCamera();
+                          },
+                        ),
+                      )
+                    : Flexible(
+                        child: Stack(
+                          children: [
+                            Container(
+                              margin: EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.grey[300],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.file(
+                                  images[2],
+                                  fit: BoxFit.cover,
+                                  width: 100,
+                                  height: 150,
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              top: 0,
+                              right: 0,
+                              child: GestureDetector(
+                                child: Container(
+                                  padding: EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Icon(
+                                    Icons.delete,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    images.removeAt(2);
+                                    newsPath.removeAt(2);
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+              ],
+            ),
+          ),
           state: _currentStep == 2
               ? _listState[1]
               : _currentStep > 2
@@ -406,11 +575,34 @@ class _AddReporteState extends State<AddReporte> {
           print(newPath);
           newsPath.add(newPath);
           images.add(File(image.path));
+          addPlaceHolder();
         }
       } else {
         print('No se ha seleccionado una imagen');
       }
     });
+  }
+
+  addPlaceHolder() {
+    for (int i = 0; i < 3; i++) {
+      placeHoldersAdds.add(
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          width: 100,
+          height: 100,
+          padding: EdgeInsets.all(5),
+          child: IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () {
+              _optionsCamera();
+            },
+          ),
+        ),
+      );
+    }
   }
 
   mensaje() => Fluttertoast.showToast(
@@ -576,7 +768,7 @@ class _AddReporteState extends State<AddReporte> {
     }
   }
 
-  /// funcion que abre la camara
+  /// Funcion que abre la camara
   Future<void> _optionsCamera() {
     return showDialog(
         context: context,
@@ -585,22 +777,38 @@ class _AddReporteState extends State<AddReporte> {
             actions: [CloseButton()],
             title: Text('Seleccione una opción'),
             content: SingleChildScrollView(
-              child: ListBody(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   GestureDetector(
-                    child: Text(
-                      'Tomar fotografía',
-                      style: TextStyle(fontSize: 18),
+                    child: Column(
+                      children: [
+                        Icon(Icons.camera, size: 35),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Text('Tomar foto')
+                      ],
                     ),
-                    onTap: () => openCamera(),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      openCamera();
+                    },
                   ),
-                  Divider(),
                   GestureDetector(
-                    child: Text(
-                      'Seleccionar una fotografía',
-                      style: TextStyle(fontSize: 18),
+                    child: Column(
+                      children: [
+                        Icon(Icons.photo_rounded, size: 35),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Text('Seleccionar foto')
+                      ],
                     ),
-                    onTap: () => openGallery(),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      openGallery();
+                    },
                   )
                 ],
               ),
@@ -619,7 +827,49 @@ class _AddReporteState extends State<AddReporte> {
         ),
         itemCount: images.length,
         itemBuilder: (BuildContext context, int index) {
-          return Image.file(File(images[index].path));
+          return Stack(
+            children: [
+              Container(
+                margin: EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.grey[300],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.file(
+                    images[index],
+                    fit: BoxFit.cover,
+                    width: 150,
+                    height: 150,
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 0,
+                right: 0,
+                child: GestureDetector(
+                  child: Container(
+                    padding: EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      Icons.delete,
+                      color: Colors.white,
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      images.removeAt(index);
+                      newsPath.removeAt(index);
+                    });
+                  },
+                ),
+              ),
+            ],
+          );
         },
       );
 

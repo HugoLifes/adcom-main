@@ -1,8 +1,11 @@
 import 'dart:convert';
 
+import 'package:adcom/json/jsonReferenciaP.dart';
+import 'package:adcom/src/extra/referencia_view.dart';
 import 'package:adcom/src/pantallas/finanzas.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:glyphicon/glyphicon.dart';
 import 'package:gradient_widgets/gradient_widgets.dart';
@@ -37,6 +40,8 @@ class _DetallesPagoState extends State<DetallesPago> {
   List<String> conceptos = [];
   bool usarSaldo = false;
   NumberFormat numberFormat = NumberFormat.decimalPattern('hi');
+  bool showText = false;
+
   @override
   void initState() {
     super.initState();
@@ -122,13 +127,13 @@ class _DetallesPagoState extends State<DetallesPago> {
             height: size.height / 50,
           ),
           Text(
-            'Elija su pago',
+            'Seleccione los meses a pagar',
             style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
           ),
-          SizedBox(
+          /*  SizedBox(
             height: 10,
-          ),
-          Flexible(
+          ), */
+          /*   Flexible(
             child: Container(
               padding: EdgeInsets.only(left: 10, top: 10, right: 10),
               child: CheckboxListTile(
@@ -164,7 +169,7 @@ class _DetallesPagoState extends State<DetallesPago> {
                 checkColor: Colors.white,
               ),
             ),
-          ),
+          ), */
           SizedBox(
             height: 20,
           ),
@@ -248,8 +253,8 @@ class _DetallesPagoState extends State<DetallesPago> {
                     SizedBox(
                         width: size.width / 1.5,
                         child: Text(
-                          'Si ya tiene una referencia no podra generar otra, hasta que venza o realice el pago.',
-                          style: TextStyle(fontSize: 18),
+                          'Si tiene una referencia, no podra generar otra, hasta que venza o realice el pago.',
+                          style: TextStyle(fontSize: 19),
                           textAlign: TextAlign.justify,
                         )),
                     SizedBox(
@@ -257,15 +262,27 @@ class _DetallesPagoState extends State<DetallesPago> {
                     )
                   ],
                 ),
-          showButton(),
+          checked == false
+              ? Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    'Si usted desea generar un pago anual, favor de comunicarse con los administradores.',
+                    style: TextStyle(
+                      fontSize: 19,
+                    ),
+                    textAlign: TextAlign.justify,
+                  ),
+                )
+              : showButton(),
           payButton()
         ],
       ),
     );
   }
 
-  Future sendingData() async {
+  Future<ReferenciaP?> sendingData() async {
     await obtainData();
+
     try {
       Dio dio = Dio();
       print('$checkedAll');
@@ -287,7 +304,9 @@ class _DetallesPagoState extends State<DetallesPago> {
       });
 
       if (response.statusCode == 200) {
-        print('aqui $response');
+        var data = response.toString();
+        print(data);
+        return referenciaPFromJson(data);
       }
     } on DioError catch (e) {
       if (e.response!.data == true) {
@@ -300,8 +319,6 @@ class _DetallesPagoState extends State<DetallesPago> {
             backgroundColor: Colors.red,
             textColor: Colors.white,
             fontSize: 16.0);
-
-        return;
       } else {
         print('aqui2:${e.response!.data.toString()}');
         Fluttertoast.showToast(
@@ -312,7 +329,6 @@ class _DetallesPagoState extends State<DetallesPago> {
             backgroundColor: Colors.red,
             textColor: Colors.white,
             fontSize: 16.0);
-        return;
       }
     }
   }
@@ -328,7 +344,7 @@ class _DetallesPagoState extends State<DetallesPago> {
                   if (pa == true) {
                     alerta2();
                   } else {
-                    sendingData().then((value) => alerta());
+                    sendingData().then((value) => alerta(value!.referenciaP!));
                   }
                 },
                 gradient: LinearGradient(colors: [
@@ -491,6 +507,8 @@ class _DetallesPagoState extends State<DetallesPago> {
                     child: CheckboxListTile(
                       value: check.contains(data),
                       onChanged: (bool? v) {
+                        HapticFeedback.lightImpact();
+
                         if (pa == true) {
                         } else {
                           if (checkedAll == false) {
@@ -519,9 +537,11 @@ class _DetallesPagoState extends State<DetallesPago> {
                                 showButton();
                               });
                             } else {
-                              setState(() {
-                                checked = v;
-                              });
+                              if (check.length == 0) {
+                                setState(() {
+                                  checked = v;
+                                });
+                              }
                             }
                           } else {
                             checked = false;
@@ -639,12 +659,18 @@ class _DetallesPagoState extends State<DetallesPago> {
     return estado;
   }
 
-  alerta() {
+  alerta(String mensaje) {
     Widget okButton = TextButton(
         onPressed: () {
           Navigator.of(context)
             ..pop()
-            ..pop();
+            ..push(MaterialPageRoute(
+                builder: (BuildContext context) => new RefView(
+                      list: widget.refp,
+                      refP: widget.list,
+                      ref: mensaje,
+                    )));
+
           //sendingData();
         },
         child: Text(
