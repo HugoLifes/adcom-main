@@ -53,7 +53,7 @@ class _ServicesState extends State<Services> {
   var userType;
   bool user = false;
   bool error = false;
-  getSomeData() async {
+  Future getSomeData() async {
     prefs = await SharedPreferences.getInstance();
     setState(() {
       idCom = prefs!.getInt('idCom');
@@ -68,6 +68,9 @@ class _ServicesState extends State<Services> {
           horarioInicio: value.data![i].horaInitAten,
           horarioFin: value.data![i].horaFinAten,
           compania: value.data![i].compania,
+          formaPago1: value.data![i].formaPago1,
+          formaPago2: value.data![i].formaPago2,
+          formaPago3: value.data![i].formaPago3,
         ));
       }
       setState(() {
@@ -77,20 +80,24 @@ class _ServicesState extends State<Services> {
           value.data!.length,
           (index) => List.generate(
               value.data![index].productos!.length,
-              (index2) => value.data![index].productos![index2].presLogoRuta!
-                  .trimRight()));
+              (index2) =>
+                  value.data![index].productos![index2].presLogoRuta! == null
+                      ? '0'
+                      : value.data![index].productos![index2].presLogoRuta!
+                          .trimRight()));
       name = List.generate(
           value.data!.length,
           (index) => List.generate(
               value.data![index].productos!.length,
-              (index2) => value.data![index].productos![index2].descripcion!
-                  .trimRight()));
+              (index2) =>
+                  value.data![index].productos![index2].descripcion == null
+                      ? '0'
+                      : value.data![index].productos![index2].descripcion!
+                          .trimRight()));
       seleccionado = List.generate(
           value.data!.length,
           (index) => List.generate(
               value.data![index].productos!.length, (index2) => false));
-
-      printLinks();
     }).catchError((e) {
       setState(() {
         mostrar = true;
@@ -108,6 +115,13 @@ class _ServicesState extends State<Services> {
   printLinks() {
     for (int i = 0; i < unidad.length; i++) {
       print(unidad[i]);
+    }
+
+    for (int i = 0; i < name.length; i++) {
+      print(name[i]);
+    }
+    for (int i = 0; i < seleccionado.length; i++) {
+      print(seleccionado[i]);
     }
   }
 
@@ -318,10 +332,11 @@ class DatosProveedor {
           'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-datos-provedores-by-com');
 
       var response = await http.post(uri, body: {'idCom': '5'}).timeout(
-          Duration(seconds: 6), onTimeout: () {
+          Duration(seconds: 8), onTimeout: () {
         return http.Response('Timeout', 408);
       });
       var data = returnResponse(response);
+      print(data);
       return seguimientoFromJson(data);
     } on SocketException {
       throw FetchDataException('Error');

@@ -46,6 +46,7 @@ Future<Proveedores?> getProv() async {
       return http.Response('Request Timeout', 408);
     });
     var data = returnResponse(response);
+    print(data);
     return proveedoresFromJson(data);
   } on SocketException {
     throw FetchDataException('Hubo un problema');

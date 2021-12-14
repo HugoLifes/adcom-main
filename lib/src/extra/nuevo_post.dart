@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:glyphicon/glyphicon.dart';
 import 'package:gradient_widgets/gradient_widgets.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http_parser/src/media_type.dart';
 
@@ -35,6 +36,7 @@ class _MakeNewPostState extends State<MakeNewPost> {
   int? idA;
   List<TipoAvisoS> avisos = [];
   List<Text>? nameFile = [];
+  List<String>? nameFile2 = [];
   List<String> type = [];
   @override
   void initState() {
@@ -60,189 +62,193 @@ class _MakeNewPostState extends State<MakeNewPost> {
         backgroundColor: Colors.blueGrey[700],
         leading: CloseButton(),
       ),
-      body: SafeArea(
-        child: ListView(children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 25, top: 15),
-                    child: Container(
-                      height: 51,
-                      width: size.width / 9,
-                      decoration: BoxDecoration(
-                          color: Colors.grey[300], shape: BoxShape.circle),
-                      child: Image.asset(
-                        'assets/images/logo.png',
+      body: LoaderOverlay(
+        child: SafeArea(
+          child: ListView(children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 25, top: 15),
+                      child: Container(
+                        height: 51,
+                        width: size.width / 9,
+                        decoration: BoxDecoration(
+                            color: Colors.grey[300], shape: BoxShape.circle),
+                        child: Image.asset(
+                          'assets/images/logo.png',
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    width: size.width / 55,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: size.width / 39),
-                    child: Text('Administrador',
-                        style: (TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w500))),
-                  ),
-                  SizedBox(
-                    width: size.width / 6,
-                  ),
-                  drop()
-                ],
-              ),
-              Container(
-                  padding: EdgeInsets.only(top: 20, left: 20, right: 20),
-                  child: Form(
-                    key: _formKey,
-                    child: TextFormField(
-                        controller: titleController,
-                        onFieldSubmitted: (_) => onSave(),
-                        validator: (title) => title != null && title.isEmpty
-                            ? 'Este campo no puede estar vacio'
-                            : null,
-                        autofocus: true,
-                        maxLines: 4,
-                        keyboardType: TextInputType.multiline,
-                        decoration: InputDecoration(
-                          labelText: "¿Algo para decir?",
-                          labelStyle: TextStyle(
-                              color: Colors.black,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500),
-                          fillColor: Colors.white,
-                          focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(25.0),
-                              borderSide: BorderSide(color: Color(0xFF455A64))),
-                        ),
-                        inputFormatters: [
-                          LengthLimitingTextInputFormatter(200)
-                        ]),
-                  )),
-              SizedBox(
-                height: size.width / 20,
-              ),
-              Divider(
-                color: Color(0xFF455A64).withOpacity(0.3),
-                thickness: 1.1,
-              ),
-              Padding(
-                padding: EdgeInsets.only(left: 20, top: 10, right: 20),
-                child: InkWell(
-                  onTap: () async {
-                    Fluttertoast.showToast(
-                        msg: "Mantenga Presionado el archivo",
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.CENTER,
-                        timeInSecForIosWeb: 1,
-                        backgroundColor: Colors.white,
-                        textColor: Colors.black,
-                        fontSize: 17.0);
-                    await filePick().then((value) => {
-                          if (value != null)
-                            {
-                              for (var item in value)
-                                {
-                                  //print('here ${item!.path.split('/').last}'),
-                                  nameFile!
-                                      .add(Text(item!.path.split('/').last))
-                                }
-                            }
-                          else
-                            {print('no existe')}
-                        });
-                    setState(() {
-                      newFiles();
-                    });
-                  },
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Glyphicon.paperclip,
-                            color: Colors.pink,
-                            size: 25,
-                          ),
-                          SizedBox(
-                            width: size.width / 20,
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Selecciona varios archivos',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold)),
-                              SizedBox(
-                                height: size.width / 20,
-                              ),
-                              nameFile!.isEmpty ? Container() : newFiles()
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
+                    SizedBox(
+                      width: size.width / 55,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: size.width / 39),
+                      child: Text('Administrador',
+                          style: (TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w500))),
+                    ),
+                    SizedBox(
+                      width: size.width / 6,
+                    ),
+                    drop()
+                  ],
                 ),
-              ),
-              SizedBox(
-                height: size.width / 15,
-                child: Divider(
+                Container(
+                    padding: EdgeInsets.only(top: 20, left: 20, right: 20),
+                    child: Form(
+                      key: _formKey,
+                      child: TextFormField(
+                          controller: titleController,
+                          onFieldSubmitted: (_) => onSave(),
+                          validator: (title) => title != null && title.isEmpty
+                              ? 'Este campo no puede estar vacio'
+                              : null,
+                          autofocus: true,
+                          maxLines: 4,
+                          keyboardType: TextInputType.multiline,
+                          decoration: InputDecoration(
+                            labelText: "¿Algo para decir?",
+                            labelStyle: TextStyle(
+                                color: Colors.black,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500),
+                            fillColor: Colors.white,
+                            focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(25.0),
+                                borderSide:
+                                    BorderSide(color: Color(0xFF455A64))),
+                          ),
+                          inputFormatters: [
+                            LengthLimitingTextInputFormatter(200)
+                          ]),
+                    )),
+                SizedBox(
+                  height: size.width / 20,
+                ),
+                Divider(
                   color: Color(0xFF455A64).withOpacity(0.3),
                   thickness: 1.1,
                 ),
-              ),
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 20, top: 10),
-                  child: DropdownButton<String>(
-                    elevation: 6,
-                    value: chosenValue,
-                    style: TextStyle(color: Colors.black),
-                    items: widget.idComu!
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                          value: value, child: Text(value));
-                    }).toList(),
-                    onChanged: (val) {
-                      print(val);
-                      print(chosenValue);
-                      if (chosenValue == null) {
-                        setState(() {
-                          chosenValue = val;
-                        });
-                        sendId();
-                      } else {
-                        if (val != chosenValue) {
-                          type.clear();
+                Padding(
+                  padding: EdgeInsets.only(left: 20, top: 10, right: 20),
+                  child: InkWell(
+                    onTap: () async {
+                      Fluttertoast.showToast(
+                          msg: "Mantenga Presionado el archivo",
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.CENTER,
+                          timeInSecForIosWeb: 1,
+                          backgroundColor: Colors.white,
+                          textColor: Colors.black,
+                          fontSize: 17.0);
+                      await filePick().then((value) => {
+                            if (value != null)
+                              {
+                                for (var item in value)
+                                  {
+                                    print('here ${item!.path.split('/').last}'),
+                                    nameFile!
+                                        .add(Text(item.path.split('/').last)),
+                                    nameFile2!.add(item.path.split('/').last),
+                                  }
+                              }
+                            else
+                              {print('no existe')}
+                          });
+                      setState(() {
+                        newFiles();
+                      });
+                    },
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Glyphicon.paperclip,
+                              color: Colors.pink,
+                              size: 25,
+                            ),
+                            SizedBox(
+                              width: size.width / 20,
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Selecciona varios archivos',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold)),
+                                SizedBox(
+                                  height: size.width / 20,
+                                ),
+                                nameFile!.isEmpty ? Container() : newFiles()
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: size.width / 15,
+                  child: Divider(
+                    color: Color(0xFF455A64).withOpacity(0.3),
+                    thickness: 1.1,
+                  ),
+                ),
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 20, top: 10),
+                    child: DropdownButton<String>(
+                      elevation: 6,
+                      value: chosenValue,
+                      style: TextStyle(color: Colors.black),
+                      items: widget.idComu!
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                            value: value, child: Text(value));
+                      }).toList(),
+                      onChanged: (val) {
+                        print(val);
+                        print(chosenValue);
+                        if (chosenValue == null) {
                           setState(() {
                             chosenValue = val;
                           });
                           sendId();
                         } else {
-                          if (val == chosenValue) {
-                          } else {
+                          if (val != chosenValue) {
                             type.clear();
+                            setState(() {
+                              chosenValue = val;
+                            });
                             sendId();
+                          } else {
+                            if (val == chosenValue) {
+                            } else {
+                              type.clear();
+                              sendId();
+                            }
                           }
                         }
-                      }
-                    },
-                    hint: Text("Elige una comunidad",
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600)),
+                      },
+                      hint: Text("Elige una comunidad",
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600)),
+                    ),
                   ),
                 ),
-              ),
-            ],
-          )
-        ]),
+              ],
+            )
+          ]),
+        ),
       ),
     );
   }
@@ -329,7 +335,7 @@ class _MakeNewPostState extends State<MakeNewPost> {
 
     if (result != null) {
       file = result.paths.map((path) => File(path!)).toList();
-
+      print(file.first);
       return file;
     } else {
       Fluttertoast.showToast(
@@ -349,8 +355,20 @@ class _MakeNewPostState extends State<MakeNewPost> {
     var id = prefs!.getInt('idPrimario');
     if (isValid) {
       if (chosenValue != null && chosenValue2 != null) {
-        await sendingData(idCom!, titleController.text, nameFile!, id!, idA!)
+        /*  await sendingData(idCom!, titleController.text, nameFile!, id!, idA!)
             .then((value) => {
+                  Navigator.of(context).pop(),
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text(
+                    'Su reporte se ha realizado con exito!',
+                    style: TextStyle(fontSize: 19),
+                  )))
+                }); */
+        context.loaderOverlay.show();
+        await sendingData2(
+                idCom!, titleController.text, file, id!, idA!, nameFile2!)
+            .then((value) => {
+                  context.loaderOverlay.hide(),
                   Navigator.of(context).pop(),
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content: Text(
@@ -395,7 +413,7 @@ class _MakeNewPostState extends State<MakeNewPost> {
         print(file.length);
         filesArr.add(item.path.split('/').last);
       }
-
+      print('filesArr: $filesArr');
       var formdata2 = FormData.fromMap({
         'params': json.encode(
             {'userId': id, 'comId': idCom, 'tipoAvisoId': idA, 'aviso': aviso}),
@@ -418,6 +436,86 @@ class _MakeNewPostState extends State<MakeNewPost> {
       }
     } on DioError catch (e) {
       throw FetchDataException('$e');
+    }
+  }
+
+  sendingData2(int idCom, String aviso, List<File> nameFile, int id, int idA,
+      List<String> newpath) async {
+    // string to uri
+    var uri = Uri.parse(
+        "http://187.189.53.8:8081/backend/web/index.php?r=adcom/crear-aviso");
+    print("image upload URL - $uri");
+// create multipart request
+    var request = new http.MultipartRequest("POST", uri);
+    for (var file in nameFile) {
+      String fileName = newpath.first;
+      var stream = new http.ByteStream(Stream.castFrom(file.openRead()));
+
+      // get file length
+
+      var length = await file.length(); //imageFile is your image file
+      print("File lenght - $length");
+      print("fileName - $fileName");
+      // multipart that takes file
+      var multipartFileSign = new http.MultipartFile(
+          'archivos[]', stream, length,
+          filename: fileName);
+
+      request.files.add(multipartFileSign);
+    }
+
+    print(idA);
+    print(aviso);
+    print(idCom);
+    print(id);
+
+    print("params - ${json.encode({
+          'userId': id,
+          'comId': idCom,
+          'tipoAvisoId': idA,
+          'aviso': aviso
+        })}");
+//adding params
+    request.fields['params'] = json.encode(
+        {'userId': id, 'comId': idCom, 'tipoAvisoId': idA, 'aviso': aviso});
+
+// send
+    var response = await request.send();
+
+    print(response.statusCode);
+
+    var res = await http.Response.fromStream(response);
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      print("Item form is statuscode 200");
+      print(res.body);
+      var responseDecode = json.decode(res.body);
+
+      return responseDecode;
+    } else {
+      if (response.statusCode == 400) {
+        print("Item form is statuscode 400");
+        print(res.body);
+        return Fluttertoast.showToast(
+            msg: "Error en el servidor, intente mas tarde",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      } else {
+        print("Item form is statuscode 500");
+        print(res.body);
+
+        return Fluttertoast.showToast(
+            msg: "Error en el servidor, intente mas tarde",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      }
     }
   }
 

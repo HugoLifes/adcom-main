@@ -28,7 +28,7 @@ class _AvisoPrivacidadState extends State<AvisoPrivacidad> {
           ),
         ),
         Container(
-          padding: EdgeInsets.all(20),
+          padding: EdgeInsets.all(10),
           child: Text(
             AvisoDePrivacidad().title!,
             style: TextStyle(
@@ -37,7 +37,19 @@ class _AvisoPrivacidadState extends State<AvisoPrivacidad> {
             ),
             textAlign: TextAlign.justify,
           ),
-        )
+        ),
+        Center(
+          child: Container(
+            child: TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text(
+                  'Aceptar',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+                )),
+          ),
+        ),
       ],
     ))));
   }

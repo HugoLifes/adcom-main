@@ -152,105 +152,168 @@ class _AddReporteState extends State<AddReporte> {
         ),
         resizeToAvoidBottomInset: true,
         //stepper, propiedades y acciones
-        body: LoaderOverlay(child: stepper()),
+        body: LoaderOverlay(
+            child: Theme(
+                data: ThemeData(
+                  primarySwatch: Colors.green,
+                  buttonTheme: ButtonThemeData(
+                    buttonColor: Colors.blue,
+                  ),
+                  splashFactory: InkRipple.splashFactory,
+                ),
+                child: stepper())),
 
         //
         // Boton que abre la camara
 
-        floatingActionButton: _currentStep != 2
+        /* floatingActionButton: _currentStep != 2
             ? null
             : FloatingActionButton(
                 backgroundColor: Colors.blue,
                 child: Icon(Icons.send),
-                onPressed: () => {alerta()}),
+                onPressed: () => {alerta()}), */
       ),
     );
   }
 
   Stepper stepper() {
     return Stepper(
-      steps: _stepper()!,
-      physics: ClampingScrollPhysics(),
-      currentStep: this._currentStep,
-      onStepTapped: (step) {
-        setState(() {
-          this._currentStep = step;
-        });
-      },
-      onStepContinue: () {
-        setState(() {
-          if (this._currentStep < this._stepper()!.length - 1) {
-            if (this._currentStep == 0) {
-              if (_formKey.currentState!.validate()) {
-                this._currentStep = this._currentStep + 1;
-              }
-            } else {
-              if (idUser == 0) {
-                if (chosenValue == null) {
-                  Fluttertoast.showToast(
-                      msg: "Elija comunidad",
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.CENTER,
-                      timeInSecForIosWeb: 1,
-                      backgroundColor: Colors.white,
-                      textColor: Colors.black,
-                      fontSize: 17.0);
-                } else {
+        steps: _stepper()!,
+        physics: ClampingScrollPhysics(),
+        currentStep: this._currentStep,
+        onStepTapped: (step) {
+          setState(() {
+            this._currentStep = step;
+          });
+        },
+        onStepContinue: () {
+          setState(() {
+            if (this._currentStep < this._stepper()!.length - 1) {
+              if (this._currentStep == 0) {
+                if (_formKey.currentState!.validate()) {
                   this._currentStep = this._currentStep + 1;
+                  FocusScope.of(context).unfocus();
                 }
               } else {
-                this._currentStep = this._currentStep + 1;
+                if (idUser == 0) {
+                  if (chosenValue == null) {
+                    Fluttertoast.showToast(
+                        msg: "Elija comunidad",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.CENTER,
+                        timeInSecForIosWeb: 1,
+                        backgroundColor: Colors.white,
+                        textColor: Colors.black,
+                        fontSize: 17.0);
+                  } else {
+                    this._currentStep = this._currentStep + 1;
+                    FocusScope.of(context).unfocus();
+                  }
+                } else {
+                  this._currentStep = this._currentStep + 1;
+                  FocusScope.of(context).unfocus();
+                }
+              }
+            } else {
+              if (images.isEmpty) {
+                Fluttertoast.showToast(
+                    msg: "Seccion de fotos vacia",
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.CENTER,
+                    timeInSecForIosWeb: 1,
+                    backgroundColor: Colors.white,
+                    textColor: Colors.black,
+                    fontSize: 17.0);
+              } else {
+                alerta();
               }
             }
-          } else {
-            if (images.isEmpty) {
-              Fluttertoast.showToast(
-                  msg: "Seccion de fotos vacia",
-                  toastLength: Toast.LENGTH_SHORT,
-                  gravity: ToastGravity.CENTER,
-                  timeInSecForIosWeb: 1,
-                  backgroundColor: Colors.white,
-                  textColor: Colors.black,
-                  fontSize: 17.0);
+          });
+        },
+        onStepCancel: () {
+          setState(() {
+            if (this._currentStep > 0) {
+              this._currentStep = this._currentStep - 1;
             } else {
-              alerta();
+              this._currentStep = 0;
             }
-          }
+          });
+        },
+        controlsBuilder: (context, {onStepContinue, onStepCancel}) {
+          return Row(
+            children: <Widget>[
+              _currentStep == 2
+                  ? Expanded(
+                      child: Container(
+                        padding: EdgeInsets.only(left: 10, top: 10),
+                        child: RaisedButton(
+                          color: Colors.green,
+                          child: Text(
+                            'Finalizar',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          onPressed: onStepContinue,
+                        ),
+                      ),
+                    )
+                  : Expanded(
+                      child: Container(
+                        padding: EdgeInsets.only(left: 10, top: 10),
+                        child: RaisedButton(
+                          color: Colors.blue,
+                          child: Text(
+                            'Siguiente',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          onPressed: onStepContinue,
+                        ),
+                      ),
+                    ),
+              _currentStep > 0
+                  ? Expanded(
+                      child: Container(
+                        padding: EdgeInsets.only(left: 10, top: 10),
+                        child: RaisedButton(
+                          color: Colors.redAccent[700],
+                          child: Text(
+                            'Atras',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          onPressed: onStepCancel,
+                        ),
+                      ),
+                    )
+                  : Container()
+            ],
+          );
         });
-      },
-      onStepCancel: () {
-        setState(() {
-          if (this._currentStep > 0) {
-            this._currentStep = this._currentStep - 1;
-          } else {
-            this._currentStep = 0;
-          }
-        });
-      },
-    );
   }
 
 //caracteristica  de cada step
   List<Step>? _stepper() {
     List<Step> _steps = <Step>[
       Step(
-          title: Text('Nombre del reporte'),
-          isActive: _currentStep >= 0,
-          state: _currentStep == 0
-              ? titleController.text.isEmpty
-                  ? _listState[3]
-                  : _listState[2]
-              : _currentStep > 0
-                  ? _listState[2]
-                  : _listState[0],
-          content: Column(
-            children: [
-              Form(
-                key: _formKey,
-                child: buildTitle(),
-              ),
-            ],
-          )),
+        title: Text('Nombre del reporte'),
+        isActive: _currentStep >= 0,
+        state: _currentStep == 0
+            ? titleController.text.isEmpty
+                ? _listState[3]
+                : _listState[2]
+            : _currentStep > 0
+                ? _listState[2]
+                : _listState[0],
+        content: Column(
+          children: [
+            Form(
+              key: _formKey,
+              child: buildTitle(),
+            ),
+          ],
+        ),
+        subtitle: _currentStep == 0
+            ? Text('Este es el nombre que aparecera en la seccion de reportes')
+            : null,
+      ),
       Step(
           title: Text('Descripcion del incidente'),
           isActive: _currentStep >= 1,
@@ -310,7 +373,10 @@ class _AddReporteState extends State<AddReporte> {
                     )
                   : Container()
             ],
-          )),
+          ),
+          subtitle: _currentStep == 1
+              ? Text('Este es el texto que aparecera en la seccion de reportes')
+              : null),
       Step(
           title: Text('Sube algunas fotos'),
           content: Container(

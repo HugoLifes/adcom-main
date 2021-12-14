@@ -99,7 +99,7 @@ class _VistaPagosState extends State<VistaPagos> {
                             textColor: Colors.black,
                             fontSize: 17.0)
                         : Fluttertoast.showToast(
-                            msg: "Deuda más atrazo",
+                            msg: "Deuda más atraso",
                             toastLength: Toast.LENGTH_SHORT,
                             gravity: ToastGravity.CENTER,
                             timeInSecForIosWeb: 1,

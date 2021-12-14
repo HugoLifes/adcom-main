@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:flutter_weather_bg_null_safety/flutter_weather_bg.dart';
 import 'package:adcom/json/jsonAmenidades.dart';
 import 'package:adcom/src/methods/eventDashboard.dart';
 import 'package:adcom/src/methods/exeptions.dart';
@@ -29,6 +29,14 @@ class Amenidades extends StatefulWidget {
 dataOff4(id) async {
   await Amenidades.init();
   prefs!.setInt('idPrimario', id);
+}
+
+strange() {
+  return WeatherBg(
+    weatherType: WeatherType.lightSnow,
+    width: 100,
+    height: 100,
+  );
 }
 
 Future<Places?> idso() async {
@@ -102,7 +110,7 @@ class _AmenidadesState extends State<Amenidades> {
         body: Stack(
           children: [
             Container(
-              height: size.height * .31,
+              height: size.height * .28,
               decoration: BoxDecoration(color: Colors.deepPurpleAccent),
             ),
             Container(

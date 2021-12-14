@@ -338,10 +338,11 @@ class _PedirServicioState extends State<PedirServicio> {
   }
 
   Step? tipoDeServicio() {
+    print(' idTipoProvedor ${widget.servicio!.idTipoProveedor}');
     switch (widget.servicio!.idTipoProveedor) {
       case 1:
         return Step(
-            title: Text('Tipo de tanque'),
+            title: Text('Tipo de producto'),
             isActive: _currentStep >= 1,
             state: StepState.disabled,
             content: ListView.builder(

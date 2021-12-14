@@ -12,6 +12,7 @@ import 'package:intl/intl.dart';
 
 import 'package:provider/provider.dart';
 
+/// La tarjeta de de mis pagos y todas su funcionalidad, como detalles, ver referencia, cambio de colores, etc.
 // ignore: must_be_immutable
 class VistaTarjeta extends StatefulWidget {
   bool landScape = false;
@@ -102,7 +103,12 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
                                 list: widget.newList,
                               )));
                     },
-                    child: Icon(Icons.add, size: 25, color: Colors.white),
+                    child: Text('Ver referencia',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        )),
                     style: OutlinedButton.styleFrom(
                         side:
                             BorderSide(width: 1.0, color: Colors.transparent)),

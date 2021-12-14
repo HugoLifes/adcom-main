@@ -11,6 +11,8 @@ import 'package:adcom/src/pantallas/loginPage.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_weather_bg_null_safety/bg/weather_bg.dart';
+import 'package:flutter_weather_bg_null_safety/flutter_weather_bg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:glyphicon/glyphicon.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
@@ -49,6 +51,16 @@ somData(user, userType, idCom, idPrimario, userId, userM, pass,
     prefs!.setString('noInterno', noInterior);
     prefs!.setString('calle', calle);
   }
+}
+
+strange() {
+  return Container(
+    child: WeatherBg(
+      weatherType: WeatherType.heavySnow,
+      width: 450,
+      height: 300,
+    ),
+  );
 }
 
 class _MainMenuState extends State<MainMenu> {
@@ -169,7 +181,7 @@ class _MainMenuState extends State<MainMenu> {
   @override
   void initState() {
     super.initState();
-    CheckInternet().checkConnection(context);
+    CheckInternet().checkFailed(context);
     OneSignal.shared
         .setNotificationOpenedHandler((OSNotificationOpenedResult result) {
       // Will be called whenever a notification is opened/button pressed.
@@ -306,6 +318,7 @@ class _MainMenuState extends State<MainMenu> {
             ],
           ),
         ),
+        strange(),
         Container(
             padding: EdgeInsets.only(
                 top: landscape == true ? size.height * .10 : size.height * .18,
@@ -371,7 +384,7 @@ class _MainMenuState extends State<MainMenu> {
                               children: [
                                 SizedBox(
                                   width: size.height / 3.5,
-                                  height: size.width / 2.0,
+                                  height: size.width / 1.9,
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -393,6 +406,9 @@ class _MainMenuState extends State<MainMenu> {
                                                   fontSize: 17,
                                                   fontWeight: FontWeight.w700),
                                             ),
+                                      SizedBox(
+                                        height: 9,
+                                      ),
                                       Text(
                                         '${user == null || user == '' ? '' : user}',
                                         style: TextStyle(
@@ -406,9 +422,7 @@ class _MainMenuState extends State<MainMenu> {
                                 ),
                               ],
                             ),
-                      SizedBox(
-                        width: size.width / 70,
-                      ), //no mover
+                      //no mover
                     ],
                   ),
                 ),

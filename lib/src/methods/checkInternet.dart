@@ -13,15 +13,31 @@ class CheckInternet {
     listener = DataConnectionChecker().onStatusChange.listen((status) {
       switch (status) {
         case DataConnectionStatus.connected:
-          InternetStatus = "Uju!";
+          InternetStatus = "Muy bien!";
           contentmessage = "Tienes conexion, ahora puedes navegar";
+
           _showDialog(InternetStatus, contentmessage, context);
           break;
+
+        default:
+      }
+    });
+    await Future.delayed(Duration(seconds: 30));
+    await listener!.cancel();
+    return await DataConnectionChecker().connectionStatus;
+  }
+
+  Future checkFailed(BuildContext context) async {
+    print("Current status: ${await DataConnectionChecker().connectionStatus}");
+
+    listener = DataConnectionChecker().onStatusChange.listen((status) {
+      switch (status) {
         case DataConnectionStatus.disconnected:
           InternetStatus = "Oh no!";
           contentmessage = "Porfavor conectate a internet para navegar";
           _showDialog(InternetStatus, contentmessage, context);
           break;
+        default:
       }
     });
     await Future.delayed(Duration(seconds: 30));

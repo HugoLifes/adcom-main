@@ -663,7 +663,7 @@ class _FinanzasState extends State<Finanzas> {
     );
   }
 
-  /// Main view representa la vista a la tarjeta, donde salen los adeudos
+  /// Main view representa la vista de la tarjeta, con su respectiva clase [VistaTarjeta]
   mainView(Size size, {landScape = false}) {
     return Padding(
       padding: EdgeInsets.only(

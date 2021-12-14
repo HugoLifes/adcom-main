@@ -128,13 +128,17 @@ class _GridDashboardState extends State<GridDashboard> {
     }
     return AnimationLimiter(
       child: Container(
+        padding: EdgeInsets.only(top: size.height / 2.85),
         child: GridView.count(
-            padding:
-                EdgeInsets.only(left: 16, right: 16, top: size.height / 2.5),
+            padding: EdgeInsets.only(
+              left: 16,
+              right: 16,
+              top: 3,
+            ),
             crossAxisCount: 2,
             childAspectRatio: widget.landscape == true ? 3.0 : 1.1,
-            crossAxisSpacing: widget.landscape == true ? 16 : 15,
-            mainAxisSpacing: 16,
+            crossAxisSpacing: widget.landscape == true ? 16 : 10,
+            mainAxisSpacing: 10,
             children: myList.map((data) {
               return AnimationConfiguration.staggeredGrid(
                 columnCount: myList.length,

@@ -41,6 +41,7 @@ class _DetallesPagoState extends State<DetallesPago> {
   bool usarSaldo = false;
   NumberFormat numberFormat = NumberFormat.decimalPattern('hi');
   bool showText = false;
+  bool hayPromo = false;
 
   @override
   void initState() {
@@ -127,13 +128,13 @@ class _DetallesPagoState extends State<DetallesPago> {
             height: size.height / 50,
           ),
           Text(
-            'Seleccione los meses a pagar',
+            'Elija su modo de pago',
             style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
           ),
-          /*  SizedBox(
+          SizedBox(
             height: 10,
-          ), */
-          /*   Flexible(
+          ),
+          Flexible(
             child: Container(
               padding: EdgeInsets.only(left: 10, top: 10, right: 10),
               child: CheckboxListTile(
@@ -169,15 +170,34 @@ class _DetallesPagoState extends State<DetallesPago> {
                 checkColor: Colors.white,
               ),
             ),
-          ), */
+          ),
           SizedBox(
             height: 20,
           ),
           Container(
               padding: EdgeInsets.only(left: 15),
               alignment: Alignment.centerLeft,
-              child: Text('Pago individual',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600))),
+              child: checkedAll == true
+                  ? Row(
+                      children: [
+                        Text(
+                          "Promociones:",
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w600),
+                        ),
+                        SizedBox(
+                          width: size.width / 60,
+                        ),
+                        Text(
+                          "Descuento por pago anual",
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.w400),
+                        ),
+                      ],
+                    )
+                  : Text('Pago individual',
+                      style: TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.w600))),
           Divider(
             color: Colors.grey,
           ),
@@ -185,37 +205,6 @@ class _DetallesPagoState extends State<DetallesPago> {
           Divider(
             color: Colors.grey,
           ),
-          /*  Container(
-            padding: EdgeInsets.only(left: 10),
-            child: Row(
-              children: [
-                Checkbox(
-                    activeColor: Colors.lightGreen[700],
-                    value: usarSaldo,
-                    onChanged: (v) {
-                      setState(() {
-                        usarSaldo = v!;
-                      });
-                    }),
-                Text(
-                  '¿Usar saldo a favor?',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                SizedBox(
-                  width: size.width / 23,
-                ),
-                usarSaldo == true
-                    ? Text('Saldo',
-                        style: TextStyle(
-                            fontSize: 19, fontWeight: FontWeight.bold))
-                    : Text(''),
-                SizedBox(
-                  width: size.width / 26,
-                ),
-                usarSaldo == true ? Text('\$ 200 MXN') : Text('')
-              ],
-            ),
-          ) */
           pa == false
               ? Row(
                   children: [
@@ -262,18 +251,7 @@ class _DetallesPagoState extends State<DetallesPago> {
                     )
                   ],
                 ),
-          checked == false
-              ? Container(
-                  padding: EdgeInsets.all(10),
-                  child: Text(
-                    'Si usted desea generar un pago anual, favor de comunicarse con los administradores.',
-                    style: TextStyle(
-                      fontSize: 19,
-                    ),
-                    textAlign: TextAlign.justify,
-                  ),
-                )
-              : showButton(),
+          showButton(),
           payButton()
         ],
       ),
@@ -471,15 +449,112 @@ class _DetallesPagoState extends State<DetallesPago> {
         ? Column(
             children: [
               Container(
-                padding: EdgeInsets.only(left: 13),
-                child: Text(
-                  'Su generará su referencia anual, su referencia vencera en 24hrs.',
-                  style: TextStyle(fontSize: size / 20),
+                padding: EdgeInsets.only(left: 20, right: 10),
+                alignment: Alignment.topLeft,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Text(
+                      'Meses a pagar:',
+                      style:
+                          TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
+                    ),
+                    SizedBox(
+                      width: size * 0.03,
+                    ),
+                    Text(
+                      'Enero - Diciembre',
+                      style:
+                          TextStyle(fontWeight: FontWeight.w400, fontSize: 20),
+                    ),
+                  ],
                 ),
               ),
-              SizedBox(
-                height: 20,
-              )
+              Container(
+                alignment: Alignment.topLeft,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Cuota:',
+                      style:
+                          TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
+                    ),
+                    SizedBox(
+                      width: size * 0.22,
+                    ),
+                    Text(
+                      '\$' + widget.list![0].montoCuota!,
+                      style:
+                          TextStyle(fontWeight: FontWeight.w400, fontSize: 20),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Text(
+                      'Atraso:',
+                      style:
+                          TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
+                    ),
+                    SizedBox(
+                      width: size * 0.22,
+                    ),
+                    Text(
+                      '\$' + '${widget.list![0].montoTardio!}.00',
+                      style:
+                          TextStyle(fontWeight: FontWeight.w400, fontSize: 20),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                alignment: Alignment.topLeft,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Descuento:',
+                      style:
+                          TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
+                    ),
+                    SizedBox(
+                      width: size * 0.1,
+                    ),
+                    Text(
+                      '\$' + '1200.00',
+                      style:
+                          TextStyle(fontWeight: FontWeight.w400, fontSize: 20),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Total a pagar:  ',
+                      style:
+                          TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
+                    ),
+                    SizedBox(
+                      width: size * 0.03,
+                    ),
+                    Text(
+                      '\$${contadorTotal.toStringAsFixed(2)}',
+                      style:
+                          TextStyle(fontWeight: FontWeight.w400, fontSize: 20),
+                    ),
+                  ],
+                ),
+              ),
             ],
           )
         : Flexible(
@@ -653,6 +728,10 @@ class _DetallesPagoState extends State<DetallesPago> {
           cortado = "Pago Permanente";
           conceptos.add(cortado);
           break;
+        case "PAGO_EXTRA":
+          cortado = "Pago Extra";
+          conceptos.add(cortado);
+          break;
       }
     }
 
@@ -700,7 +779,7 @@ class _DetallesPagoState extends State<DetallesPago> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Su referencia ha sido generada con exito!, Actualice y revise el apartado de referencias en +',
+              'Su referencia ha sido generada con exito!',
               style: TextStyle(fontSize: 18),
             )
           ],
