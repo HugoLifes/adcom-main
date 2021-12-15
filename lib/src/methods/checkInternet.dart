@@ -24,9 +24,22 @@ class CheckInternet {
           break;
       }
     });
-    await Future.delayed(Duration(seconds:30));
+    await Future.delayed(Duration(seconds:10));
     await listener!.cancel();
     return await DataConnectionChecker().connectionStatus;
+  }
+
+  checkFailed(BuildContext context) async{
+    listener = DataConnectionChecker().onStatusChange.listen((status) {
+      switch (status) {
+        case DataConnectionStatus.disconnected:
+          InternetStatus = "Oh no! No tienes conexion a internet";
+          contentmessage = "Porfavor conectate a internet para navegar";
+          _showDialog(InternetStatus, contentmessage, context);
+          break;
+        default:
+      }
+    });
   }
 
   void _showDialog(String title, String content, BuildContext context) {
@@ -42,7 +55,13 @@ class CheckInternet {
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    child: new Text("Close"))
+                    child: new Text("Cerrar")),
+                new TextButton(
+                    onPressed: () async {
+                      Navigator.of(context).pop();
+                      checkConnection(context);
+                    },
+                    child: new Text("Reintentar"))
               ]);
         });
   }

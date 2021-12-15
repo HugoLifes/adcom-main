@@ -67,7 +67,7 @@ class EventProvider extends ChangeNotifier {
     _loading = false;
     notifyListeners();
 
-    try {
+    
       await loginAcces(user, pass).then((value) {
         var userId;
         var post = value;
@@ -98,6 +98,27 @@ class EventProvider extends ChangeNotifier {
               timeInSecForIosWeb: 2,
               fontSize: 19.0);
         }
+      }).catchError((e){
+        HapticFeedback.lightImpact();
+      {
+        Widget okButton = TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pushNamedAndRemoveUntil('/', (route) => false);
+              tk.clear();
+              tk2.clear();
+              
+            },
+            child: Text('OK'));
+
+        AlertDialog alert = AlertDialog(
+          title: Text('Atencion!'),
+          content: Text('Error 408: espera larga'),
+          actions: [okButton],
+        );
+
+        showDialog(context: ctx, builder: (_) => alert);
+        notifyListeners();
+      }
       });
 
       if (userd != null) {
@@ -109,26 +130,7 @@ class EventProvider extends ChangeNotifier {
         _islogged = false;
         notifyListeners();
       }
-    } catch (e) {
-      HapticFeedback.lightImpact();
-      {
-        Widget okButton = TextButton(
-            onPressed: () {
-              Navigator.of(ctx).pushNamedAndRemoveUntil('/', (route) => false);
-              tk.clear();
-              tk2.clear();
-            },
-            child: Text('OK'));
-
-        AlertDialog alert = AlertDialog(
-          title: Text('Atencion!'),
-          content: Text('Intento de conexion fallido : 408'),
-          actions: [okButton],
-        );
-
-        showDialog(context: ctx, builder: (_) => alert);
-      }
-    }
+    
   }
 
   void loginState() async {

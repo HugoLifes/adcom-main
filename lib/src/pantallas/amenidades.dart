@@ -87,17 +87,18 @@ class _AmenidadesState extends State<Amenidades> {
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
+          title: Text('Amenidades', style:TextStyle(fontSize: 25 )),
           elevation: 6,
           backgroundColor: Colors.deepPurpleAccent,
         ),
         body: Stack(
           children: [
             Container(
-              height: size.height * .33,
+              height: size.height * .28,
               decoration: BoxDecoration(color: Colors.deepPurpleAccent),
             ),
             Container(
-              padding: EdgeInsets.only(top: 95),
+              padding: EdgeInsets.only(top: 90, right: 20),
               alignment: Alignment.topRight,
               child: Icon(
                 Icons.event,
@@ -111,17 +112,7 @@ class _AmenidadesState extends State<Amenidades> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    "Amenidades",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 40,
-                        fontFamily: 'Roboto',
-                        fontWeight: FontWeight.w700),
-                  ),
+                  
                   SizedBox(
                     height: 15,
                   ),
@@ -130,17 +121,20 @@ class _AmenidadesState extends State<Amenidades> {
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
-                        fontSize: 15),
+                        fontSize: 18),
                   ),
                   SizedBox(
                     height: 15,
                   ),
                   SizedBox(
                     width: size.width * .5,
-                    child: Text(
+                    child: Container(
+                      padding: EdgeInsets.only(top: 10),
+                      child: Text(
                       'Enterate de la disponibilidad de tus areas recreativas o aparta con tiempo para tus eventos',
                       style: TextStyle(
                           color: Colors.white, fontSize: size.width / 20),
+                    ),
                     ),
                   ),
                   EventDashboard()

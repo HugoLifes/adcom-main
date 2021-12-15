@@ -94,7 +94,10 @@ class _LevantarReporteState extends State<LevantarReporte> {
   var evidencias = <dynamic, dynamic>{};
   bool siTieneDatos = false;
   List<Map<dynamic, Map>> superEvidencia = [];
-
+  var datosProgre;
+  var fechasList;
+  bool llamado =  false;
+  List<dynamic> her = [];
   /// Activa el guardado en memoria
   addata() async {
     prefs = await SharedPreferences.getInstance();
@@ -168,7 +171,13 @@ class _LevantarReporteState extends State<LevantarReporte> {
         cuentas!.data![i].progreso!.forEach((element) {
           if (mounted) {
             setState(() {
+              if(cuentas!.data![i].progreso!.isEmpty){
+                setState((){
+                  progress.add(0);
+                });
+              }else{
               progress.add(element.idProgreso);
+              }
             });
           }
         });
@@ -276,7 +285,7 @@ class _LevantarReporteState extends State<LevantarReporte> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        reversedList.length == 0
+                        siTieneDatos == true
                             ? Text(
                                 'Presiona + para añadir un nuevo caso',
                                 style: TextStyle(
@@ -323,7 +332,7 @@ class _LevantarReporteState extends State<LevantarReporte> {
         },
         itemCount: reversedList.length,
         itemBuilder: (context, int index) {
-          estatus(index);
+          
 
           return Container(
             padding: EdgeInsets.all(8),
@@ -374,9 +383,9 @@ class _LevantarReporteState extends State<LevantarReporte> {
                             padding: EdgeInsets.only(left: 6, top: 2),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
-                              color: stepColor(index),
+                              color: stepColor(index) == null ? Colors.grey : stepColor(index),
                             ),
-                            child: Text('${headerText(index)}'))
+                            child: headerText(index)== null ? Text('Enviado') : Text('${headerText(index)}'))
                       ],
                     ),
                   ),
@@ -420,26 +429,46 @@ class _LevantarReporteState extends State<LevantarReporte> {
     return newTime;
   }
 
-  estatus(int index) {
-    /// recorre el mapeado
-    reversedList4[index].forEach((key, value) {
-      if (reversedList[index].id == key) {
-        /// recorre el segundo mapeado
-        value.forEach((key, value) {
-          if (key == 'Progreso') {
-            for (int i = 0; i < value.length; i++) {
-              progres.add(new p.ProgressIndicator(id: value[i]));
-            }
-          }
-        });
-      } else {
-        return;
+   Color? stepColor(index) {
+    var estado;
+    for (int i = 0; i < reversedList4[index].length; i++) {
+      if (reversedList4[index].keys.elementAt(i) == reversedList[index].id) {
+        for (int j = 0;
+            j < reversedList4[index].values.elementAt(i).values.length;
+            j++) {
+          estado = reversedList4[index].values.elementAt(i).values.elementAt(j);
+          return estado == null ? estadoColor(0) : estadoColor(estado.last);
+        }
       }
-    });
+    }
   }
 
-  Color? stepColor(index) {
-    switch (progres.isEmpty ? 0 : progres.last.id) {
+  String? headerText(index) {
+    var estado;
+
+    for (int i = 0; i < reversedList4[index].length; i++) {
+      if (reversedList4[index].keys.elementAt(i) == reversedList[index].id) {
+        if (reversedList4[index].values.elementAt(i).values.isEmpty == 0) {
+          print('here');
+          return 'Sin Progreso';
+        } else {
+          print('here2');
+          for (int j = 0;
+              j < reversedList4[index].values.elementAt(i).values.length;
+              j++) {
+            estado =
+                reversedList4[index].values.elementAt(i).values.elementAt(j);
+            return estado == 0
+                ? estadoProgreso(0)
+                : estadoProgreso(estado.last);
+          }
+        }
+      }
+    }
+  }
+
+  estadoColor(last) {
+    switch (last) {
       case 1:
         return Colors.yellow;
       case 2:
@@ -454,12 +483,12 @@ class _LevantarReporteState extends State<LevantarReporte> {
     }
   }
 
-  String? headerText(index) {
-    switch (progres.isEmpty ? 0 : progres.last.id) {
+  estadoProgreso(last) {
+    switch (last == null ? 0 : last) {
       case 1:
-        return 'Revisión';
-      case 2:
         return 'En proceso';
+      case 2:
+        return 'Revision';
       case 3:
         return 'Respuesta';
       case 4:
@@ -468,12 +497,12 @@ class _LevantarReporteState extends State<LevantarReporte> {
         return 'Enviado';
     }
   }
-
+  
   alerta5() {
     Widget okButton = TextButton(
         onPressed: () {
           Navigator.of(context)..pop();
-          data();
+          
         },
         child: Text(
           'Si, continuar',

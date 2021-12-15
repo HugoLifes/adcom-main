@@ -12,6 +12,9 @@ import 'package:http/http.dart' as http;
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:ui' as ui;
+
+SharedPreferences? prefs;
 
 class LoginPage extends StatefulWidget {
   final bool isPremium;
@@ -33,9 +36,51 @@ class _LoginPageState extends State<LoginPage> {
   Posting? post;
   bool rememberMe = false;
   var userId;
+  bool landScape = false;
+  bool? isTablet;
+  bool? isPhone;
+
+  @override
+  void initState() {
+    super.initState();
+     final double devicePixelRatio = ui.window.devicePixelRatio;
+  final ui.Size size2 = ui.window.physicalSize;
+  final double width = size2.width;
+  final double height = size2.height;
+    
+     if(devicePixelRatio < 2 && (width >= 1000 || height >= 1000)) {
+      setState((){
+        isTablet = true;
+        isPhone = false;
+      });
+        
+      
+  
+    }else if(devicePixelRatio == 2 && (width >= 1920 || height >= 1920)) {
+     setState((){
+      isTablet = true;
+      isPhone = false;  
+      });
+    }else {
+    setState((){
+        isTablet = false;
+  isPhone = true; 
+      }); 
+}
+  whatDevice();
+    
+  }
+
+  whatDevice() async{
+    prefs = await SharedPreferences.getInstance();
+    prefs!.setBool('isPhone', isPhone!);
+    prefs!.setBool('isTablet', isTablet!);
+
+  }
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();
@@ -43,8 +88,28 @@ class _LoginPageState extends State<LoginPage> {
       },
       child: Scaffold(
         backgroundColor: Colors.white,
-        body: LoaderOverlay(
-          child: ListView(
+        body: OrientationBuilder(
+          builder: (BuildContext context, Orientation orientation) {
+            if(orientation == Orientation.portrait){  
+              return mainMenuLogin(size , isTablet!, isPhone!,landScape: false);
+            }else{
+              
+              return mainMenuLogin(size ,isTablet!, isPhone! ,landScape: true);
+
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  mainMenuLogin(Size s,bool isTablet,bool isPhone,{landScape = false} ){
+    return LoaderOverlay(
+          child: Container(
+            //width : landScape == true ? 550 : s.width * 0.60,
+            padding: isTablet == false ? null : EdgeInsets.only(right: landScape == true ? 350 :250, left: landScape == true ? 350 :250, top: landScape == true ? 0:55),
+            child: ListView(
+            
             children: [
               SizedBox(
                 height: 35,
@@ -58,7 +123,7 @@ class _LoginPageState extends State<LoginPage> {
                   )
                 ],
               ),
-              Padding(
+              Container(
                 padding: EdgeInsets.all(30),
                 child: Consumer<EventProvider>(
                   builder: (_, a, child) {
@@ -71,6 +136,8 @@ class _LoginPageState extends State<LoginPage> {
                     }
                   },
                   child: Container(
+                    width : landScape == true ? 100 : 0,
+                  
                     decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
@@ -204,7 +271,11 @@ class _LoginPageState extends State<LoginPage> {
                                         listen: false)
                                     .login(user, pass, context, tk, tk2)
                                     .whenComplete(
-                                        () => context.loaderOverlay.hide());
+                                        () => {
+                                          if(mounted){
+                                            context.loaderOverlay.hide(),
+                                          }
+                                        });
                               } catch (e) {
                                 HapticFeedback.heavyImpact();
                                 alerta5();
@@ -262,9 +333,8 @@ class _LoginPageState extends State<LoginPage> {
               ))
             ],
           ),
-        ),
-      ),
-    );
+          )
+        );
   }
 
   showAlertDialog2() {
@@ -327,7 +397,7 @@ Future<Posting?> loginAcces(String user, String pass) async {
       "params": jsonEncode({'username': user, 'password': pass}),
     }).timeout(Duration(seconds: 7), onTimeout: () {
       print('flag1');
-      return http.Response('408', 408);
+      return http.Response('OutOfTime', 408);
     });
 
     data = returnResponse(response);

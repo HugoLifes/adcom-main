@@ -63,14 +63,18 @@ class _MainMenuState extends State<MainMenu> {
   String? pass;
   OSDeviceState? statusOneSignal;
   int? idPrim;
+  bool landScape = false;
   bool? usuarioIncorrecto = false;
-
+  bool? isTablet;
+  bool? isPhone;
   /// obtiene en memoria el tipo de usuario y el nombre de usuario
   userName() async {
     prefs = await SharedPreferences.getInstance();
     setState(() {
       user = prefs!.getString('user');
       userType = prefs!.getInt('userType');
+      isTablet = prefs!.getBool('isTablet');
+      isPhone = prefs!.getBool('isPhone');
     });
   }
 
@@ -84,7 +88,7 @@ class _MainMenuState extends State<MainMenu> {
   @override
   void initState() {
     super.initState();
-    CheckInternet().checkConnection(context);
+    CheckInternet().checkFailed(context);
     obtainData();
     userName();
   }
@@ -146,8 +150,17 @@ class _MainMenuState extends State<MainMenu> {
     //final args = ModalRoute.of(context)!.settings.arguments as LoginPage;
     Size size = MediaQuery.of(context).size;
     List<Widget> _widgetOptions = [mainMenuView(size), Services()];
+    List<Widget> _widgetOptionsLandScape = [mainMenuView(size, landScape: true), Services()];
     return Scaffold(
-      body: _widgetOptions.elementAt(_selectedIndex),
+      body: OrientationBuilder(
+        builder: (BuildContext context, Orientation orientation) {
+          if(orientation == Orientation.portrait){
+            return _widgetOptions.elementAt(_selectedIndex);
+          }else{
+            return _widgetOptionsLandScape.elementAt(_selectedIndex);
+          }
+        },
+      ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -173,11 +186,11 @@ class _MainMenuState extends State<MainMenu> {
     );
   }
 
-  Stack mainMenuView(Size size) {
+  Stack mainMenuView(Size size, {bool landScape = false}) {
     return Stack(
       children: [
         Container(
-          height: size.height * .35,
+          height: landScape == true ? size.height * .31  : size.height * .35,
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(
@@ -195,11 +208,11 @@ class _MainMenuState extends State<MainMenu> {
         
         Container(
             padding:
-                EdgeInsets.only(top: size.height * .18, right: size.width / 18),
+                EdgeInsets.only(top: landScape == true? isTablet== true ? size.height*.10  : size.height*.10 : isPhone == true  ? size.height * .18 : size.height * .10, right: size.width / 24),
             alignment: Alignment.topRight,
             child: Image.asset(
               'assets/images/AdCom3.png',
-              width: size.width * .38,
+              width: landScape== true ? size.width * .14 : isPhone == true ? size.width * .38 : size.width * .27 ,
             )),
         SafeArea(
           child: Padding(
@@ -212,11 +225,10 @@ class _MainMenuState extends State<MainMenu> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Column(
-                        children: [
+                   landScape == true ? Row(
+                     children: [
                           SizedBox(
-                            width: size.height / 3.5,
-                            height: size.width / 2.0,
+                           
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -233,16 +245,61 @@ class _MainMenuState extends State<MainMenu> {
                                         style: TextStyle(
                                             color: Colors.black,
                                             fontFamily: 'Roboto',
-                                            fontSize: size.width / 18,
+                                            fontSize: size.width / 17,
                                             fontWeight: FontWeight.w700),
                                       ),
+                                SizedBox(
+                                  height: isTablet == true ?  20: 5
+                                ),
                                 Text(
                                   '${user == null || user == '' ? '' : user}',
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontFamily: 'Roboto',
-                                      fontSize: size.width / 11,
+                                      fontSize: size.width / 30,
                                       fontWeight: FontWeight.w700),
+                                  
+                                   
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                   ) :Column(
+                        children: [
+                          SizedBox(
+                            width: size.height / 3.5,
+                            height: size.width / 2.0,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                user == null || user == ''
+                                    ? Text('¡${greeting()}! ',
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontFamily: 'Roboto',
+                                            fontSize: 35,
+                                            fontWeight: FontWeight.w700))
+                                    : Text(
+                                        '¡${greeting()}!',
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontFamily: 'Roboto',
+                                            fontSize: isTablet == true ? 40  :size.width / 17,
+                                            fontWeight: FontWeight.w700),
+                                      ),
+                                SizedBox(
+                                  height: isTablet == true ?  20: 5
+                                ),
+                                Text(
+                                  '${user == null || user == '' ? '' : user}',
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontFamily: 'Roboto',
+                                      fontSize: isTablet == true ? size.width / 15 : size.width / 10.5,
+                                      fontWeight: FontWeight.w700),
+                                  maxLines: 3
                                 ),
                               ],
                             ),
@@ -263,6 +320,7 @@ class _MainMenuState extends State<MainMenu> {
         ),
         GridDashboard(
           userId: userType,
+          landScape: landScape
         )
       ],
     );
@@ -275,12 +333,12 @@ class _MainMenuState extends State<MainMenu> {
       },
       child: Text(
         'Si, continuar',
-        style: TextStyle(color: Colors.red[900]),
+        style: TextStyle(color: Colors.blue),
       ),
     );
     Widget backButton = TextButton(
       onPressed: () {},
-      child: Text('Atras', style: TextStyle(color: Colors.orange)),
+      child: Text('Atras', style: TextStyle(color: Colors.red)),
     );
 
     AlertDialog alert = AlertDialog(

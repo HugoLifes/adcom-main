@@ -155,7 +155,7 @@ class _EventDashboardState extends State<EventDashboard> {
         ? Center(
             child: itsTrue == false
                 ? Container(
-                    padding: EdgeInsets.only(top: size / 20),
+                    padding: EdgeInsets.only(top: size / 5),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -165,7 +165,7 @@ class _EventDashboardState extends State<EventDashboard> {
                           height: 200,
                         ),
                         Text(
-                          'Lo sentimos, por el momento no dispone amenidades',
+                          'Lo sentimos, por el momento su comunidad no dispone amenidades, gracias por su atencion',
                           style: TextStyle(
                             fontSize: size / 20,
                             color: Colors.deepPurple,
@@ -175,7 +175,7 @@ class _EventDashboardState extends State<EventDashboard> {
                       ],
                     ))
                 : Container(
-                    padding: EdgeInsets.only(top: size / 20),
+                    padding: EdgeInsets.only(top: size / 5),
                     child: CircularProgressIndicator(
                       backgroundColor: Colors.white,
                     ),
@@ -187,7 +187,7 @@ class _EventDashboardState extends State<EventDashboard> {
   viewAmenidades({width, heigth}) {
     return Flexible(
         child: GridView.builder(
-      padding: EdgeInsets.only(left: 10, right: 15, top: 20),
+      padding: EdgeInsets.only(left: 10, right: 15, top: width/8),
       itemCount: myList.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 1,

@@ -229,7 +229,7 @@ class _ReportEditPageState extends State<ReportEditPage> {
             backgroundColor: Colors.blue,
             leading: CloseButton(),
           ),
-          floatingActionButton: usertype == 4
+          floatingActionButton: usertype == 4 || usertype == 2
               ? FloatingActionButton(
                   onPressed: () {
                     Navigator.push(
@@ -536,15 +536,15 @@ class _ReportEditPageState extends State<ReportEditPage> {
   String? headerText() {
     switch (progres.isEmpty ? 0 : progres.last.id) {
       case 1:
-        return 'Revisión';
-      case 2:
         return 'En proceso';
+      case 2:
+        return 'Revision';
       case 3:
         return 'Respuesta';
       case 4:
         return 'Finalizado';
       default:
-        return 'Enviado';
+        return 'En espera';
     }
   }
 

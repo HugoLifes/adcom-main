@@ -22,6 +22,7 @@ class VistaPagos extends StatefulWidget {
   List<Deudas>? deudasList = [];
   DatosUsuario? datosUsuario;
   bool? esPendiente;
+  bool? landScape = false;
   VistaPagos(
       {Key? key,
       this.deudas,
@@ -29,6 +30,7 @@ class VistaPagos extends StatefulWidget {
       this.datosUsuario,
       this.userName,
       this.notiene,
+      this.landScape = false,
       this.esPendiente,
       this.deudasList})
       : super(key: key);
@@ -96,7 +98,7 @@ class _VistaPagosState extends State<VistaPagos> {
                             textColor: Colors.white,
                             fontSize: 17.0)
                         : Fluttertoast.showToast(
-                            msg: "Deuda más atrazo",
+                            msg: "Deuda más atraso",
                             toastLength: Toast.LENGTH_SHORT,
                             gravity: ToastGravity.BOTTOM,
                             timeInSecForIosWeb: 2,
@@ -190,7 +192,7 @@ class _VistaPagosState extends State<VistaPagos> {
         byteList = bytes.buffer.asUint8List();
       });
     } else if (idCom == 3) {
-      bytes = await rootBundle.load('assets/images/EV3.jpg');
+      bytes = await rootBundle.load('assets/images/EV3.png');
       setState(() {
         byteList = bytes.buffer.asUint8List();
       });

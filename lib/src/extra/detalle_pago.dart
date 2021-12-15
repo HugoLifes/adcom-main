@@ -1,13 +1,16 @@
 import 'dart:convert';
 
+import 'package:adcom/json/jsonReferenciaP.dart';
+import 'package:adcom/src/extra/referencia_view.dart';
 import 'package:adcom/src/pantallas/finanzas.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:glyphicon/glyphicon.dart';
 import 'package:gradient_widgets/gradient_widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 SharedPreferences? prefs;
 
@@ -37,6 +40,8 @@ class _DetallesPagoState extends State<DetallesPago> {
   List<String> conceptos = [];
   bool usarSaldo = false;
   NumberFormat numberFormat = NumberFormat.decimalPattern('hi');
+  bool showText = false;
+  bool? checkPromo = false;
   @override
   void initState() {
     super.initState();
@@ -64,7 +69,20 @@ class _DetallesPagoState extends State<DetallesPago> {
         title: Text('Detalles de pago'),
         backgroundColor: Colors.lightGreen[700],
       ),
-      body: Container(
+      body: OrientationBuilder(
+        builder: (BuildContext context, Orientation orientation) {
+          if(orientation == Orientation.portrait){
+            return mainMenu(size, size2, landScape: false);
+          }else{
+            return mainMenu(size, size2, landScape: true);
+          }
+        },
+      ),
+    );
+  }
+
+  Container mainMenu(Size size, double size2, {landScape = false}){
+    return Container(
         child: Column(
           children: [
             Container(
@@ -92,7 +110,7 @@ class _DetallesPagoState extends State<DetallesPago> {
                       child: Text(
                         'Elije lo que decidas pagar y genera tu referencia maestra.',
                         style: TextStyle(
-                            fontSize: size.height / 40,
+                            fontSize: landScape == true ? 16 : size.height / 40,
                             fontWeight: FontWeight.w500,
                             color: Colors.white),
                         textAlign: TextAlign.justify,
@@ -102,7 +120,7 @@ class _DetallesPagoState extends State<DetallesPago> {
                   Container(
                     padding: EdgeInsets.only(right: size.width / 9),
                     child: Icon(Glyphicon.check2_square,
-                        size: size.width / 6, color: Colors.white),
+                        size: landScape == true ? 50 : size.width / 6, color: Colors.white),
                   )
                 ],
               ),
@@ -111,10 +129,10 @@ class _DetallesPagoState extends State<DetallesPago> {
               height: size.height / 50,
             ),
             Text(
-              'Elija su pago',
+              'Seleccione su opcion de pago',
               style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
             ),
-            SizedBox(
+         SizedBox(
               height: 10,
             ),
             Flexible(
@@ -124,7 +142,7 @@ class _DetallesPagoState extends State<DetallesPago> {
                   tileColor: Colors.lightGreen[300],
                   value: checkedAll,
                   title: Text(
-                    'Pago anual ó pago restante ',
+                    'Pago anual o Pago restante',
                     style: TextStyle(fontWeight: FontWeight.w500),
                   ),
                   onChanged: (v) {
@@ -153,14 +171,16 @@ class _DetallesPagoState extends State<DetallesPago> {
                   checkColor: Colors.white,
                 ),
               ),
-            ),
+            ), 
             SizedBox(
               height: 20,
             ),
             Container(
                 padding: EdgeInsets.only(left: 15),
                 alignment: Alignment.centerLeft,
-                child: Text('Pago individual',
+                child: checkedAll == true ? Text('Promociones', 
+                    style:
+                        TextStyle(fontSize: 20, fontWeight: FontWeight.w600)): Text('Pago individual',
                     style:
                         TextStyle(fontSize: 20, fontWeight: FontWeight.w600))),
             Divider(
@@ -170,42 +190,12 @@ class _DetallesPagoState extends State<DetallesPago> {
             Divider(
               color: Colors.grey,
             ),
-            /*  Container(
-              padding: EdgeInsets.only(left: 10),
-              child: Row(
-                children: [
-                  Checkbox(
-                      activeColor: Colors.lightGreen[700],
-                      value: usarSaldo,
-                      onChanged: (v) {
-                        setState(() {
-                          usarSaldo = v!;
-                        });
-                      }),
-                  Text(
-                    '¿Usar saldo a favor?',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(
-                    width: size.width / 23,
-                  ),
-                  usarSaldo == true
-                      ? Text('Saldo',
-                          style: TextStyle(
-                              fontSize: 19, fontWeight: FontWeight.bold))
-                      : Text(''),
-                  SizedBox(
-                    width: size.width / 26,
-                  ),
-                  usarSaldo == true ? Text('\$ 200 MXN') : Text('')
-                ],
-              ),
-            ) */
+          
             pa == false
                 ? Row(
                     children: [
                       Container(
-                          padding: EdgeInsets.only(left: 190, top: 0),
+                          padding: EdgeInsets.only(left: size.width/ 2.5, top: 0),
                           child: Row(
                             children: [
                               Text(
@@ -214,17 +204,20 @@ class _DetallesPagoState extends State<DetallesPago> {
                                     fontSize: 25, fontWeight: FontWeight.bold),
                               ),
                               SizedBox(
-                                width: size.width / 26,
+                                width: size.width / 40,
                               ),
                               checkedAll == true
                                   ? Text(
                                       '${numberFormat.format(contadorTotal)} MXN',
                                       style: TextStyle(fontSize: 19))
-                                  : Text(
+                                  : Container(
+                                    padding: EdgeInsets.only(left: 0),
+                                    child: Text(
                                       ///contador
-                                      '\$ ${numberFormat.format(contador)} MXN',
+                                      '\$${numberFormat.format(contador)}.00 MXN',
                                       style: TextStyle(fontSize: 19),
                                     ),
+                                  ),
                               SizedBox(
                                 height: size.height / 20,
                               )
@@ -235,27 +228,28 @@ class _DetallesPagoState extends State<DetallesPago> {
                 : Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+
+                
                       SizedBox(
                           width: size.width / 1.5,
                           child: Text(
-                            'Si ya tiene una referencia no podra generar otra, hasta que venza o realice el pago.',
+                            'Si ya tiene una referencia, no podra generar otra, hasta que venza o realice el pago.',
                             style: TextStyle(fontSize: 18),
                             textAlign: TextAlign.justify,
                           )),
                       SizedBox(
                         height: size.height / 10,
-                      )
+                      ) 
                     ],
                   ),
             showButton(),
             payButton()
           ],
         ),
-      ),
-    );
+      );
   }
 
-  Future sendingData() async {
+  Future<ReferenciaP?> sendingData() async {
     await obtainData();
     try {
       Dio dio = Dio();
@@ -278,7 +272,9 @@ class _DetallesPagoState extends State<DetallesPago> {
       });
 
       if (response.statusCode == 200) {
+        var data = response.toString();
         print('aqui $response');
+        return referenciaPFromJson(data);
       }
     } on DioError catch (e) {
       if (e.response!.data == true) {
@@ -292,7 +288,7 @@ class _DetallesPagoState extends State<DetallesPago> {
             textColor: Colors.white,
             fontSize: 16.0);
 
-        return;
+        
       } else {
         print('aqui2:${e.response!.data.toString()}');
         Fluttertoast.showToast(
@@ -303,7 +299,7 @@ class _DetallesPagoState extends State<DetallesPago> {
             backgroundColor: Colors.red,
             textColor: Colors.white,
             fontSize: 16.0);
-        return;
+        
       }
     }
   }
@@ -319,7 +315,7 @@ class _DetallesPagoState extends State<DetallesPago> {
                   if (pa == true) {
                     alerta2();
                   } else {
-                    sendingData().then((value) => alerta());
+                    sendingData().then((value) => alerta(value!.referenciaP!));
                   }
                 },
                 gradient: LinearGradient(colors: [
@@ -445,21 +441,113 @@ class _DetallesPagoState extends State<DetallesPago> {
     return (checkedAll) == true
         ? Column(
             children: [
-              Container(
-                padding: EdgeInsets.only(left: 13),
-                child: Text(
-                  'Su generará su referencia anual, su referencia vencera en 24hrs.',
-                  style: TextStyle(fontSize: size / 20),
-                ),
-              ),
-              SizedBox(
-                height: 20,
-              )
+                  Container(
+                    padding: EdgeInsets.only(left: 10, right: 20),
+                    alignment: Alignment.topLeft,
+                  child:Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Text(
+                        'Meses a pagar',
+                        style: TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
+                      ),
+                      SizedBox(
+                        width: size*0.03,
+                      ),
+                      Text(
+                        'Enero-Diciembre',
+                        style: TextStyle(fontWeight: FontWeight.w400, fontSize:20),
+                      )
+                    ]
+                  ),
+                   ),
+                   Container(
+                    padding: EdgeInsets.only(left: 10, right: 20),
+                    alignment: Alignment.topLeft,
+                  child:Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Text(
+                        'Cuota:',
+                        style: TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
+                      ),
+                      SizedBox(
+                        width: size*0.40,
+                      ),
+                      Text(
+                        '\$' + widget.list![0].montoCuota!,
+                        style: TextStyle(fontWeight: FontWeight.w400, fontSize:20),
+                      )
+                    ]
+                  ),
+                   ),
+                    Container(
+                    padding: EdgeInsets.only(left: 10, right: 20),
+                    alignment: Alignment.topLeft,
+                  child:Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Text(
+                        'Atraso:',
+                        style: TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
+                      ),
+                      SizedBox(
+                        width: size*0.44,
+                      ),
+                      Text(
+                        '\$' + '${widget.list![0].montoTardio!}.00',
+                        style: TextStyle(fontWeight: FontWeight.w400, fontSize:20),
+                      )
+                    ]
+                  ),
+                   ),
+                     Container(
+                    padding: EdgeInsets.only(left: 10, right: 20),
+                    alignment: Alignment.topLeft,
+                  child:Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Text(
+                        'Descuento:',
+                        style: TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
+                      ),
+                      SizedBox(
+                        width: size*0.27,
+                      ),
+                      Text(
+                        '\$' + '1200.00',
+                        style: TextStyle(fontWeight: FontWeight.w400, fontSize:20),
+                      )
+                    ]
+                  ),
+                   ),
+
+                     Container(
+                    padding: EdgeInsets.only(left: 10, right: 20),
+                    alignment: Alignment.topLeft,
+                  child:Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Text(
+                        'Total a pagar:',
+                        style: TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
+                      ),
+                      SizedBox(
+                        width: size*0.24,
+                      ),
+                      Text(
+                        '\$${contadorTotal.toStringAsFixed(2)}',
+                        style: TextStyle(fontWeight: FontWeight.w400, fontSize:20),
+                      )
+                    ]
+                  ),
+                   ),
+                  
             ],
           )
         : Flexible(
             flex: 3,
-            child: GridView.builder(
+            child: mesFormat.isNotEmpty ? GridView.builder(
                 padding: EdgeInsets.only(left: 10, right: 10),
                 itemCount: mesFormat.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -482,6 +570,7 @@ class _DetallesPagoState extends State<DetallesPago> {
                     child: CheckboxListTile(
                       value: check.contains(data),
                       onChanged: (bool? v) {
+                        HapticFeedback.lightImpact();
                         if (pa == true) {
                         } else {
                           if (checkedAll == false) {
@@ -510,9 +599,11 @@ class _DetallesPagoState extends State<DetallesPago> {
                                 showButton();
                               });
                             } else {
-                              setState(() {
-                                checked = v;
-                              });
+                              if(check.length == 0){
+                                setState((){
+                                  checked = v;
+                                });
+                              }
                             }
                           } else {
                             checked = false;
@@ -561,7 +652,7 @@ class _DetallesPagoState extends State<DetallesPago> {
                       ),
                     ),
                   );
-                }));
+                }): Container());
   }
 
   sacarConcepto() {
@@ -624,16 +715,22 @@ class _DetallesPagoState extends State<DetallesPago> {
           cortado = "Pago Permanente";
           conceptos.add(cortado);
           break;
+        case "PAGO_EXTRA":
+          cortado = "Pago Extra";
+          conceptos.add(cortado);
+          break;
       }
     }
 
     return estado;
   }
 
-  alerta() {
+  alerta(String text) {
     Widget okButton = TextButton(
         onPressed: () {
-          Navigator.of(context)..pop()..pop();
+          Navigator.of(context)..pop()..push(MaterialPageRoute(
+            builder: (_) => RefView(list: widget.refp, refP: widget.list, ref:text)
+          ));
           //sendingData();
         },
         child: Text(

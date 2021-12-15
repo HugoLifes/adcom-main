@@ -4,17 +4,39 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:adcom/src/models/event_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+
+SharedPreferences? prefs;
 class GridDashboard extends StatefulWidget {
   final userId;
-  GridDashboard({this.userId});
+  bool? landScape = false;
+  GridDashboard({this.userId, this.landScape});
   @override
   _GridDashboardState createState() => _GridDashboardState();
 }
 
 class _GridDashboardState extends State<GridDashboard> {
+  bool? isTablet;
+  bool? isPhone;
+
+
+  initData()async{
+    prefs = await SharedPreferences.getInstance();
+
+    setState((){
+      isTablet = prefs!.getBool('isTablet');
+      isPhone = prefs!.getBool('isPhone');
+    });
+
+    print('tableto:$isTablet');
+    print('fon: $isPhone');
+  }
+
   @override
   void initState() {
     super.initState();
+    initData();
   }
 
   Items item1 = new Items(
@@ -135,11 +157,11 @@ class _GridDashboardState extends State<GridDashboard> {
       child: Container(
         child: GridView.count(
             padding:
-                EdgeInsets.only(left: 16, right: 16, top: size.width / 1.2),
+                EdgeInsets.only(left: 16, right: 16, top: isTablet == true ? widget.landScape == true ? size.width / 3.9  :size.width / 2.0 : size.width / 1.2),
             crossAxisCount: 2,
-            childAspectRatio: 1.1,
-            crossAxisSpacing: 15,
-            mainAxisSpacing: 15,
+            childAspectRatio: widget.landScape == true ? isTablet == true ? 3.0 :1.1  : isPhone == true ? 1.1 :2.0,
+            crossAxisSpacing: widget.landScape== true ? isTablet == true ? 20 : 15 : isPhone== true ?  15 : 20,
+            mainAxisSpacing: 16,
             children: myList.map((data) {
               return AnimationConfiguration.staggeredGrid(
                 columnCount: myList.length,

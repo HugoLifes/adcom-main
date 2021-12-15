@@ -484,7 +484,7 @@ class AvisosCall {
           "http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-comunities");
 
       final response =
-          await http.get(url).timeout(Duration(seconds: 10), onTimeout: () {
+          await http.get(url).timeout(Duration(seconds: 7), onTimeout: () {
         return http.Response('Error', 400);
       });
       var data = returnResponse(response);
@@ -519,7 +519,7 @@ class AvisosUsuario {
           "http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-avisos-by-residente");
       var response = await http
           .post(url, body: {'idCom': id.toString()}).timeout(
-              Duration(seconds: 10), onTimeout: () {
+              Duration(seconds: 7), onTimeout: () {
         return http.Response('Error', 500);
       });
       var data = returnResponse(response);

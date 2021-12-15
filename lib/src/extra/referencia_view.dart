@@ -2,13 +2,16 @@ import 'package:adcom/src/models/event_provider.dart';
 import 'package:adcom/src/pantallas/finanzas.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:gradient_widgets/gradient_widgets.dart';
 import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
 class RefView extends StatefulWidget {
   late List<DatosCuenta>? list = [];
   late List<DatosCuenta>? refP = [];
-  RefView({Key? key, this.list, this.refP}) : super(key: key);
+  final ref;
+  RefView({Key? key, this.list, this.refP, this.ref}) : super(key: key);
   @override
   _RefViewState createState() => _RefViewState();
 }
@@ -36,7 +39,10 @@ class _RefViewState extends State<RefView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(
+              widget.ref != null ? Text(
+                'Tipo Ref: Agrupado',
+                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+              ) : Text(
                 'Tipo Ref: $tipoReferencia',
                 style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
               ),
@@ -49,7 +55,7 @@ class _RefViewState extends State<RefView> {
                   InkWell(
                       onTap: () {
                         Clipboard.setData(
-                                new ClipboardData(text: referenciaApagar()))
+                                new ClipboardData(text: widget.ref != null ? widget.ref : referenciaApagar()))
                             .then((_) {
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                               content: Text(
@@ -58,7 +64,14 @@ class _RefViewState extends State<RefView> {
                           )));
                         });
                       },
-                      child: Text(
+                      child: widget.ref != null ? Text(
+                        '${widget.ref}',
+                        style: TextStyle(
+                            fontSize: 35,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Roboto',
+                            decoration: TextDecoration.underline),
+                      ) : Text(
                         '${referenciaApagar()}',
                         style: TextStyle(
                             fontSize: 35,
@@ -101,7 +114,8 @@ class _RefViewState extends State<RefView> {
                   textAlign: TextAlign.justify,
                   style: TextStyle(fontSize: 25),
                 ),
-              )
+              ),
+              payButton()
             ],
           ),
         ),
@@ -166,4 +180,76 @@ class _RefViewState extends State<RefView> {
     }
     return ref;
   }
+
+   payButton() {
+    return Container(
+      padding: EdgeInsets.only(left: 10, right: 10, top: 20),
+      width: 300,
+      child: GradientButton(
+          child: Text('Pagar ahora'),
+          callback: () {
+            HapticFeedback.lightImpact();
+            alerta5();
+          },
+          gradient: LinearGradient(colors: [
+            Colors.lightGreen[500]!,
+            Colors.lightGreen[600]!,
+            Colors.lightGreen[700]!
+          ]),
+          elevation: 5.0,
+          increaseHeightBy: 28,
+          increaseWidthBy: double.infinity,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
+    );
+  }
+
+  alerta5() {
+    Widget okButton = TextButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: Text(
+          'Si, continuar',
+          style: TextStyle(color: Colors.red[900]),
+        ));
+    Widget backButton = TextButton(
+        onPressed: () {
+          Navigator.of(context)..pop();
+        },
+        child: Text(
+          'Regresar',
+          style: TextStyle(color: Colors.orange),
+        ));
+    AlertDialog alert = AlertDialog(
+      actions: [backButton],
+      title: Text(
+        'Atención!',
+        style: TextStyle(
+          fontSize: 25,
+        ),
+      ),
+      content: Container(
+        width: 140,
+        height: 150,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Adcom informa',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Text(
+                'Esta funcion estará próximamente disponible, gracias por su paciencia.'),
+          ],
+        ),
+      ),
+    );
+
+    showDialog(context: context, builder: (_) => alert);
+  }
+
 }

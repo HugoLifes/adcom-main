@@ -112,6 +112,11 @@ class _FinanzasState extends State<Finanzas> {
       pagosRecientes(deudasReverse2, false, deudas2, size),
       pagosRecientes(deudasReverse, true, deudas, size)
     ];
+     List<Widget> landScapeBodie = [
+      mainView(size, landScape: true),
+      pagosRecientes(deudasReverse2, false, deudas2, size, landScape: true),
+      pagosRecientes(deudasReverse, true, deudas, size, landScape: true)
+    ];
     return Scaffold(
       appBar: _selectedIndex == 1
           ? null
@@ -129,23 +134,31 @@ class _FinanzasState extends State<Finanzas> {
               backgroundColor: Colors.lightGreen[700],
             ),
       resizeToAvoidBottomInset: false,
-      body: MisPagosView(size, bodies),
+      body: OrientationBuilder(
+        builder: (BuildContext context, Orientation orientation) {
+          if(orientation == Orientation.portrait){
+            return MisPagosView(size,bodies);
+          }else{
+            return MisPagosView(size, landScapeBodie, landScape: true);
+          }
+        },
+      ),
     );
   }
 
-  Stack MisPagosView(Size size, List<Widget> bodies) {
+  Stack MisPagosView(Size size, List<Widget> bodies, {landScape = false}) {
     return Stack(
       children: [
         Container(
-          height: size.height * .25,
+          height: landScape == true ? size.height*.27 : size.height * .25,
           decoration: BoxDecoration(color: Colors.lightGreen[700]),
         ),
         Container(
-          padding: EdgeInsets.only(top: size.height / 22),
-          alignment: Alignment.topRight,
+          padding: EdgeInsets.only(top: landScape== true? 0 : size.height / 22, left: landScape== true ? size.width*.70 :0),
+          alignment: landScape== true? Alignment.topCenter : Alignment.topRight,
           child: Icon(
             Icons.show_chart_rounded,
-            size: size.width / 2,
+            size: landScape== true? size.width/7 :size.width / 2,
             color: Colors.white,
           ),
         ),
@@ -162,11 +175,11 @@ class _FinanzasState extends State<Finanzas> {
                       deudas.clear();
                       deudas2.clear();
                       data().catchError((e) {
-                        alerta5();
+                        print(e);
                       });
                     } else {
                       data().catchError((e) {
-                        alerta5();
+                        print(e);
                       });
                     }
                   });
@@ -174,9 +187,7 @@ class _FinanzasState extends State<Finanzas> {
               },
               child: Stack(
                 children: [
-                  SizedBox(
-                    height: size.width / 10,
-                  ),
+                 
                   Padding(
                     padding: const EdgeInsets.only(top: 12),
                     child: Text(
@@ -191,13 +202,13 @@ class _FinanzasState extends State<Finanzas> {
                     height: size.width / 20,
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(top: 55),
+                    padding: EdgeInsets.only(top: landScape == true ? 40 : 55),
                     child: SizedBox(
-                      width: size.width * .6,
+                      width: landScape == true ? size.width *.8 : size.width * .6,
                       child: Text(
                         'Mantente actualizado revisando tus estados de cuenta y adeudos pendientes.',
                         style: TextStyle(
-                            color: Colors.white, fontSize: size.width / 20),
+                            color: Colors.white, fontSize: landScape== true? size.width/50 : size.width / 20),
                       ),
                     ),
                   ),
@@ -235,7 +246,7 @@ class _FinanzasState extends State<Finanzas> {
                                   children: [
                                     Container(
                                       padding: EdgeInsets.only(
-                                          top: size.width / 1.75),
+                                          top: landScape == true ? size.width/7.7 : size.width / 1.75),
                                       width: size.width / 1,
                                       child: CupertinoSlidingSegmentedControl(
                                         thumbColor: Colors.lightGreen,
@@ -286,7 +297,7 @@ class _FinanzasState extends State<Finanzas> {
   /// esta funcion se usa para crear el pdf
   /// pasa el ultimo mes pagado,
   /// no retrona valor
-  ultimoMes() async {
+  Future ultimoMes() async {
     int? mesPagado;
     double cuota;
     double monto;
@@ -582,7 +593,7 @@ class _FinanzasState extends State<Finanzas> {
   /// y tambien la lista de users obtenida en la misma funcion
   /// userName y datosUsuarios se actualizan por estado en [data]
   ///  List<DatosCuenta> localList, List<Users> users, List<Deudas> parametros opcionales
-  pagosRecientes(deudas, bool esPendiente, List<Deudas> dd, Size size) {
+  pagosRecientes(deudas, bool esPendiente, List<Deudas> dd, Size size, {landScape = false}) {
     print(users.length);
     return Container(
       child: dd.isEmpty
@@ -606,12 +617,12 @@ class _FinanzasState extends State<Finanzas> {
                   ),
                 )
           : Container(
-              padding: EdgeInsets.only(top: size.width / 1.5),
+              padding: EdgeInsets.only(top: landScape == true ? size.width /6.0 : size.width / 1.5),
               child: GridView.builder(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 1,
-                    childAspectRatio: 2.8,
-                    crossAxisSpacing: 16,
+                    crossAxisCount: landScape == true ? 2 : 1,
+                    childAspectRatio: landScape == true ? 3.0 :2.8,
+                    crossAxisSpacing: 20,
                     mainAxisSpacing: 5,
                   ),
                   itemCount: deudas.length,
@@ -619,12 +630,14 @@ class _FinanzasState extends State<Finanzas> {
                     return Container(
                         padding: EdgeInsets.all(12),
                         child: VistaPagos(
-                          users: users[index],
+                          users: esPendiente == true? null : users[index],
                           deudas: deudas[index],
                           datosUsuario: datosUsuario,
                           userName: userName,
                           esPendiente: esPendiente,
                           deudasList: deudas,
+                          landScape:landScape
+                          
                         ));
                   }),
             ),
@@ -632,15 +645,22 @@ class _FinanzasState extends State<Finanzas> {
   }
 
   /// main view representa la vista a la tarjeta, donde salen los adeudos
-  mainView(Size size) {
+  mainView(Size size, {landScape = false }) {
     return Padding(
-      padding: EdgeInsets.only(top: size.width / 1.5),
-      child: Column(
+      padding: EdgeInsets.only(top: landScape == true ? size.width/5.9 : size.width / 1.45),
+      child: Stack(
         children: [
           SizedBox(
             height: 15,
           ),
           //vista tarejeta es la tarjeta en si
+          landScape == true ?ListView(
+            children:[
+            VistaTarjeta(
+            newList: localList,
+            landScape: true,
+            refP: refPadre,
+            bandera: bandera,)]):
           VistaTarjeta(
             newList: localList,
             refP: refPadre,
@@ -774,8 +794,10 @@ class _FinanzasState extends State<Finanzas> {
         ),
       ),
     );
-
-    showDialog(context: context, builder: (_) => alert, barrierDismissible: false);
+    if(mounted){
+      showDialog(context: context, builder: (_) => alert, barrierDismissible: false);
+    }
+    
   }
 }
 

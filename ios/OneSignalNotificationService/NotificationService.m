@@ -18,11 +18,13 @@
     self.bestAttemptContent = [request.content mutableCopy];
     
     //If your SDK version is < 3.5.0 uncomment and use this code:
+    
     /*
-    [OneSignal didReceiveNotificationExtensionRequest:self.receivedRequest
-                       withMutableNotificationContent:self.bestAttemptContent];
-    self.contentHandler(self.bestAttemptContent);
-    */
+       [OneSignal didReceiveNotificationExtensionRequest:self.receivedRequest
+                          withMutableNotificationContent:self.bestAttemptContent];
+       self.contentHandler(self.bestAttemptContent);
+       */
+    
     
     /* DEBUGGING: Uncomment the 2 lines below and comment out the one above to ensure this extension is excuting
                   Note, this extension only runs when mutable-content is set

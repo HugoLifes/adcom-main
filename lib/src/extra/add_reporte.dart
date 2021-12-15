@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:adcom/json/tipoAvisot.dart';
 import 'package:adcom/src/extra/nuevo_post.dart';
-import 'package:adcom/src/methods/exeptions.dart';
 import 'package:adcom/src/pantallas/avisos.dart';
 import 'package:camera/camera.dart';
 import 'package:dio/dio.dart';
@@ -67,8 +66,10 @@ class _AddReporteState extends State<AddReporte> {
   List<String> type = [];
   List<TipoAvisoS>? avisos = [];
   List<String>? idComName = [];
-
+  int? _current;
   List<StepState> _listState = [];
+  List<dynamic> placeHoldersAdds = [];
+  
 
   Future sendId() async {
     for (int i = 0; i < widget.comunities!.length; i++) {
@@ -96,20 +97,26 @@ class _AddReporteState extends State<AddReporte> {
 
     AvisosCall().getComunidades().then((value) => {
           for (int i = 0; i < value!.data!.length; i++)
-            {idComName!.add(value.data![i].nombreComu!)}
+            {
+              idComName!.add(value.data![i].nombreComu!),
+            }
         });
   }
 
   @override
   void initState() {
-    super.initState();
     addata();
+    _current = 0;
+
+    /// Lista que maneja estados de los pasos
     _listState = [
       StepState.indexed,
       StepState.editing,
       StepState.complete,
       StepState.disabled,
     ];
+    
+    super.initState();
   }
 
   @override
@@ -140,18 +147,26 @@ class _AddReporteState extends State<AddReporte> {
         ),
         resizeToAvoidBottomInset: true,
         //stepper, propiedades y acciones
-        body: LoaderOverlay(child: stepper()),
+        body: LoaderOverlay(child: Theme(
+          data: ThemeData(
+            primarySwatch: Colors.green,
+            buttonTheme: ButtonThemeData(
+              buttonColor: Colors.blue,
+            ),
+            splashFactory: InkRipple.splashFactory,
+          ),
+          child: stepper()
+        ) ),
 
         //
         // Boton que abre la camara
 
-        floatingActionButton: FloatingActionButton(
-            backgroundColor: Colors.blue,
-            child: Icon(Icons.camera),
-            onPressed: () => {
-                  HapticFeedback.lightImpact(),
-                  images.length == 3 ? mensaje() : _optionsCamera(),
-                }),
+       /*  floatingActionButton: _currentStep != 2
+            ? null
+            : FloatingActionButton(
+                backgroundColor: Colors.blue,
+                child: Icon(Icons.send),
+                onPressed: () => {alerta()}), */
       ),
     );
   }
@@ -172,23 +187,26 @@ class _AddReporteState extends State<AddReporte> {
             if (this._currentStep == 0) {
               if (_formKey.currentState!.validate()) {
                 this._currentStep = this._currentStep + 1;
-              } else {}
+                FocusScope.of(context).unfocus();
+              }
             } else {
               if (idUser == 0) {
                 if (chosenValue == null) {
                   Fluttertoast.showToast(
                       msg: "Elija comunidad",
                       toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.CENTER,
+                      gravity: ToastGravity.BOTTOM,
                       timeInSecForIosWeb: 1,
-                      backgroundColor: Colors.white,
-                      textColor: Colors.black,
+                      backgroundColor: Colors.black,
+                      textColor: Colors.white,
                       fontSize: 17.0);
                 } else {
                   this._currentStep = this._currentStep + 1;
+                  FocusScope.of(context).unfocus();
                 }
               } else {
                 this._currentStep = this._currentStep + 1;
+                FocusScope.of(context).unfocus();
               }
             }
           } else {
@@ -196,10 +214,10 @@ class _AddReporteState extends State<AddReporte> {
               Fluttertoast.showToast(
                   msg: "Seccion de fotos vacia",
                   toastLength: Toast.LENGTH_SHORT,
-                  gravity: ToastGravity.CENTER,
+                  gravity: ToastGravity.BOTTOM,
                   timeInSecForIosWeb: 1,
-                  backgroundColor: Colors.white,
-                  textColor: Colors.black,
+                  backgroundColor: Colors.black,
+                  textColor: Colors.white,
                   fontSize: 17.0);
             } else {
               alerta();
@@ -216,6 +234,43 @@ class _AddReporteState extends State<AddReporte> {
           }
         });
       },
+
+      controlsBuilder: (context, {onStepContinue, onStepCancel}){
+        return Row(
+          children : [
+            _currentStep == 2 ? Expanded(child:Container(
+              padding : EdgeInsets.only(left:10,top:10),
+              child: RaisedButton(
+                color: Colors.green,
+                child: Text('Finalizar', style: TextStyle(color: Colors.white),
+                
+                ),
+                onPressed: onStepContinue,
+              )
+            )) : Expanded(child:Container(
+              padding : EdgeInsets.only(left:10,top:10),
+              child: RaisedButton(
+                color: Colors.blue,
+                child: Text('Siguiente', style: TextStyle(color: Colors.white),
+                
+                ),
+                onPressed: onStepContinue,
+              )
+            )), 
+
+            _currentStep >0 ? Expanded(child:Container(
+              padding : EdgeInsets.only(left:10,top:10),
+              child: RaisedButton(
+                color: Colors.redAccent[700],
+                child: Text('Atras', style: TextStyle(color: Colors.white),
+                
+                ),
+                onPressed: onStepCancel,
+              )
+            )) : Container(),
+          ]
+        );
+      }
     );
   }
 
@@ -225,7 +280,13 @@ class _AddReporteState extends State<AddReporte> {
       Step(
           title: Text('Nombre del reporte'),
           isActive: _currentStep >= 0,
-          state: _currentStep == 0 ? titleController.text.isEmpty? _listState[3] : _listState[3] : _currentStep > 0 ?  _listState[2]: _listState[0],
+          state: _currentStep == 0
+              ? titleController.text.isEmpty
+                  ? _listState[3]
+                  : _listState[2]
+              : _currentStep > 0
+                  ? _listState[2]
+                  : _listState[0],
           content: Column(
             children: [
               Form(
@@ -233,11 +294,17 @@ class _AddReporteState extends State<AddReporte> {
                 child: buildTitle(),
               ),
             ],
-          )),
+          ),
+          subtitle : _currentStep == 0 ? Text('Este es el nombre que aparecera en la seccion de reportes') : null,
+          ),
       Step(
           title: Text('Descripcion del incidente'),
           isActive: _currentStep >= 1,
-          state: _currentStep == 1 ?  _listState[1] : _currentStep > 1 ?  _listState[2]: _listState[3],
+          state: _currentStep == 1
+              ? _listState[1]
+              : _currentStep > 1
+                  ? _listState[2]
+                  : _listState[3],
           content: Column(
             children: [
               Form(
@@ -289,32 +356,208 @@ class _AddReporteState extends State<AddReporte> {
                     )
                   : Container()
             ],
-          )),
+          ),
+          subtitle : _currentStep == 1 ? Text('Este es el texto que aparecera en la seccion de reportes') : null,
+          ),
       Step(
           title: Text('Sube algunas fotos'),
-          content: images.isEmpty
-              ? Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('Presiona en',
-                        style: TextStyle(
-                          fontSize: 17,
-                        )),
-                    SizedBox(
-                      width: 2,
-                    ),
-                    Icon(Icons.camera, size: 21),
-                    SizedBox(
-                      width: 2,
-                    ),
-                    Text(
-                      'para añadir fotos',
-                      style: TextStyle(fontSize: 17),
-                    )
-                  ],
-                )
-              : buildImage(),
-          state: _currentStep == 2 ?  _listState[1] : _currentStep > 2 ?  _listState[2]: _listState[3],
+          content: Container(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                images.isEmpty
+                    ? Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        width: 100,
+                        height: 100,
+                        padding: EdgeInsets.all(5),
+                        child: IconButton(
+                          icon: Icon(Icons.add),
+                          onPressed: () {
+                            _optionsCamera();
+                          },
+                        ),
+                      )
+                    : Flexible(
+                        child: Stack(
+                          children: [
+                            Container(
+                              margin: EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.grey[300],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.file(
+                                  images[0],
+                                  fit: BoxFit.cover,
+                                  width: 100,
+                                  height: 150,
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              top: 0,
+                              right: 0,
+                              child: GestureDetector(
+                                child: Container(
+                                  padding: EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Icon(
+                                    Icons.delete,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    images.removeAt(0);
+                                    newsPath.removeAt(0);
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                images.length < 2
+                    ? Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        width: 100,
+                        height: 100,
+                        padding: EdgeInsets.all(5),
+                        child: IconButton(
+                          icon: Icon(Icons.add),
+                          onPressed: () {
+                            _optionsCamera();
+                          },
+                        ),
+                      )
+                    : Flexible(
+                        child: Stack(
+                          children: [
+                            Container(
+                              margin: EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.grey[300],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.file(
+                                  images[1],
+                                  fit: BoxFit.cover,
+                                  width: 100,
+                                  height: 150,
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              top: 0,
+                              right: 0,
+                              child: GestureDetector(
+                                child: Container(
+                                  padding: EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Icon(
+                                    Icons.delete,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    images.removeAt(1);
+                                    newsPath.removeAt(1);
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                images.length < 3
+                    ? Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        width: 100,
+                        height: 100,
+                        padding: EdgeInsets.all(5),
+                        child: IconButton(
+                          icon: Icon(Icons.add),
+                          onPressed: () {
+                            _optionsCamera();
+                          },
+                        ),
+                      )
+                    : Flexible(
+                        child: Stack(
+                          children: [
+                            Container(
+                              margin: EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.grey[300],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.file(
+                                  images[2],
+                                  fit: BoxFit.cover,
+                                  width: 100,
+                                  height: 150,
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              top: 0,
+                              right: 0,
+                              child: GestureDetector(
+                                child: Container(
+                                  padding: EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Icon(
+                                    Icons.delete,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    images.removeAt(2);
+                                    newsPath.removeAt(2);
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+              ],
+            ),
+          ),
+          subtitle : _currentStep == 2 ? Text('Las fotos ayudaran a detallar mejor su reporte') : null,
+          state: _currentStep == 2
+              ? _listState[1]
+              : _currentStep > 2
+                  ? _listState[2]
+                  : _listState[3],
           isActive: _currentStep >= 2)
     ];
     return _steps;
@@ -364,10 +607,10 @@ class _AddReporteState extends State<AddReporte> {
         inputFormatters: [new LengthLimitingTextInputFormatter(50)],
       );
 
-  /// funcion que abre la camara y muestra
+  //funcion que abre la camara y muestra
   void openCamera() async {
     var image =
-        await _picker.pickImage(source: ImageSource.camera, imageQuality: 30);
+        await _picker.pickImage(source: ImageSource.camera, imageQuality: 40);
 
     setState(() {
       if (image != null) {
@@ -381,11 +624,34 @@ class _AddReporteState extends State<AddReporte> {
           print(newPath);
           newsPath.add(newPath);
           images.add(File(image.path));
+          addPlaceHolder();
         }
       } else {
         print('No se ha seleccionado una imagen');
       }
     });
+  }
+
+  addPlaceHolder() {
+    for (int i = 0; i < 3; i++) {
+      placeHoldersAdds.add(
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          width: 100,
+          height: 100,
+          padding: EdgeInsets.all(5),
+          child: IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () {
+              _optionsCamera();
+            },
+          ),
+        ),
+      );
+    }
   }
 
   mensaje() => Fluttertoast.showToast(
@@ -399,10 +665,11 @@ class _AddReporteState extends State<AddReporte> {
   // funcion que abre la galeria para las fotos
   void openGallery() async {
     var image =
-        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 30);
-
+        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 40);
+    var i = 0;
     setState(() {
       if (image != null) {
+        i++;
         String dir = path.dirname(image.path);
         String newPath = path.join(dir, 'reportesAdcom.jpg');
         print(newPath);
@@ -462,10 +729,12 @@ class _AddReporteState extends State<AddReporte> {
       ),
     );
 
-    showDialog(context: context, builder: (_) => alert, barrierDismissible: false);
+    showDialog(context: context, builder: (_) => alert);
   }
 
-  Future sendingData2(String titulo, String descrip, List<File> files,
+  // envia las fotos al serv mas toda su informacion que reqiere como los params
+
+  sendingData2(String titulo, String descrip, List<File> files,
       List<String> newpath) async {
     // string to uri
     var uri = Uri.parse(
@@ -488,6 +757,18 @@ class _AddReporteState extends State<AddReporte> {
 
       request.files.add(multipartFileSign);
     }
+
+    print(titulo);
+    print(descrip);
+    print(idCom);
+    print(idUser);
+
+    print("params - ${json.encode({
+          'descripcionCorta': titulo,
+          'descripcionLarga': descrip,
+          'idCom': idCom,
+          'idUsusarioResidente': idUser
+        })}");
 //adding params
     request.fields['params'] = json.encode({
       'descripcionCorta': titulo,
@@ -501,10 +782,7 @@ class _AddReporteState extends State<AddReporte> {
 
     print(response.statusCode);
 
-    var res = await http.Response.fromStream(response)
-        .timeout(Duration(seconds: 8), onTimeout: () {
-      return http.Response('Timeout', 408);
-    });
+    var res = await http.Response.fromStream(response);
     if (response.statusCode == 200 || response.statusCode == 201) {
       print("Item form is statuscode 200");
       print(res.body);
@@ -512,10 +790,34 @@ class _AddReporteState extends State<AddReporte> {
 
       return responseDecode;
     } else {
-      print(res.body);
+      if (response.statusCode == 400) {
+        print("Item form is statuscode 400");
+        print(res.body);
+        return Fluttertoast.showToast(
+            msg: "Error en el servidor, intente mas tarde",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      } else {
+        print("Item form is statuscode 500");
+        print(res.body);
+
+        return Fluttertoast.showToast(
+            msg: "Error en el servidor, intente mas tarde",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      }
     }
   }
 
+  /// Funcion que abre la camara
   Future<void> _optionsCamera() {
     return showDialog(
         context: context,
@@ -524,22 +826,38 @@ class _AddReporteState extends State<AddReporte> {
             actions: [CloseButton()],
             title: Text('Seleccione una opción'),
             content: SingleChildScrollView(
-              child: ListBody(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   GestureDetector(
-                    child: Text(
-                      'Tomar fotografía',
-                      style: TextStyle(fontSize: 18),
+                    child: Column(
+                      children: [
+                        Icon(Icons.camera, size: 35),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Text('Tomar foto')
+                      ],
                     ),
-                    onTap: () => openCamera(),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      openCamera();
+                    },
                   ),
-                  Divider(),
                   GestureDetector(
-                    child: Text(
-                      'Seleccionar una fotografía',
-                      style: TextStyle(fontSize: 18),
+                    child: Column(
+                      children: [
+                        Icon(Icons.photo_rounded, size: 35),
+                        SizedBox(
+                          height: 5,
+                        ),
+                        Text('Seleccionar foto')
+                      ],
                     ),
-                    onTap: () => openGallery(),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      openGallery();
+                    },
                   )
                 ],
               ),
@@ -548,6 +866,7 @@ class _AddReporteState extends State<AddReporte> {
         });
   }
 
+  /// funcion que construye las fotos
   buildImage() => GridView.builder(
         shrinkWrap: true,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -557,10 +876,53 @@ class _AddReporteState extends State<AddReporte> {
         ),
         itemCount: images.length,
         itemBuilder: (BuildContext context, int index) {
-          return Image.file(File(images[index].path));
+          return Stack(
+            children: [
+              Container(
+                margin: EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.grey[300],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.file(
+                    images[index],
+                    fit: BoxFit.cover,
+                    width: 150,
+                    height: 150,
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 0,
+                right: 0,
+                child: GestureDetector(
+                  child: Container(
+                    padding: EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      Icons.delete,
+                      color: Colors.white,
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      images.removeAt(index);
+                      newsPath.removeAt(index);
+                    });
+                  },
+                ),
+              ),
+            ],
+          );
         },
       );
 
+  /// el save form hace la validacion de que todo este bien antes de enviar los datos
   Future saveForm() async {
     final isValid = _formKey.currentState!.validate();
     final isValid2 = _formKey2.currentState!.validate();
@@ -571,42 +933,59 @@ class _AddReporteState extends State<AddReporte> {
           description: descriptionController.text,
           image: images,
           time: DateTime.now());
-
+      final provider = Provider.of<EventProvider>(context, listen: false);
       final Response? response = await sendingData2(titleController.text,
               descriptionController.text, images, newsPath)
           .then((value) {
-            Navigator.of(context).pop();
-          })
-          .whenComplete(() => {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text(
-                  'Su reporte se ha realizado con exito!',
-                  style: TextStyle(fontSize: 19),
-                )))
-              })
-          .catchError((e) {});
+        Navigator.of(context).pop();
+
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+          'Su reporte se ha realizado con exito!',
+          style: TextStyle(fontSize: 19),
+        )));
+      });
 
       return response;
     }
   }
 
+  /// obtiene el tipo de aviso en el caso de ser administrador o supervisor
   Future<TipoAviso?> getTipoAviso() async {
-    try {
-      print(idCom);
-      print(idUser);
-      final Uri url = Uri.parse(
-          'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-tipo-aviso');
-      final response = await http
-          .post(url, body: {"idCom": idCom.toString()}).timeout(
-              Duration(seconds: 8), onTimeout: () {
-        return http.Response('Timeout', 408);
-      });
+    print(idCom);
+    print(idUser);
+    final Uri url = Uri.parse(
+        'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-tipo-aviso');
+    final response = await http.post(url, body: {"idCom": idCom.toString()});
 
-      var data = returnResponse(response);
+    if (response.statusCode == 200) {
+      var data = response.body;
       print(data);
       return tipoAvisoFromJson(data);
-    } on SocketException {
-      throw FetchDataException('Something wrong');
+    } else {
+      if (response.statusCode == 400) {
+        print("Item form is statuscode 400");
+
+        Fluttertoast.showToast(
+            msg: "Error en el servidor, intente mas tarde",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      } else {
+        print("Item form is statuscode 500");
+
+        Fluttertoast.showToast(
+            msg: "Error en el servidor, intente mas tarde",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+      }
     }
   }
 

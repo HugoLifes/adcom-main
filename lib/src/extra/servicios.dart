@@ -78,13 +78,13 @@ class _ServicesState extends State<Services> {
           value.data!.length,
           (index) => List.generate(
               value.data![index].productos!.length,
-              (index2) => value.data![index].productos![index2].presLogoRuta!
+              (index2) => value.data![index].productos![index2].presLogoRuta! == null ? '0' : value.data![index].productos![index2].presLogoRuta!
                   .trimRight()));
       name = List.generate(
           value.data!.length,
           (index) => List.generate(
               value.data![index].productos!.length,
-              (index2) => value.data![index].productos![index2].descripcion!
+              (index2) => value.data![index].productos![index2].descripcion == null ? '0' : value.data![index].productos![index2].descripcion!
                   .trimRight()));
       seleccionado = List.generate(
           value.data!.length,
@@ -201,7 +201,7 @@ class _ServicesState extends State<Services> {
                           children: [
                             SizedBox(
                               child: Text(
-                                'Servicios',
+                                'Servicios para el hogar',
                                 style: TextStyle(fontSize: 18),
                               ),
                             ),
@@ -318,7 +318,7 @@ class DatosProveedor {
       Uri uri = Uri.parse(
           'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-datos-provedores-by-com');
 
-      var response = await http.post(uri, body: {'idCom': '5'}).timeout(Duration(seconds: 8), onTimeout:(){
+      var response = await http.post(uri, body: {'idCom': '5'}).timeout(Duration(seconds: 6), onTimeout:(){
         return http.Response('Timeout', 408);
       });
       var data = returnResponse(response);

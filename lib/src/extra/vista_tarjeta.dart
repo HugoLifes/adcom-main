@@ -4,16 +4,28 @@ import 'package:adcom/src/extra/more_view_cuota.dart';
 import 'package:adcom/src/extra/referencia_view.dart';
 import 'package:adcom/src/models/event_provider.dart';
 import 'package:adcom/src/pantallas/finanzas.dart';
-
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+// ignore: must_be_immutable
+
+SharedPreferences? prefs;
 
 // ignore: must_be_immutable
 class VistaTarjeta extends StatefulWidget {
   List<DatosCuenta>? newList = [];
   List<DatosCuenta>? refP = [];
+  bool? landScape = false;
   String? bandera;
-  VistaTarjeta({Key? key, this.newList, this.refP, this.bandera}) : super(key: key);
+  VistaTarjeta({
+    Key? key,
+    this.newList,
+    this.refP,
+    this.bandera,
+    this.landScape = false,
+  }) : super(key: key);
 
   @override
   _VistaTarjetaState createState() => _VistaTarjetaState();
@@ -25,13 +37,24 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
   List<DatosCuenta> mylist = [];
   List<String> mesFormat = [];
   NumberFormat numberFormat = NumberFormat.decimalPattern('hi');
+  bool? isTablet;
+  bool? isPhone;
+
+  whatDevice() async {
+    prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      isTablet = prefs!.getBool('isTablet');
+      isPhone = prefs!.getBool('isPhone');
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     _showPersBottomSheetCallBack = _showPersBottomSheetCallBack;
     //data();
-
+    whatDevice();
     setState(() {
       ultimaDeuda();
       estadodepago();
@@ -50,13 +73,12 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
 
     return Container(
       width: MediaQuery.of(context).size.width,
-      height: 220,
+      height: widget.landScape == true ? 200 : 220,
       decoration: BoxDecoration(boxShadow: [
         BoxShadow(color: Colors.grey, blurRadius: 6, offset: Offset(0, 1))
       ], color: estadodepagoColor(), borderRadius: BorderRadius.circular(10)),
       child: Padding(
-        padding:
-            const EdgeInsets.only(left: 13, right: 13, top: 13, bottom: 20),
+        padding: EdgeInsets.only(left: 13, right: 13, top: 13, bottom: 20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -89,13 +111,12 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
                   height: 30,
                   child: OutlinedButton(
                     onPressed: () {
+                      HapticFeedback.lightImpact();
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (_) => RefView(
-                                list: widget.newList,
-                                refP: widget.refP
-                              )));
+                              list: widget.newList, refP: widget.refP)));
                     },
-                    child: Icon(Icons.add, size: 25, color: Colors.white),
+                    child: Text('Ver referencia',style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 15)),
                     style: OutlinedButton.styleFrom(
                         side:
                             BorderSide(width: 1.0, color: Colors.transparent)),
@@ -129,6 +150,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
               children: [
                 OutlinedButton(
                   onPressed: () {
+                    HapticFeedback.lightImpact();
                     _showModalSheet();
                   },
                   child: Text(
@@ -143,10 +165,10 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
 
                 OutlinedButton(
                   onPressed: () {
+                    HapticFeedback.lightImpact();
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (_) => DetallesPago(
-                              list: widget.newList!,
-                            )));
+                            list: widget.newList!, refp: widget.refP)));
                   },
                   child: Text('Detalles',
                       textAlign: TextAlign.center,
@@ -162,7 +184,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
     );
   }
 
- void _showModalSheet() {
+  void _showModalSheet() {
     showModalBottomSheet(
         elevation: 5,
         clipBehavior: Clip.antiAliasWithSaveLayer,
@@ -195,9 +217,8 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
                       children: [
                         Row(
                           children: [
-                            
                             Text(
-                              'Proximamente',
+                              '\$ 0.00 MXN',
                               style: TextStyle(fontSize: 30),
                             ),
                           ],
@@ -316,7 +337,8 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
       actions: [okButton],
     );
 
-    showDialog(context: context, builder: (_) => alert, barrierDismissible: false);
+    showDialog(
+        context: context, builder: (_) => alert, barrierDismissible: false);
   }
 
   data() async {
@@ -430,9 +452,9 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
     double deuda;
     double tardio;
     for (int i = 0; i < widget.newList!.length; i++) {
-      if(widget.newList![i].montoCuota == null){
+      if (widget.newList![i].montoCuota == null) {
         deuda = 0.0;
-      }else{
+      } else {
         deuda = double.parse(widget.newList![i].montoCuota!);
       }
       tardio = double.parse(widget.newList![i].montoTardio!);
@@ -458,7 +480,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
         }
       }
     }
-    return numberFormat.format(contador) ;
+    return numberFormat.format(contador);
   }
 
   estadodepago() {
@@ -507,20 +529,17 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
   ///ok
   estadodepagoColor() {
     Color? estado;
-    if(widget.bandera == "verde" || widget.newList!.last.pago == 1){
-       return estado = Colors.lightGreen[700];
-    }else{
-      if(widget.bandera == "Amarillo"){
-         return estado= Colors.amber[400];
-      }else{
-        if(widget.bandera == "Rojo"){
-          return estado= Colors.red[700];
+    if (widget.bandera == "verde" || widget.newList!.last.pago == 1) {
+      return estado = Colors.lightGreen[700];
+    } else {
+      if (widget.bandera == "Amarillo") {
+        return estado = Colors.amber[400];
+      } else {
+        if (widget.bandera == "Rojo") {
+          return estado = Colors.red[700];
         }
-        
       }
     }
-
-    
   }
 
   ///ok
