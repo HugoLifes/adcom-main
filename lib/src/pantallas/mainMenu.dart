@@ -172,10 +172,8 @@ class _MainMenuState extends State<MainMenu> {
         }
       }
     });
-    if (prefs!.getBool('EnvioId') == true) {
-    } else {
-      SendIdNotification().sendId(status!.userId!, idPrim!);
-    }
+
+    SendIdNotification().sendId(status!.userId!, idPrim!);
   }
 
   @override
@@ -186,6 +184,13 @@ class _MainMenuState extends State<MainMenu> {
         .setNotificationOpenedHandler((OSNotificationOpenedResult result) {
       // Will be called whenever a notification is opened/button pressed.
       print('Message: ${result.notification.body}');
+    });
+
+    OneSignal.shared.setNotificationWillShowInForegroundHandler(
+        (OSNotificationReceivedEvent event) {
+      // Will be called whenever a notification is received in foreground
+      // Display Notification, pass null param for not displaying the notification
+      event.complete(event.notification);
     });
 
     initConnectivity();
@@ -318,7 +323,7 @@ class _MainMenuState extends State<MainMenu> {
             ],
           ),
         ),
-        strange(),
+        //strange(),
         Container(
             padding: EdgeInsets.only(
                 top: landscape == true ? size.height * .10 : size.height * .18,
@@ -456,8 +461,8 @@ class SendIdNotification {
   Future sendId(String nuserId, int userIdApp) async {
     Uri uri = Uri.parse(
         'http://187.189.53.8:8081/backend/web/index.php?r=adcom/token');
-    print(nuserId);
-    print(userIdApp);
+    print('here: $nuserId');
+    print('here2: $userIdApp');
     var response = await http.post(uri, body: {
       "params": json.encode({
         "idUsurioApp": userIdApp,
@@ -466,7 +471,7 @@ class SendIdNotification {
     }).timeout(Duration(seconds: 5), onTimeout: () {
       return http.Response('Timeout', 408);
     });
-    print(response.body);
+    print('here: ${response.body}');
     if (response.statusCode == 200) {
       print('ok');
     } else {
@@ -493,7 +498,5 @@ class SendIdNotification {
             fontSize: 16.0);
       }
     }
-    prefs = await SharedPreferences.getInstance();
-    prefs!.setBool('EnvioId', true);
   }
 }

@@ -13,6 +13,8 @@ import 'package:loader_overlay/loader_overlay.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:glyphicon/glyphicon.dart';
 import 'package:intl/intl.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:photo_view/photo_view_gallery.dart';
 import 'package:printing/printing.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -26,6 +28,7 @@ class PedirServicio extends StatefulWidget {
   List<dynamic>? url;
   Servicios? servicio;
   List<dynamic>? name;
+  List<dynamic>? precios;
 
   List<dynamic>? seleccionado = [];
   PedirServicio(
@@ -34,6 +37,7 @@ class PedirServicio extends StatefulWidget {
       this.servicio,
       this.datosProveedor,
       this.url,
+      this.precios,
       this.seleccionado,
       this.name})
       : super(key: key);
@@ -339,54 +343,82 @@ class _PedirServicioState extends State<PedirServicio> {
 
   Step? tipoDeServicio() {
     print(' idTipoProvedor ${widget.servicio!.idTipoProveedor}');
+    print('here ${widget.servicio!.idproveedor}');
     switch (widget.servicio!.idTipoProveedor) {
       case 1:
         return Step(
             title: Text('Tipo de producto'),
             isActive: _currentStep >= 1,
             state: StepState.disabled,
-            content: ListView.builder(
-                itemCount: widget.url!.length,
-                addAutomaticKeepAlives: true,
-                shrinkWrap: true,
-                itemBuilder: (_, index) {
-                  return InkWell(
-                    onTap: () {
-                      setState(() {
-                        selectindex = index;
-                        eleccion = widget.name![index].toString().toLowerCase();
-                      });
+            content: Container(
+                height: 400,
+                margin: EdgeInsets.only(left: 15, right: 15),
+                width: MediaQuery.of(context).size.width,
+                child: ListView.builder(
+                    itemCount: widget.url!.length,
+                    addAutomaticKeepAlives: true,
+                    shrinkWrap: true,
+                    itemBuilder: (_, index) {
+                      return InkWell(
+                        onTap: () {
+                          setState(() {
+                            selectindex = index;
+                            eleccion =
+                                widget.name![index].toString().toLowerCase();
+                          });
 
-                      if (eleccion == 'tanque 30') {
-                        setState(() {
-                          tanqueLleno = true;
-                        });
-                      } else if (eleccion == 'tanque 45') {
-                        setState(() {
-                          tanqueLleno = true;
-                        });
-                      } else if (eleccion == 'tanque estacionario' ||
-                          eleccion == 'estacionario') {
-                        setState(() {
-                          tanqueLleno = false;
-                        });
-                      }
-                      print(eleccion);
-                    },
-                    child: ListTile(
-                      title: Container(
-                          width: 90,
-                          height: 90,
-                          decoration: BoxDecoration(
-                              border: Border.all(
-                                  color: selectindex == index
-                                      ? Colors.red
-                                      : Colors.transparent,
-                                  width: 2.0)),
-                          child: Image.network(widget.url![index])),
-                    ),
-                  );
-                }));
+                          if (eleccion == 'tanque 30') {
+                            setState(() {
+                              tanqueLleno = true;
+                            });
+                          } else if (eleccion == 'tanque 45') {
+                            setState(() {
+                              tanqueLleno = true;
+                            });
+                          } else if (eleccion == 'tanque estacionario' ||
+                              eleccion == 'estacionario') {
+                            setState(() {
+                              tanqueLleno = false;
+                            });
+                          } else {}
+                          print(eleccion);
+                        },
+                        child: widget.servicio!.idproveedor! > 20
+                            ? ListTile(
+                                title: Container(
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: selectindex == index
+                                                ? Colors.red
+                                                : Colors.transparent,
+                                            width: 2.0)),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        Image.network(
+                                          widget.url![index],
+                                          width: 260,
+                                          height: 300,
+                                          fit: BoxFit.contain,
+                                        ),
+                                      ],
+                                    )),
+                              )
+                            : ListTile(
+                                title: Container(
+                                    width: 90,
+                                    height: 90,
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: selectindex == index
+                                                ? Colors.red
+                                                : Colors.transparent,
+                                            width: 2.0)),
+                                    child: Image.network(widget.url![index])),
+                              ),
+                      );
+                    })));
 
       case 2:
         return Step(
@@ -402,7 +434,21 @@ class _PedirServicioState extends State<PedirServicio> {
                 ),
               ],
             ));
+
       default:
+        return Step(
+            title: Text('Comente su pedido'),
+            isActive: _currentStep >= 1,
+            state: StepState.disabled,
+            content: Column(
+              children: [
+                Form(
+                  key: _formKey4,
+                  child: buildComents(
+                      descripCompra, 'Describa su compra', _currentStep),
+                ),
+              ],
+            ));
     }
   }
 
@@ -411,7 +457,7 @@ class _PedirServicioState extends State<PedirServicio> {
     switch (widget.servicio!.idTipoProveedor) {
       case 1:
         return Step(
-            title: Text('Tipo de pago y Cantidad a cargar'),
+            title: Text('Tipo de pago'),
             content: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -550,6 +596,22 @@ class _PedirServicioState extends State<PedirServicio> {
             ),
             state: StepState.disabled,
             isActive: _currentStep >= 2);
+      case 3:
+        return Step(
+            title: Text('Tipo de pago'),
+            state: StepState.disabled,
+            isActive: _currentStep >= 2,
+            content: Row(
+              children: [camposTipoPago()],
+            ));
+      case 4:
+        return Step(
+            title: Text('Tipo de pago'),
+            state: StepState.disabled,
+            isActive: _currentStep >= 2,
+            content: Row(
+              children: [camposTipoPago()],
+            ));
       default:
     }
   }
@@ -668,7 +730,7 @@ class _PedirServicioState extends State<PedirServicio> {
             hintText: 'Nombre Completo'),
       );
 
-  /// construye el los toma tiempo y fecha
+  /// construye los toma tiempo y fecha
   buildDateTimePickers() => Column(
         children: [
           buildForm(),

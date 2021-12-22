@@ -18,6 +18,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 // ignore: must_be_immutable
 class MultiServicios extends StatefulWidget {
   final int? service;
+  List<dynamic>? precios = [];
   List<DatosProveedor>? datosP = [];
   List<dynamic>? unidad = [];
   List<dynamic>? name = [];
@@ -28,6 +29,7 @@ class MultiServicios extends StatefulWidget {
       this.datosP,
       this.unidad,
       this.name,
+      this.precios,
       this.seleccionado})
       : super(key: key);
 
@@ -146,30 +148,19 @@ class _MultiServiciosState extends State<MultiServicios> {
                   itemBuilder: (_, int index) {
                     return InkWell(
                       onTap: () {
-                        if (index == 1) {
-                          Fluttertoast.showToast(
-                              msg: "Proximamente",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.CENTER,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.white,
-                              textColor: Colors.black,
-                              fontSize: 17.0);
-                        } else {
-                          /// Aqui se llama a la funcion que se encarga de pedir el servicio
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => PedirServicio(
-                                        servicio: serv[index],
-                                        service: index,
-                                        //datosProveedor: widget.datosP![index],
-                                        url: widget.unidad![index],
-                                        name: widget.name![index],
-                                        seleccionado:
-                                            widget.seleccionado![index],
-                                      )));
-                        }
+                        /// Aqui se llama a la funcion que se encarga de pedir el servicio
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => PedirServicio(
+                                      servicio: serv[index],
+                                      service: index,
+                                      precios: widget.precios![index],
+                                      datosProveedor: widget.datosP![index],
+                                      url: widget.unidad![index],
+                                      name: widget.name![index],
+                                      seleccionado: widget.seleccionado![index],
+                                    )));
                       },
                       child: Container(
                         padding: EdgeInsets.only(top: 15, left: 10),

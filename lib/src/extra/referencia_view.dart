@@ -9,8 +9,10 @@ import 'package:provider/provider.dart';
 class RefView extends StatefulWidget {
   late List<DatosCuenta>? list = [];
   late List<DatosCuenta>? refP = [];
+  PagoAnualR? pagoAnualR;
   final ref;
-  RefView({Key? key, this.list, this.refP, this.ref}) : super(key: key);
+  RefView({Key? key, this.list, this.refP, this.ref, this.pagoAnualR})
+      : super(key: key);
   @override
   _RefViewState createState() => _RefViewState();
 }

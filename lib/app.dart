@@ -3,7 +3,6 @@ import 'package:adcom/src/extra/add_reporte.dart';
 import 'package:adcom/src/extra/chat_page.dart';
 import 'package:adcom/src/extra/eventos.dart';
 import 'package:adcom/src/extra/reporte.dart';
-import 'package:adcom/src/extra/seguimiento.dart';
 import 'package:adcom/src/methods/event_editing_page.dart';
 import 'package:adcom/src/models/event_provider.dart';
 import 'package:adcom/src/pantallas/amenidades.dart';
@@ -39,7 +38,7 @@ class _MyAppState extends State<MyApp> {
   final heroController = HeroController();
   GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   var id = 'icono';
-  bool _loggedIn = false;
+  // bool _loggedIn = false;
 
   @override
   void initState() {
@@ -90,7 +89,6 @@ class _MyAppState extends State<MyApp> {
           '/screen13': (BuildContext context) => EventEditingPage(),
           '/screen14': (BuildContext context) => LevantarReporte(),
           '/screen15': (BuildContext context) => ChatPage(),
-          '/screen16': (BuildContext context) => Seguimiento(),
           '/screen17': (BuildContext context) {
             var tru = prefs!.containsKey('UnaVez');
             if (tru == true) {

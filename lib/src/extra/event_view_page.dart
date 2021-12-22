@@ -16,6 +16,7 @@ class EventViewinPage extends StatelessWidget {
         backgroundColor: Colors.deepPurpleAccent,
         leading: CloseButton(),
         actions: buildViewActions(context, event),
+        
       ),
       body: ListView(
         padding: EdgeInsets.all(32),

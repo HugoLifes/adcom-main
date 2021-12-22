@@ -149,7 +149,7 @@ class _VistaPagosState extends State<VistaPagos> {
                     style:
                         TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500)),
                 SizedBox(
-                  width: 12,
+                  width: 5,
                 ),
                 Container(
                   padding: EdgeInsets.only(right: 5),
@@ -159,9 +159,22 @@ class _VistaPagosState extends State<VistaPagos> {
                           fontSize: 14.0,
                           fontWeight: FontWeight.bold)),
                 ),
-                Text(
-                  '${widget.deudas!.mes!}',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                Row(
+                  children: [
+                    Text(
+                      '${widget.deudas!.mes!}',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Text(
+                      '${widget.deudas!.fechaGeneracion!}',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                    ),
+                  ],
                 ),
                 SizedBox(
                   width: 19,

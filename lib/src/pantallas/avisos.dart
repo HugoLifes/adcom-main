@@ -35,8 +35,8 @@ class _AvisosState extends State<Avisos> {
   List<String> idComName = [];
 
   List<AvisosUsuario> avisos = [];
-  List? links;
-  List? name;
+  List<dynamic>? links;
+  List<dynamic>? name;
   bool error = false;
   List<String> hLinks = [];
   var nombres = <dynamic, dynamic>{};
@@ -272,7 +272,7 @@ class _AvisosState extends State<Avisos> {
                                           height: 200,
                                         ),
                                         Text(
-                                          'Lo sentimos, por el momento no hay avisos',
+                                          'Lo sentimos, por el momento su comunidad no tiene ningún aviso.',
                                           style: TextStyle(
                                             fontSize: size.width / 20,
                                             color: Colors.blueGrey[700],
@@ -309,11 +309,13 @@ class _AvisosState extends State<Avisos> {
                 elevation: 5,
                 backgroundColor: Colors.blueGrey[700],
                 onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (_) => MakeNewPost(
-                            idComu: idComName,
-                            comunities: comunities,
-                          )));
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(
+                          builder: (_) => MakeNewPost(
+                                idComu: idComName,
+                                comunities: comunities,
+                              )))
+                      .then((value) => callBackFunc());
                 },
                 tooltip: 'add post',
                 child: const Icon(
@@ -348,6 +350,26 @@ class _AvisosState extends State<Avisos> {
     OneSignal.shared.setPermissionObserver((changes) {
       print('El permiso ha cambiado ${changes.jsonRepresentation()}');
     });
+  }
+
+  callBackFunc() async {
+    refresh();
+  }
+
+  refresh() {
+    if (comunities.isNotEmpty) {
+      setState(() {
+        avisos.clear();
+        links!.clear();
+        name!.clear();
+        comunities.clear();
+        userCheck();
+      });
+    } else {
+      setState(() {
+        userCheck();
+      });
+    }
   }
 
   alerta5() {

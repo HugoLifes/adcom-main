@@ -47,6 +47,7 @@ class _ServicesState extends State<Services> {
   List<dynamic> name = [];
   List<dynamic> seleccionado = [];
   List<DatosProveedor> datos = [];
+  List<dynamic> precio = [];
   bool cargado = false;
   bool mostrar = false;
   var idCom;
@@ -68,14 +69,27 @@ class _ServicesState extends State<Services> {
           horarioInicio: value.data![i].horaInitAten,
           horarioFin: value.data![i].horaFinAten,
           compania: value.data![i].compania,
-          formaPago1: value.data![i].formaPago1,
-          formaPago2: value.data![i].formaPago2,
-          formaPago3: value.data![i].formaPago3,
+          formaPago1: value.data![i].formaPago1!,
+          formaPago2: value.data![i].formaPago2!,
+          formaPago3: value.data![i].formaPago3!,
         ));
       }
       setState(() {
         cargado = true;
       });
+
+      /// aqui se obtienen caracteristicas del producto
+      /// en este caso el campo unidad del service
+      precio = List.generate(
+          value.data!.length,
+          (index) => List.generate(
+              value.data![index].productos!.length,
+              (index2) => value.data![index].productos![index2].unidad == null
+                  ? '0'
+                  : value.data![index].productos![index2].unidad!.trimRight()));
+
+      /// aqui se obtienen caracteristicas del producto
+      /// en este caso el campo de las imagenes del producto
       unidad = List.generate(
           value.data!.length,
           (index) => List.generate(
@@ -100,7 +114,9 @@ class _ServicesState extends State<Services> {
               value.data![index].productos!.length, (index2) => false));
     }).catchError((e) {
       setState(() {
-        mostrar = true;
+        if (mounted) {
+          mostrar = true;
+        }
       });
       alerta5();
     });
@@ -191,6 +207,7 @@ class _ServicesState extends State<Services> {
                                     service: servicios[index].tipoDeServ,
                                     datosP: datos,
                                     unidad: unidad,
+                                    precios: precio,
                                     name: name,
                                     seleccionado: seleccionado,
                                   )));
@@ -331,8 +348,9 @@ class DatosProveedor {
       Uri uri = Uri.parse(
           'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-datos-provedores-by-com');
 
-      var response = await http.post(uri, body: {'idCom': '5'}).timeout(
-          Duration(seconds: 8), onTimeout: () {
+      var response = await http
+          .post(uri, body: {'idCom': idCom.toString()}).timeout(
+              Duration(seconds: 8), onTimeout: () {
         return http.Response('Timeout', 408);
       });
       var data = returnResponse(response);

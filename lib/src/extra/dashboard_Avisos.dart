@@ -297,15 +297,9 @@ class _AvisosDashboardState extends State<AvisosDashboard> {
 
     print('here${path.path}');
 
-    if (names.contains('.pdf') == false) {
-      setState(() {
-        filePath = path.path + '/' + names + '.pdf';
-      });
-    } else {
-      setState(() {
-        filePath = path.path + '/$names';
-      });
-    }
+    setState(() {
+      filePath = path.path + '/$names';
+    });
 
     return filePath;
   }

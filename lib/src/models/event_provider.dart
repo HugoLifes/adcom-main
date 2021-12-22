@@ -61,6 +61,7 @@ class EventProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Funcion que se usa para logear al usuario e informar cualquir problema de logeo
   var userd;
   Future<void> login(user, pass, ctx, TextEditingController tk,
       TextEditingController tk2) async {

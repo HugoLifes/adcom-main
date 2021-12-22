@@ -9,13 +9,20 @@ Accounts accountsFromJson(String str) => Accounts.fromJson(json.decode(str));
 String accountsToJson(Accounts data) => json.encode(data.toJson());
 
 class Accounts {
-  Accounts({this.value, this.message, this.data, this.data2, this.bandera});
+  Accounts(
+      {this.value,
+      this.message,
+      this.data,
+      this.data2,
+      this.bandera,
+      this.pagoAnualRestante});
 
   int? value;
   String? message;
   List<Datum>? data;
   Data2? data2;
   String? bandera;
+  PagoAnualRestante? pagoAnualRestante;
 
   factory Accounts.fromJson(Map<String, dynamic> json) => Accounts(
       value: json["value"] == null ? null : json["value"],
@@ -24,7 +31,10 @@ class Accounts {
           ? null
           : List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
       data2: json["data2"] == null ? null : Data2.fromJson(json["data2"]),
-      bandera: json["bandera"] == null ? null : json["bandera"]);
+      bandera: json["bandera"] == null ? null : json["bandera"],
+      pagoAnualRestante: json["pagoAnualORestante"] == null
+          ? null
+          : PagoAnualRestante.fromJson(json["pagoAnualORestante"]));
 
   Map<String, dynamic> toJson() => {
         "value": value == null ? null : value,
@@ -33,7 +43,9 @@ class Accounts {
             ? null
             : List<dynamic>.from(data!.map((x) => x.toJson())),
         "data2": data2 == null ? null : data2!.toJson(),
-        "bandera": bandera == null ? null : bandera
+        "bandera": bandera == null ? null : bandera,
+        "pagoAnualORestante":
+            pagoAnualRestante == null ? null : pagoAnualRestante!.toJson(),
       };
 }
 
@@ -187,5 +199,34 @@ class Data2 {
         "CP": cp == null ? null : cp,
         "COMUNIDAD": comunidad == null ? null : comunidad,
         "CALLE": calle == null ? null : calle,
+      };
+}
+
+class PagoAnualRestante {
+  String? mesesApagar;
+  dynamic cuota;
+  dynamic descuento;
+  int? totalApagar;
+
+  PagoAnualRestante({
+    this.mesesApagar,
+    this.cuota,
+    this.descuento,
+    this.totalApagar,
+  });
+
+  factory PagoAnualRestante.fromJson(Map<String, dynamic> json) =>
+      PagoAnualRestante(
+        mesesApagar: json["mesesAPagar"] == null ? null : json["mesesAPagar"],
+        cuota: json["cuota"] == null ? null : json["cuota"],
+        descuento: json["descuento"] == null ? null : json["descuento"],
+        totalApagar: json["totalAPagar"] == null ? null : json["totalAPagar"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "mesesAPagar": mesesApagar == null ? null : mesesApagar,
+        "cuota": cuota == null ? null : cuota,
+        "descuento": descuento == null ? null : descuento,
+        "totalAPagar": totalApagar == null ? null : totalApagar,
       };
 }

@@ -215,18 +215,7 @@ class _AddReporteState extends State<AddReporte> {
                 }
               }
             } else {
-              if (images.isEmpty) {
-                Fluttertoast.showToast(
-                    msg: "Seccion de fotos vacia",
-                    toastLength: Toast.LENGTH_SHORT,
-                    gravity: ToastGravity.CENTER,
-                    timeInSecForIosWeb: 1,
-                    backgroundColor: Colors.white,
-                    textColor: Colors.black,
-                    fontSize: 17.0);
-              } else {
-                alerta();
-              }
+              alerta();
             }
           });
         },

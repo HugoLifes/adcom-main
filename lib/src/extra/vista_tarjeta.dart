@@ -19,9 +19,15 @@ class VistaTarjeta extends StatefulWidget {
   List<DatosCuenta>? newList = [];
   List<DatosCuenta>? refP = [];
   String? bandera;
-  VistaTarjeta(
-      {Key? key, this.newList, this.refP, this.bandera, this.landScape = false})
-      : super(key: key);
+  PagoAnualR? pagoAnualR;
+  VistaTarjeta({
+    Key? key,
+    this.newList,
+    this.refP,
+    this.bandera,
+    this.pagoAnualR,
+    this.landScape = false,
+  }) : super(key: key);
 
   @override
   _VistaTarjetaState createState() => _VistaTarjetaState();
@@ -165,6 +171,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
                         builder: (_) => DetallesPago(
                               list: widget.newList!,
                               refp: widget.refP,
+                              pagoAnualR: widget.pagoAnualR,
                             )));
                   },
                   child: Text('Detalles',

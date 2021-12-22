@@ -48,7 +48,7 @@ dynamic returnResponse(http.Response response) {
       throw UnauthorisedException(response.body.toString());
     case 500:
     case 408:
-      throw BadRequestException(response.body.toString());
+      throw UnauthorisedException(response.body.toString());
     default:
       throw FetchDataException(
           'Error occured while Communication with Server with StatusCode : ${response.statusCode}');
