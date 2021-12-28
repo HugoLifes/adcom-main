@@ -84,9 +84,9 @@ class _ServicesState extends State<Services> {
           value.data!.length,
           (index) => List.generate(
               value.data![index].productos!.length,
-              (index2) => value.data![index].productos![index2].unidad == null
+              (index2) => value.data![index].productos![index2].costo == null
                   ? '0'
-                  : value.data![index].productos![index2].unidad!.trimRight()));
+                  : value.data![index].productos![index2].costo!.trimRight()));
 
       /// aqui se obtienen caracteristicas del producto
       /// en este caso el campo de las imagenes del producto

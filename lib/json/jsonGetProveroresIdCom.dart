@@ -94,23 +94,23 @@ class Datum {
 
 class Producto {
   Producto({
-    this.unidad,
+    this.costo,
     this.descripcion,
     this.presLogoRuta,
   });
 
-  String? unidad;
+  String? costo;
   String? descripcion;
   dynamic presLogoRuta;
 
   factory Producto.fromJson(Map<String, dynamic> json) => Producto(
-        unidad: json["UNIDAD"] == null ? null : json["UNIDAD"],
+        costo: json["COSTO"] == null ? null : json["COSTO"],
         descripcion: json["DESCRIPCION"] == null ? null : json["DESCRIPCION"],
         presLogoRuta: json["PRES_LOGO_RUTA"],
       );
 
   Map<String, dynamic> toJson() => {
-        "UNIDAD": unidad == null ? null : unidad,
+        "UNIDAD": costo == null ? null : costo,
         "DESCRIPCION": descripcion == null ? null : descripcion,
         "PRES_LOGO_RUTA": presLogoRuta,
       };

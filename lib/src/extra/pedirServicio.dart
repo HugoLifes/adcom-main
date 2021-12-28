@@ -365,6 +365,86 @@ class _PedirServicioState extends State<PedirServicio> {
                             selectindex = index;
                             eleccion =
                                 widget.name![index].toString().toLowerCase();
+                            cantidadController.text = widget.precios![index];
+                          });
+
+                          if (eleccion == 'tanque 30') {
+                            setState(() {
+                              tanqueLleno = true;
+                            });
+                          } else if (eleccion == 'tanque 45') {
+                            setState(() {
+                              tanqueLleno = true;
+                            });
+                          } else if (eleccion == 'tanque estacionario' ||
+                              eleccion == 'estacionario') {
+                            setState(() {
+                              tanqueLleno = false;
+                            });
+                          } else {}
+                          print(eleccion);
+                          print(' precio ${cantidadController.text}');
+                        },
+                        child: widget.servicio!.idproveedor! > 20
+                            ? ListTile(
+                                title: Container(
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: selectindex == index
+                                                ? Colors.red
+                                                : Colors.transparent,
+                                            width: 2.0)),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        Container(
+                                          width: 150,
+                                          height: 300,
+                                          child: PhotoView(
+                                              imageProvider: NetworkImage(
+                                                  widget.url![index],
+                                                  scale: 1.5)),
+                                        ),
+                                      ],
+                                    )),
+                              )
+                            : ListTile(
+                                title: Container(
+                                    width: 90,
+                                    height: 90,
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: selectindex == index
+                                                ? Colors.red
+                                                : Colors.transparent,
+                                            width: 2.0)),
+                                    child: Image.network(widget.url![index])),
+                              ),
+                      );
+                    })));
+
+      case 2:
+        return Step(
+            title: Text('Tipo de producto'),
+            isActive: _currentStep >= 1,
+            state: StepState.disabled,
+            content: Container(
+                height: 400,
+                margin: EdgeInsets.only(left: 15, right: 15),
+                width: MediaQuery.of(context).size.width,
+                child: ListView.builder(
+                    itemCount: widget.url!.length,
+                    addAutomaticKeepAlives: true,
+                    shrinkWrap: true,
+                    itemBuilder: (_, index) {
+                      return InkWell(
+                        onTap: () {
+                          setState(() {
+                            selectindex = index;
+                            eleccion =
+                                widget.name![index].toString().toLowerCase();
+                            cantidadController.text = widget.precios![index];
                           });
 
                           if (eleccion == 'tanque 30') {
@@ -396,12 +476,9 @@ class _PedirServicioState extends State<PedirServicio> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceEvenly,
                                       children: [
-                                        Image.network(
-                                          widget.url![index],
-                                          width: 260,
-                                          height: 300,
-                                          fit: BoxFit.contain,
-                                        ),
+                                        PhotoView(
+                                            imageProvider: NetworkImage(
+                                                widget.url![index])),
                                       ],
                                     )),
                               )
@@ -419,36 +496,6 @@ class _PedirServicioState extends State<PedirServicio> {
                               ),
                       );
                     })));
-
-      case 2:
-        return Step(
-            title: Text('Comente su pedido'),
-            isActive: _currentStep >= 1,
-            state: StepState.disabled,
-            content: Column(
-              children: [
-                Form(
-                  key: _formKey4,
-                  child: buildComents(
-                      descripCompra, 'Describa su compra', _currentStep),
-                ),
-              ],
-            ));
-
-      default:
-        return Step(
-            title: Text('Comente su pedido'),
-            isActive: _currentStep >= 1,
-            state: StepState.disabled,
-            content: Column(
-              children: [
-                Form(
-                  key: _formKey4,
-                  child: buildComents(
-                      descripCompra, 'Describa su compra', _currentStep),
-                ),
-              ],
-            ));
     }
   }
 
@@ -692,9 +739,10 @@ class _PedirServicioState extends State<PedirServicio> {
           cursorColor: Colors.black,
 
           onFieldSubmitted: (_) => {},
-          //el controlles accede a propiedades como el texto
+          //el controller accede a propiedades como el texto
           controller: cantidadController,
           style: TextStyle(fontSize: 20),
+          readOnly: cantidadController.text.isEmpty ? false : true,
           validator: (title) => title != null && title.isEmpty
               ? 'Este campo no puede estar vacio'
               : null,
@@ -907,7 +955,7 @@ class _PedirServicioState extends State<PedirServicio> {
               height: 15,
             ),
             Text(
-                'Este día, el gas no tiene prioridad en este fraccionamiento, esto podría hacer que demore un poco más, le pedimos que sea paciente.')
+                'Este día, el servicio que intenta adquirir no tiene prioridad en este fraccionamiento, esto podría hacer que demore un poco más en llegar, le pedimos que sea paciente.')
           ],
         ),
       ),
@@ -1190,14 +1238,15 @@ class EnviarCorreo {
 
     // pass the UTC time here
 
-    print(eleccion);
-    print(idRe);
-    print(id);
-    print('here $cantidad');
-    print(goDate);
-    print(newDate);
-    print(tipoPago);
-    print(coments);
+    print('eleccion: $eleccion');
+    print('idRe: $idRe');
+    print('id: $id');
+    print('here: $cantidad');
+    print('go: $goDate');
+    print('from: $fromhr');
+    print('to: $newDate');
+    print('pago: $tipoPago');
+    print('coments: $coments');
     Uri url = Uri.parse(
         "http://187.189.53.8:8080/AdcomBackend/backend/web/index.php?r=adcom/envio-correo-servicio");
 
@@ -1218,6 +1267,7 @@ class EnviarCorreo {
     if (response.statusCode == 200) {
       var data = response.body;
       print(data);
+      print(response.statusCode);
 
       return correoFromJson(data);
     } else {

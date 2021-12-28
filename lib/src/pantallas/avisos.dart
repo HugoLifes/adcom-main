@@ -458,12 +458,8 @@ class _AvisosState extends State<Avisos> {
     print(path.path);
 
     var filePath;
-    names.contains('.pdf');
-    if (names.contains('.pdf') == false) {
-      filePath = path.path + '/' + names + '.pdf';
-    } else {
-      filePath = path.path + '/$names';
-    }
+
+    filePath = path.path + '/$names';
 
     print('here $filePath');
     return filePath;
