@@ -35,8 +35,8 @@ class _AvisosState extends State<Avisos> {
   List<String> idComName = [];
 
   List<AvisosUsuario> avisos = [];
-  List? links;
-  List? name;
+  List<dynamic>? links;
+  List<dynamic>? name;
   bool error = false;
   List<String> hLinks = [];
   var nombres = <dynamic, dynamic>{};
@@ -272,7 +272,7 @@ class _AvisosState extends State<Avisos> {
                                           height: 200,
                                         ),
                                         Text(
-                                          'Lo sentimos, por el momento no hay avisos',
+                                          'Lo sentimos, por el momento su comunidad ningún aviso',
                                           style: TextStyle(
                                             fontSize: size.width / 20,
                                             color: Colors.blueGrey[700],
@@ -313,7 +313,7 @@ class _AvisosState extends State<Avisos> {
                       builder: (_) => MakeNewPost(
                             idComu: idComName,
                             comunities: comunities,
-                          )));
+                          ))).then((value) => callBackFunc());
                 },
                 tooltip: 'add post',
                 child: const Icon(
@@ -434,20 +434,40 @@ class _AvisosState extends State<Avisos> {
     print(path.path);
 
     var filePath;
-    names.contains('.pdf');
-    if (names.contains('.pdf') == false) {
-      filePath = path.path + '/' + names + '.pdf';
-    } else {
+   
       filePath = path.path + '/$names';
-    }
+    
 
     print('here $filePath');
     return filePath;
+  
+  
   }
 
   void showDownloadProgress(received, total) {
     if (total != -1) {
       print((received / total * 100).toStringAsFixed(0) + "%");
+    }
+  }
+
+  callBackFunc() async{
+    refresh();
+  }
+
+  refresh(){
+    if(comunities.isNotEmpty){
+      setState((){
+        avisos.clear();
+        links!.clear();
+        name!.clear();
+        comunities.clear();
+        userCheck();
+      });
+    }else{
+      setState((){
+        userCheck();
+      });
+
     }
   }
 }

@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:adcom/json/jsonReferenciaP.dart';
 import 'package:adcom/src/extra/referencia_view.dart';
 import 'package:adcom/src/pantallas/finanzas.dart';
@@ -19,7 +19,8 @@ class DetallesPago extends StatefulWidget {
   late List<DatosCuenta>? list = [];
   late List<DatosCuenta>? refp = [];
   bool? hayRefPadre;
-  DetallesPago({Key? key, this.list, this.refp}) : super(key: key);
+  PagoAnualR? pagoAnualR;
+  DetallesPago({Key? key, this.list, this.refp, this.pagoAnualR,this.hayRefPadre}) : super(key: key);
 
   @override
   _DetallesPagoState createState() => _DetallesPagoState();
@@ -81,8 +82,9 @@ class _DetallesPagoState extends State<DetallesPago> {
     );
   }
 
-  Container mainMenu(Size size, double size2, {landScape = false}){
-    return Container(
+mainMenu(Size size, double size2, {landScape = false}){
+    return LoaderOverlay(
+      child: Container(
         child: Column(
           children: [
             Container(
@@ -198,7 +200,7 @@ class _DetallesPagoState extends State<DetallesPago> {
                           padding: EdgeInsets.only(left: size.width/ 2.5, top: 0),
                           child: Row(
                             children: [
-                              Text(
+                              checkedAll == true ? Text(''): Text(
                                 'Total',
                                 style: TextStyle(
                                     fontSize: 25, fontWeight: FontWeight.bold),
@@ -207,9 +209,7 @@ class _DetallesPagoState extends State<DetallesPago> {
                                 width: size.width / 40,
                               ),
                               checkedAll == true
-                                  ? Text(
-                                      '${numberFormat.format(contadorTotal)} MXN',
-                                      style: TextStyle(fontSize: 19))
+                                  ?   Text('')
                                   : Container(
                                     padding: EdgeInsets.only(left: 0),
                                     child: Text(
@@ -218,6 +218,10 @@ class _DetallesPagoState extends State<DetallesPago> {
                                       style: TextStyle(fontSize: 19),
                                     ),
                                   ),
+
+                                  /* Text(
+                                      '${numberFormat.format(contadorTotal)} MXN',
+                                      style: TextStyle(fontSize: 19)) */
                               SizedBox(
                                 height: size.height / 20,
                               )
@@ -246,7 +250,8 @@ class _DetallesPagoState extends State<DetallesPago> {
             payButton()
           ],
         ),
-      );
+      ),
+    );
   }
 
   Future<ReferenciaP?> sendingData() async {
@@ -315,7 +320,11 @@ class _DetallesPagoState extends State<DetallesPago> {
                   if (pa == true) {
                     alerta2();
                   } else {
-                    sendingData().then((value) => alerta(value!.referenciaP!));
+                    context.loaderOverlay.show();
+                    sendingData().then((value) => {
+                      context.loaderOverlay.hide(),
+                      alerta(value!.referenciaP!),
+                    });
                   }
                 },
                 gradient: LinearGradient(colors: [
@@ -445,18 +454,18 @@ class _DetallesPagoState extends State<DetallesPago> {
                     padding: EdgeInsets.only(left: 10, right: 20),
                     alignment: Alignment.topLeft,
                   child:Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         'Meses a pagar',
                         style: TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
                       ),
                       SizedBox(
-                        width: size*0.03,
+                        width: size*0.01,
                       ),
                       Text(
-                        'Enero-Diciembre',
-                        style: TextStyle(fontWeight: FontWeight.w400, fontSize:20),
+                        '${widget.pagoAnualR!.mesesApagar}',
+                        style: TextStyle(fontWeight: FontWeight.w400, fontSize:19),
                       )
                     ]
                   ),
@@ -465,7 +474,7 @@ class _DetallesPagoState extends State<DetallesPago> {
                     padding: EdgeInsets.only(left: 10, right: 20),
                     alignment: Alignment.topLeft,
                   child:Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         'Cuota:',
@@ -475,13 +484,13 @@ class _DetallesPagoState extends State<DetallesPago> {
                         width: size*0.40,
                       ),
                       Text(
-                        '\$' + widget.list![0].montoCuota!,
+                        '\$' + '${widget.pagoAnualR!.cuota!.toString()}.00',
                         style: TextStyle(fontWeight: FontWeight.w400, fontSize:20),
                       )
                     ]
                   ),
                    ),
-                    Container(
+                   /*  Container(
                     padding: EdgeInsets.only(left: 10, right: 20),
                     alignment: Alignment.topLeft,
                   child:Row(
@@ -500,12 +509,12 @@ class _DetallesPagoState extends State<DetallesPago> {
                       )
                     ]
                   ),
-                   ),
+                   ), */
                      Container(
                     padding: EdgeInsets.only(left: 10, right: 20),
                     alignment: Alignment.topLeft,
                   child:Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         'Descuento:',
@@ -515,7 +524,7 @@ class _DetallesPagoState extends State<DetallesPago> {
                         width: size*0.27,
                       ),
                       Text(
-                        '\$' + '1200.00',
+                        '\$' + '${widget.pagoAnualR!.descuento}.00',
                         style: TextStyle(fontWeight: FontWeight.w400, fontSize:20),
                       )
                     ]
@@ -526,7 +535,7 @@ class _DetallesPagoState extends State<DetallesPago> {
                     padding: EdgeInsets.only(left: 10, right: 20),
                     alignment: Alignment.topLeft,
                   child:Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         'Total a pagar:',
@@ -536,7 +545,7 @@ class _DetallesPagoState extends State<DetallesPago> {
                         width: size*0.24,
                       ),
                       Text(
-                        '\$${contadorTotal.toStringAsFixed(2)}',
+                        '\$${widget.pagoAnualR!.totalApagar!.toStringAsFixed(2)}',
                         style: TextStyle(fontWeight: FontWeight.w400, fontSize:20),
                       )
                     ]
@@ -819,60 +828,60 @@ class _DetallesPagoState extends State<DetallesPago> {
   sacarMesDeAtrazo() async {
     int? mesesAtrazo;
     String? mes;
-
+    int? year;
     for (int i = 0; i < widget.list!.length; i++) {
       if (widget.list![i].pago == 1) {
       } else {
         mesesAtrazo = widget.list![i].fechaGenerada!.month;
-
+        year = widget.list![i].fechaGenerada!.year;
         switch (mesesAtrazo) {
           case 1:
-            mes = "Enero";
+            mes = "Enero $year";
             mesFormat.add(mes);
             break;
           case 2:
-            mes = "Febrero";
+            mes = "Febrero $year";
             mesFormat.add(mes);
             break;
           case 3:
-            mes = "Marzo";
+            mes = "Marzo $year";
             mesFormat.add(mes);
             break;
           case 4:
-            mes = "Abril";
+            mes = "Abril $year";
             mesFormat.add(mes);
             break;
           case 5:
-            mes = "Mayo";
+            mes = "Mayo $year";
             mesFormat.add(mes);
             break;
 
           case 6:
-            mes = "Junio";
+            mes = "Junio $year";
             mesFormat.add(mes);
             break;
           case 7:
-            mes = "Julio";
+            mes = "Julio $year";
             mesFormat.add(mes);
             break;
           case 8:
-            mes = "Agosto";
+            mes = "Agosto $year";
             mesFormat.add(mes);
             break;
           case 9:
-            mes = "Septiembre";
+            mes = "Septiembre $year";
             mesFormat.add(mes);
             break;
           case 10:
-            mes = "Octubre";
+            mes = "Octubre $year";
             mesFormat.add(mes);
             break;
           case 11:
-            mes = "Noviembre";
+            mes = "Noviembre $year";
             mesFormat.add(mes);
             break;
           case 12:
-            mes = "Diciembre";
+            mes = "Diciembre $year";
             mesFormat.add(mes);
             break;
         }

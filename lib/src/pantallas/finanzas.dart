@@ -80,6 +80,7 @@ class _FinanzasState extends State<Finanzas> {
   List<Deudas> deudasReverse = [];
   List<Deudas> deudasReverse2 = [];
   bool error = false;
+  PagoAnualR? pagoanualR;
 
   /// El init state inicializa funciones cuando abre el boton mis pagos
   @override
@@ -562,7 +563,14 @@ class _FinanzasState extends State<Finanzas> {
             comunidad: cuentas!.data2!.comunidad,
             cp: cuentas!.data2!.cp,
             tipoLote: cuentas!.data2!.tipoLote);
+        pagoanualR = PagoAnualR(
+          mesesApagar: cuentas!.pagoAnualR!.mesesApagar,
+          cuota: cuentas!.pagoAnualR!.cuota,
+          descuento: cuentas!.pagoAnualR!.descuento,
+          totalApagar: cuentas!.pagoAnualR!.totalApagar,
+        );
       });
+      print(pagoanualR!.mesesApagar!);
     } else {
       setState(() {
         if (mounted) {
@@ -660,11 +668,14 @@ class _FinanzasState extends State<Finanzas> {
             newList: localList,
             landScape: true,
             refP: refPadre,
-            bandera: bandera,)]):
+            bandera: bandera,
+            pagoAnualR: pagoanualR
+            )]):
           VistaTarjeta(
             newList: localList,
             refP: refPadre,
             bandera: bandera,
+            pagoAnualR: pagoanualR,
           ),
         ],
       ),
@@ -694,7 +705,10 @@ class _FinanzasState extends State<Finanzas> {
                               referencia: value.data![i].referencia,
                               noTiene: false,
                               descripcion: value.data![i].formaPago,
-                              folio: value.data![i].folio))
+                              fechaGeneracion: value.data![i].fechaGeneracion,
+                              folio: value.data![i].folio,
+                              pagoTardio: value.data![i].pagoTardio,
+                              ))
                         },
                       deudasReverse = deudas.reversed.toList()
                     }
@@ -736,7 +750,10 @@ class _FinanzasState extends State<Finanzas> {
                               referencia: value.data![i].referencia,
                               noTiene: false,
                               descripcion: value.data![i].formaPago,
-                              folio: value.data![i].folio)),
+                              fechaGeneracion: value.data![i].fechaGeneracion,
+                              folio: value.data![i].folio,
+                              pagoTardio: value.data![i].pagoTardio,
+                              )),
                           deudasReverse2 = deudas2.reversed.toList()
                         }
                     }
@@ -875,6 +892,8 @@ class Deudas {
   String? descripcion;
   bool? noTiene;
   String? folio;
+  String? fechaGeneracion;
+  dynamic pagoTardio;
 
   Deudas(
       {this.id,
@@ -886,7 +905,9 @@ class Deudas {
       this.mes,
       this.noTiene,
       this.referencia,
+      this.fechaGeneracion,
       this.folio,
+      this.pagoTardio,
       this.descripcion});
   Future<AdeudosJ?> getDeudas(int i) async {
     try {
@@ -907,4 +928,14 @@ class Deudas {
       throw FetchDataException('$e');
     }
   }
+}
+
+
+class PagoAnualR{
+  String? mesesApagar;
+  dynamic cuota;
+  dynamic descuento;
+  int? totalApagar;
+
+  PagoAnualR({this.mesesApagar, this.cuota, this.descuento, this.totalApagar});
 }

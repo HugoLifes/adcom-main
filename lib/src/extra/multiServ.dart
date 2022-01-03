@@ -20,12 +20,14 @@ class MultiServicios extends StatefulWidget {
   List<dynamic>? unidad = [];
   List<dynamic>? name = [];
   List<dynamic>? seleccionado = [];
+  List<dynamic>? precios = [];
   MultiServicios(
       {Key? key,
       this.service,
       this.datosP,
       this.unidad,
       this.name,
+      this.precios,
       this.seleccionado})
       : super(key: key);
 
@@ -140,16 +142,7 @@ class _MultiServiciosState extends State<MultiServicios> {
                   itemBuilder: (_, int index) {
                     return InkWell(
                       onTap: () {
-                        if (index == 1) {
-                          Fluttertoast.showToast(
-                              msg: "Proximamente",
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.CENTER,
-                              timeInSecForIosWeb: 1,
-                              backgroundColor: Colors.white,
-                              textColor: Colors.black,
-                              fontSize: 17.0);
-                        } else {
+                        
                           /// Aqui se llama a la funcion que se encarga de pedir el servicio
                           Navigator.push(
                               context,
@@ -160,10 +153,11 @@ class _MultiServiciosState extends State<MultiServicios> {
                                         //datosProveedor: widget.datosP![index],
                                         url: widget.unidad![index],
                                         name: widget.name![index],
+                                        precios: widget.precios![index],
                                         seleccionado:
                                             widget.seleccionado![index],
                                       )));
-                        }
+                        
                       },
                       child: Container(
                         padding: EdgeInsets.only(top: 15, left: 10),

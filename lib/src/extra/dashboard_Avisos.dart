@@ -300,11 +300,11 @@ class _AvisosDashboardState extends State<AvisosDashboard2> {
       Directory temp = await getApplicationDocumentsDirectory();
       print(temp.path);
       var filePath;
-      if (names.contains('.pdf') == false) {
-        filePath = temp.path + '/' + names + '.pdf';
-      } else {
-        filePath = temp.path + '/$names';
-      }
+        setState((){
+          filePath = temp.path + '/$names';
+        });
+        
+      
       return filePath;
     } else {
       String path = await ExternalPath.getExternalStoragePublicDirectory(

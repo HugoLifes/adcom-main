@@ -44,6 +44,7 @@ class _ServicesState extends State<Services> {
   
   List<dynamic> unidad = [];
   List<dynamic> name = [];
+  List<dynamic> precio = [];
   List<dynamic> seleccionado = [];
   List<DatosProveedor> datos = [];
   bool cargado = false;
@@ -67,13 +68,22 @@ class _ServicesState extends State<Services> {
           horarioInicio: value.data![i].horaInitAten,
           horarioFin: value.data![i].horaFinAten,
           compania: value.data![i].compania,
+          formaPago1: value.data![i].formaPago1!,
+          formaPago2: value.data![i].formaPago2!,
+          formaPago3: value.data![i].formaPago3!,
         ));
       }
 
       setState((){
         cargado = true;
       });
-
+       precio = List.generate(
+          value.data!.length,
+          (index) => List.generate(
+              value.data![index].productos!.length,
+              (index2) => value.data![index].productos![index2].unidad == null
+                  ? '0'
+                  : value.data![index].productos![index2].unidad!.trimRight()));
       unidad = List.generate(
           value.data!.length,
           (index) => List.generate(
@@ -93,9 +103,11 @@ class _ServicesState extends State<Services> {
 
       printLinks();
     }).catchError((e){
-      setState((){
+     if(mounted){
+        setState((){
         mostrar = true;
       });
+     }
       alerta5();
     });
   }
@@ -178,6 +190,7 @@ class _ServicesState extends State<Services> {
                               service: servicios[index].tipoDeServ,
                               datosP: datos,
                               unidad: unidad,
+                              precios: precio,
                               name: name,
                               seleccionado: seleccionado,
                             )));
@@ -318,7 +331,7 @@ class DatosProveedor {
       Uri uri = Uri.parse(
           'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-datos-provedores-by-com');
 
-      var response = await http.post(uri, body: {'idCom': '5'}).timeout(Duration(seconds: 6), onTimeout:(){
+      var response = await http.post(uri, body: {'idCom': idCom.toString()}).timeout(Duration(seconds: 6), onTimeout:(){
         return http.Response('Timeout', 408);
       });
       var data = returnResponse(response);

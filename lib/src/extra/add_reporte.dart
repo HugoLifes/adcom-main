@@ -210,18 +210,9 @@ class _AddReporteState extends State<AddReporte> {
               }
             }
           } else {
-            if (images.isEmpty) {
-              Fluttertoast.showToast(
-                  msg: "Seccion de fotos vacia",
-                  toastLength: Toast.LENGTH_SHORT,
-                  gravity: ToastGravity.BOTTOM,
-                  timeInSecForIosWeb: 1,
-                  backgroundColor: Colors.black,
-                  textColor: Colors.white,
-                  fontSize: 17.0);
-            } else {
+           
               alerta();
-            }
+            
           }
         });
       },
@@ -242,7 +233,7 @@ class _AddReporteState extends State<AddReporte> {
               padding : EdgeInsets.only(left:10,top:10),
               child: RaisedButton(
                 color: Colors.green,
-                child: Text('Finalizar', style: TextStyle(color: Colors.white),
+                child: Text('Omitir y enviar', style: TextStyle(color: Colors.white),
                 
                 ),
                 onPressed: onStepContinue,

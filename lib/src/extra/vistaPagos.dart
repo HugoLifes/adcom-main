@@ -80,7 +80,7 @@ class _VistaPagosState extends State<VistaPagos> {
                 padding: const EdgeInsets.only(left: 15),
                 child: widget.deudas!.totalAdeudo == null
                     ? Container()
-                    : Text('\$${widget.deudas!.totalAdeudo}',
+                    : Text('\$${formatMoney(widget.deudas!.totalAdeudo!)} MXN',
                         style: TextStyle(
                             fontSize: 16.0, fontWeight: FontWeight.w500)),
               ),
@@ -88,16 +88,28 @@ class _VistaPagosState extends State<VistaPagos> {
                 padding: const EdgeInsets.only(left: 40),
                 child: InkWell(
                   onTap: () {
-                    widget.esPendiente == false
-                        ? Fluttertoast.showToast(
+                    if(widget.esPendiente == false){
+                      Fluttertoast.showToast(
                             msg: "Pagado",
                             toastLength: Toast.LENGTH_SHORT,
                             gravity: ToastGravity.BOTTOM,
                             timeInSecForIosWeb: 2,
                             backgroundColor: Colors.black,
                             textColor: Colors.white,
-                            fontSize: 17.0)
-                        : Fluttertoast.showToast(
+                            fontSize: 17.0);
+                    }else{
+                      print('pago Tardio: ${widget.deudas!.pagoTardio}');
+                      if(widget.deudas!.pagoTardio == '0'){
+                        Fluttertoast.showToast(
+                            msg: "Pago pendinte",
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 2,
+                            backgroundColor: Colors.black,
+                            textColor: Colors.white,
+                            fontSize: 17.0);
+                      }else{
+                        Fluttertoast.showToast(
                             msg: "Deuda más atraso",
                             toastLength: Toast.LENGTH_SHORT,
                             gravity: ToastGravity.BOTTOM,
@@ -105,6 +117,10 @@ class _VistaPagosState extends State<VistaPagos> {
                             backgroundColor: Colors.black,
                             textColor: Colors.white,
                             fontSize: 17.0);
+                      }
+                    }
+                     
+                        
                   },
                   child: Row(
                     children: [
@@ -158,9 +174,21 @@ class _VistaPagosState extends State<VistaPagos> {
                           fontSize: 14.0,
                           fontWeight: FontWeight.bold)),
                 ),
-                Text(
+                Row(
+                  children: [
+                    Text(
                   '${widget.deudas!.mes!}',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                ),
+
+                SizedBox(
+                  width: 5,
+                ),
+                Text(
+                  '${widget.deudas!.fechaGeneracion}',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize:15),
+                )
+                  ]
                 ),
                 SizedBox(
                   width: 19,
@@ -173,7 +201,10 @@ class _VistaPagosState extends State<VistaPagos> {
     );
   }
 
-  imagenComu() async {}
+  formatMoney(String money){
+    var pagoTardio = numberFormat.format(double.parse(money));
+    return pagoTardio;
+  }
 
   Future<Uint8List> buildPdf(PdfPageFormat format) async {
     ByteData bytes;

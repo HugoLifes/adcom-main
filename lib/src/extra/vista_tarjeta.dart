@@ -19,11 +19,13 @@ class VistaTarjeta extends StatefulWidget {
   List<DatosCuenta>? refP = [];
   bool? landScape = false;
   String? bandera;
+  PagoAnualR? pagoAnualR;
   VistaTarjeta({
     Key? key,
     this.newList,
     this.refP,
     this.bandera,
+    this.pagoAnualR,
     this.landScape = false,
   }) : super(key: key);
 
@@ -168,7 +170,7 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
                     HapticFeedback.lightImpact();
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (_) => DetallesPago(
-                            list: widget.newList!, refp: widget.refP)));
+                            list: widget.newList!, refp: widget.refP, pagoAnualR:widget.pagoAnualR)));
                   },
                   child: Text('Detalles',
                       textAlign: TextAlign.center,

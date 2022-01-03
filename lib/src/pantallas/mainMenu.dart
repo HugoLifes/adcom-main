@@ -16,6 +16,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:adcom/src/models/event_provider.dart';
 import 'package:adcom/src/methods/checkInternet.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
+
 SharedPreferences? prefs;
 
 class MainMenu extends StatefulWidget {
@@ -91,6 +93,9 @@ class _MainMenuState extends State<MainMenu> {
     CheckInternet().checkFailed(context);
     obtainData();
     userName();
+    OneSignal.shared.setNotificationWillShowInForegroundHandler((OSNotificationReceivedEvent event){
+      event.complete(event.notification);
+    });
   }
 
   /// obtiene el usuario y password
@@ -134,10 +139,9 @@ class _MainMenuState extends State<MainMenu> {
         }
       }
     });
-    if (prefs!.getBool('EnvioId') == true) {
-    } else {
+   
       SendIdNotification().sendId(statusOneSignal!.userId!, idPrim!);
-    }
+    
   }
 
   @override
@@ -202,9 +206,6 @@ class _MainMenuState extends State<MainMenu> {
             ],
           ),
         ),
-        
-      
-        
         
         Container(
             padding:

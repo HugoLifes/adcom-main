@@ -10,19 +10,21 @@ import 'package:provider/provider.dart';
 class RefView extends StatefulWidget {
   late List<DatosCuenta>? list = [];
   late List<DatosCuenta>? refP = [];
+  PagoAnualR? pagoAnualR;
   final ref;
-  RefView({Key? key, this.list, this.refP, this.ref}) : super(key: key);
+  RefView({Key? key, this.list, this.refP, this.ref, this.pagoAnualR}) : super(key: key);
   @override
   _RefViewState createState() => _RefViewState();
 }
 
 class _RefViewState extends State<RefView> {
   String? tipoReferencia;
-
+   String? ref;
   @override
   void initState() {
     super.initState();
     referenciaApagar();
+    mesMasCerca();
   }
 
   @override
@@ -55,7 +57,7 @@ class _RefViewState extends State<RefView> {
                   InkWell(
                       onTap: () {
                         Clipboard.setData(
-                                new ClipboardData(text: widget.ref != null ? widget.ref : referenciaApagar()))
+                                new ClipboardData(text: widget.ref != null ? widget.ref : mesMasCerca()))
                             .then((_) {
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                               content: Text(
@@ -72,7 +74,7 @@ class _RefViewState extends State<RefView> {
                             fontFamily: 'Roboto',
                             decoration: TextDecoration.underline),
                       ) : Text(
-                        '${referenciaApagar()}',
+                        '${mesMasCerca()}',
                         style: TextStyle(
                             fontSize: 35,
                             fontWeight: FontWeight.bold,
@@ -82,7 +84,7 @@ class _RefViewState extends State<RefView> {
                   InkWell(
                       onTap: () {
                         Clipboard.setData(
-                                new ClipboardData(text: referenciaApagar()))
+                                new ClipboardData(text: mesMasCerca()))
                             .then((_) {
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                               content: Text(
@@ -124,7 +126,7 @@ class _RefViewState extends State<RefView> {
   }
 
   referenciaApagar() {
-    String? ref;
+   
     for (int i = 0; i < widget.list!.length; i++) {
       //no hay referencia padre
       if (widget.refP!.isEmpty) {
@@ -250,6 +252,62 @@ class _RefViewState extends State<RefView> {
     );
 
     showDialog(context: context, builder: (_) => alert);
+  }
+
+  mesMasCerca() {
+    DateTime fechaActual = DateTime.now();
+
+    for (int i = 0; i < widget.list!.length; i++) {
+      if (widget.list![i].referenciaP == "0" ||
+          widget.list![i].referenciaP == null) {
+        if (widget.list![i].fechaPago != null) {
+          DateTime fechafinal = widget.list![i].fechaLimite!;
+          if (fechafinal.isAfter(fechaActual)) {
+            setState(() {
+              tipoReferencia = "Normal";
+            });
+            return widget.list![i].referencia;
+          } else {
+            setState(() {
+              tipoReferencia = "Normal";
+            });
+            return widget.list![i].referencia;
+          }
+        }
+      } else {
+        if (widget.list![i].fechaPago != null) {
+          DateTime fechaPago = widget.list![i].fechaLimite!;
+          if (fechaPago.isAfter(fechaActual)) {
+            setState(() {
+              tipoReferencia = "Agrupada";
+            });
+            return widget.list![i].referenciaP;
+          } else {
+            setState(() {
+              tipoReferencia = "Agrupada";
+            });
+            return widget.list![i].referenciaP;
+          }
+        } else {
+          if (widget.refP!.last.pago == 1) {
+            ref = 'Pagado';
+          } else {
+            if (widget.refP!.last.referenciaP != '0' ||
+                widget.refP!.last.referenciaP != null) {
+              setState(() {
+                tipoReferencia = "Pago Anual";
+              });
+              return widget.refP!.last.referenciaP;
+            } else {
+              setState(() {
+                tipoReferencia = "Agrupada";
+              });
+              return widget.list![i].referenciaP;
+            }
+          }
+        }
+      }
+    }
   }
 
 }

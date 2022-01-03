@@ -10,7 +10,8 @@ class Accounts {
     this.message,
     this.data,
     this.data2,
-    this.bandera
+    this.bandera,
+    this.pagoAnualR,
   });
 
   int? value;
@@ -18,6 +19,7 @@ class Accounts {
   List<Datum>? data;
   Data2? data2;
   String? bandera;
+  PagoAnualRestante? pagoAnualR;
 
   factory Accounts.fromJson(Map<String, dynamic> json) => Accounts(
         value: json["value"] == null ? null : json["value"],
@@ -26,7 +28,8 @@ class Accounts {
             ? null
             : List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
         data2: json["data2"] == null ? null : Data2.fromJson(json["data2"]),
-        bandera: json["bandera"] == null? null : json["bandera"]
+        bandera: json["bandera"] == null? null : json["bandera"],
+        pagoAnualR: json["pagoAnualORestante"] == null ? null : PagoAnualRestante.fromJson(json["pagoAnualORestante"])
       );
 
   Map<String, dynamic> toJson() => {
@@ -36,6 +39,8 @@ class Accounts {
             ? null
             : List<dynamic>.from(data!.map((x) => x.toJson())),
         "data2": data2 == null ? null : data2!.toJson(),
+        "bandera": bandera == null? null : bandera,
+        "pagoAnualORestante": pagoAnualR == null ? null : pagoAnualR!.toJson(),
       };
 }
 
@@ -190,4 +195,33 @@ class Data2 {
         "COMUNIDAD": comunidad == null ? null : comunidad,
         "CALLE": calle == null ? null : calle,
       };
+}
+
+class PagoAnualRestante{
+  String? mesesApagar;
+  dynamic cuota;
+  dynamic descuento;
+  int? totalApagar;
+
+  PagoAnualRestante({
+    this.mesesApagar,
+    this.cuota,
+    this.descuento,
+    this.totalApagar,
+  });
+
+  factory PagoAnualRestante.fromJson(Map<String, dynamic> json) => PagoAnualRestante(
+    mesesApagar: json["mesesAPagar"] == null ? null : json["mesesAPagar"],
+    cuota: json["cuota"] == null? null: json["cuota"],
+    descuento: json["descuento"] == null? null: json["descuento"],
+    totalApagar: json["totalAPagar"] == null? null : json["totalAPagar"]
+  );
+
+  Map<String, dynamic> toJson() => {
+    "mesesAPagar": mesesApagar == null ? null : mesesApagar,
+    "cuota": cuota == null ? null : cuota,
+    "descuento": descuento == null ? null : descuento,
+    "totalAPagar": totalApagar == null ?null : totalApagar,
+  };
+  
 }
