@@ -47,6 +47,7 @@ class Datum {
       this.mes,
       this.formaPago,
       this.fechaGeneracion,
+      this.pagoTardio,
       this.folio,
       this.referencia});
 
@@ -61,6 +62,7 @@ class Datum {
   String? referencia;
   String? folio;
   String? fechaGeneracion;
+  dynamic pagoTardio;
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
         idComu: json["ID_COMU"] == null ? null : json["ID_COMU"],
@@ -77,6 +79,7 @@ class Datum {
         folio: json["Folio"] == null ? null : json["Folio"],
         fechaGeneracion:
             json["FECHA_GENERACION"] == null ? null : json["FECHA_GENERACION"],
+        pagoTardio: json["PAGO_TARDIO"] == null ? null : json["PAGO_TARDIO"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -91,5 +94,6 @@ class Datum {
         "FormaPago": formaPago == null ? null : formaPago,
         "Folio": folio == null ? null : folio,
         "FECHA_GENERACION": fechaGeneracion == null ? null : fechaGeneracion,
+        "PAGO_TARDIO": pagoTardio == null ? null : pagoTardio,
       };
 }

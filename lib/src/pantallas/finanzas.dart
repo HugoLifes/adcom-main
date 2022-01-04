@@ -82,6 +82,7 @@ class _FinanzasState extends State<Finanzas> {
   List<Deudas> deudasReverse2 = [];
   bool error = false;
   PagoAnualR? pagoanualR;
+  bool esPendiente = false;
 
   /// El init state inicializa funciones cuando abre el boton mis pagos
   @override
@@ -717,18 +718,20 @@ class _FinanzasState extends State<Finanzas> {
                       for (int i = 0; i < value.data!.length; i++)
                         {
                           deudas.add(Deudas(
-                              id: value.data![i].idComu,
-                              idResidente: value.data![i].idResidente,
-                              montoCuota: value.data![i].montoCuota,
-                              montoPagoTardio: value.data![i].montoPagoTardio,
-                              totalAdeudo: value.data![i].totadeudo,
-                              idConcepto: value.data![i].idConcepto!.trimLeft(),
-                              mes: value.data![i].mes,
-                              referencia: value.data![i].referencia,
-                              noTiene: false,
-                              fechaGeneracion: value.data![i].fechaGeneracion,
-                              descripcion: value.data![i].formaPago,
-                              folio: value.data![i].folio))
+                            id: value.data![i].idComu,
+                            idResidente: value.data![i].idResidente,
+                            montoCuota: value.data![i].montoCuota,
+                            montoPagoTardio: value.data![i].montoPagoTardio,
+                            totalAdeudo: value.data![i].totadeudo,
+                            idConcepto: value.data![i].idConcepto!.trimLeft(),
+                            mes: value.data![i].mes,
+                            referencia: value.data![i].referencia,
+                            noTiene: false,
+                            fechaGeneracion: value.data![i].fechaGeneracion,
+                            descripcion: value.data![i].formaPago,
+                            folio: value.data![i].folio,
+                            pagoTardio: value.data![i].pagoTardio,
+                          ))
                         },
                       deudasReverse = deudas.reversed.toList()
                     }
@@ -773,7 +776,8 @@ class _FinanzasState extends State<Finanzas> {
                               noTiene: false,
                               descripcion: value.data![i].formaPago,
                               fechaGeneracion: value.data![i].fechaGeneracion,
-                              folio: value.data![i].folio)),
+                              folio: value.data![i].folio,
+                              pagoTardio: value.data![i].pagoTardio)),
                           deudasReverse2 = deudas2.reversed.toList()
                         }
                     }
@@ -915,6 +919,7 @@ class Deudas {
   bool? noTiene;
   String? folio;
   String? fechaGeneracion;
+  dynamic pagoTardio;
 
   Deudas(
       {this.id,
@@ -928,6 +933,7 @@ class Deudas {
       this.noTiene,
       this.referencia,
       this.folio,
+      this.pagoTardio,
       this.descripcion});
   Future<AdeudosJ?> getDeudas(int i) async {
     try {

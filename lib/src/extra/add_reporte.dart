@@ -237,10 +237,15 @@ class _AddReporteState extends State<AddReporte> {
                         padding: EdgeInsets.only(left: 10, top: 10),
                         child: RaisedButton(
                           color: Colors.green,
-                          child: Text(
-                            'Finalizar',
-                            style: TextStyle(color: Colors.white),
-                          ),
+                          child: images.isEmpty
+                              ? Text(
+                                  'Omitir y enviar',
+                                  style: TextStyle(color: Colors.white),
+                                )
+                              : Text(
+                                  'Finalizar',
+                                  style: TextStyle(color: Colors.white),
+                                ),
                           onPressed: onStepContinue,
                         ),
                       ),

@@ -360,68 +360,53 @@ class _PedirServicioState extends State<PedirServicio> {
                     shrinkWrap: true,
                     itemBuilder: (_, index) {
                       return InkWell(
-                        onTap: () {
-                          setState(() {
-                            selectindex = index;
-                            eleccion =
-                                widget.name![index].toString().toLowerCase();
-                            cantidadController.text = widget.precios![index];
-                          });
-
-                          if (eleccion == 'tanque 30') {
+                          onTap: () {
                             setState(() {
-                              tanqueLleno = true;
+                              selectindex = index;
+                              eleccion =
+                                  widget.name![index].toString().toLowerCase();
+                              cantidadController.text = widget.precios![index];
                             });
-                          } else if (eleccion == 'tanque 45') {
-                            setState(() {
-                              tanqueLleno = true;
-                            });
-                          } else if (eleccion == 'tanque estacionario' ||
-                              eleccion == 'estacionario') {
-                            setState(() {
-                              tanqueLleno = false;
-                            });
-                          } else {}
-                          print(eleccion);
-                          print(' precio ${cantidadController.text}');
-                        },
-                        child: widget.servicio!.idproveedor! > 20
-                            ? ListTile(
-                                title: Container(
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                            color: selectindex == index
-                                                ? Colors.red
-                                                : Colors.transparent,
-                                            width: 2.0)),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        Container(
-                                          width: 150,
-                                          height: 300,
-                                          child: PhotoView(
-                                              imageProvider: NetworkImage(
-                                                  widget.url![index],
-                                                  scale: 1.5)),
-                                        ),
-                                      ],
-                                    )),
-                              )
-                            : ListTile(
-                                title: Container(
-                                    width: 90,
-                                    height: 90,
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                            color: selectindex == index
-                                                ? Colors.red
-                                                : Colors.transparent,
-                                            width: 2.0)),
-                                    child: Image.network(widget.url![index])),
-                              ),
-                      );
+                            if (eleccion == 'tanque 30') {
+                              setState(() {
+                                tanqueLleno = true;
+                              });
+                            } else if (eleccion == 'tanque 45') {
+                              setState(() {
+                                tanqueLleno = true;
+                              });
+                            } else if (eleccion == 'tanque estacionario' ||
+                                eleccion == 'estacionario') {
+                              setState(() {
+                                tanqueLleno = false;
+                              });
+                            } else {}
+                            print('Seleccionado: $eleccion');
+                            print(' precio ${cantidadController.text}');
+                          },
+                          child: ListTile(
+                            title: Container(
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                        color: selectindex == index
+                                            ? Colors.red
+                                            : Colors.transparent,
+                                        width: 2.0)),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Container(
+                                      width: 195,
+                                      height: 310,
+                                      child: Image.network(
+                                        widget.url![index],
+                                        fit: BoxFit.fill,
+                                      ),
+                                    ),
+                                  ],
+                                )),
+                          ));
                     })));
 
       case 2:
@@ -439,62 +424,37 @@ class _PedirServicioState extends State<PedirServicio> {
                     shrinkWrap: true,
                     itemBuilder: (_, index) {
                       return InkWell(
-                        onTap: () {
-                          setState(() {
-                            selectindex = index;
-                            eleccion =
-                                widget.name![index].toString().toLowerCase();
-                            cantidadController.text = widget.precios![index];
-                          });
+                          onTap: () {
+                            setState(() {
+                              selectindex = index;
+                              eleccion =
+                                  widget.name![index].toString().toLowerCase();
+                              cantidadController.text = widget.precios![index];
+                            });
 
-                          if (eleccion == 'tanque 30') {
-                            setState(() {
-                              tanqueLleno = true;
-                            });
-                          } else if (eleccion == 'tanque 45') {
-                            setState(() {
-                              tanqueLleno = true;
-                            });
-                          } else if (eleccion == 'tanque estacionario' ||
-                              eleccion == 'estacionario') {
-                            setState(() {
-                              tanqueLleno = false;
-                            });
-                          } else {}
-                          print(eleccion);
-                        },
-                        child: widget.servicio!.idproveedor! > 20
-                            ? ListTile(
-                                title: Container(
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                            color: selectindex == index
-                                                ? Colors.red
-                                                : Colors.transparent,
-                                            width: 2.0)),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        PhotoView(
-                                            imageProvider: NetworkImage(
-                                                widget.url![index])),
-                                      ],
-                                    )),
-                              )
-                            : ListTile(
-                                title: Container(
-                                    width: 90,
-                                    height: 90,
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                            color: selectindex == index
-                                                ? Colors.red
-                                                : Colors.transparent,
-                                            width: 2.0)),
-                                    child: Image.network(widget.url![index])),
-                              ),
-                      );
+                            print('Seleccionado: $eleccion');
+                            print(' precio ${cantidadController.text}');
+                          },
+                          child: ListTile(
+                            title: Container(
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                        color: selectindex == index
+                                            ? Colors.red
+                                            : Colors.transparent,
+                                        width: 2.0)),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceAround,
+                                  children: [
+                                    Container(
+                                        width: 198,
+                                        height: 310,
+                                        child: Image.network(widget.url![index],
+                                            fit: BoxFit.fill)),
+                                  ],
+                                )),
+                          ));
                     })));
     }
   }
