@@ -20,7 +20,9 @@ class DetallesPago extends StatefulWidget {
   late List<DatosCuenta>? refp = [];
   bool? hayRefPadre;
   PagoAnualR? pagoAnualR;
-  DetallesPago({Key? key, this.list, this.refp, this.pagoAnualR,this.hayRefPadre}) : super(key: key);
+  DetallesPago(
+      {Key? key, this.list, this.refp, this.pagoAnualR, this.hayRefPadre})
+      : super(key: key);
 
   @override
   _DetallesPagoState createState() => _DetallesPagoState();
@@ -72,9 +74,9 @@ class _DetallesPagoState extends State<DetallesPago> {
       ),
       body: OrientationBuilder(
         builder: (BuildContext context, Orientation orientation) {
-          if(orientation == Orientation.portrait){
+          if (orientation == Orientation.portrait) {
             return mainMenu(size, size2, landScape: false);
-          }else{
+          } else {
             return mainMenu(size, size2, landScape: true);
           }
         },
@@ -82,7 +84,7 @@ class _DetallesPagoState extends State<DetallesPago> {
     );
   }
 
-mainMenu(Size size, double size2, {landScape = false}){
+  mainMenu(Size size, double size2, {landScape = false}) {
     return LoaderOverlay(
       child: Container(
         child: Column(
@@ -122,7 +124,8 @@ mainMenu(Size size, double size2, {landScape = false}){
                   Container(
                     padding: EdgeInsets.only(right: size.width / 9),
                     child: Icon(Glyphicon.check2_square,
-                        size: landScape == true ? 50 : size.width / 6, color: Colors.white),
+                        size: landScape == true ? 50 : size.width / 6,
+                        color: Colors.white),
                   )
                 ],
               ),
@@ -134,7 +137,7 @@ mainMenu(Size size, double size2, {landScape = false}){
               'Seleccione su opcion de pago',
               style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
             ),
-         SizedBox(
+            SizedBox(
               height: 10,
             ),
             Flexible(
@@ -173,18 +176,20 @@ mainMenu(Size size, double size2, {landScape = false}){
                   checkColor: Colors.white,
                 ),
               ),
-            ), 
+            ),
             SizedBox(
               height: 20,
             ),
             Container(
                 padding: EdgeInsets.only(left: 15),
                 alignment: Alignment.centerLeft,
-                child: checkedAll == true ? Text('Promociones', 
-                    style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.w600)): Text('Pago individual',
-                    style:
-                        TextStyle(fontSize: 20, fontWeight: FontWeight.w600))),
+                child: checkedAll == true
+                    ? Text('Promociones',
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w600))
+                    : Text('Pago individual',
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w600))),
             Divider(
               color: Colors.grey,
             ),
@@ -192,34 +197,37 @@ mainMenu(Size size, double size2, {landScape = false}){
             Divider(
               color: Colors.grey,
             ),
-          
             pa == false
                 ? Row(
                     children: [
                       Container(
-                          padding: EdgeInsets.only(left: size.width/ 2.5, top: 0),
+                          padding:
+                              EdgeInsets.only(left: size.width / 2.5, top: 0),
                           child: Row(
                             children: [
-                              checkedAll == true ? Text(''): Text(
-                                'Total',
-                                style: TextStyle(
-                                    fontSize: 25, fontWeight: FontWeight.bold),
-                              ),
+                              checkedAll == true
+                                  ? Text('')
+                                  : Text(
+                                      'Total',
+                                      style: TextStyle(
+                                          fontSize: 25,
+                                          fontWeight: FontWeight.bold),
+                                    ),
                               SizedBox(
                                 width: size.width / 40,
                               ),
                               checkedAll == true
-                                  ?   Text('')
+                                  ? Text('')
                                   : Container(
-                                    padding: EdgeInsets.only(left: 0),
-                                    child: Text(
-                                      ///contador
-                                      '\$${numberFormat.format(contador)}.00 MXN',
-                                      style: TextStyle(fontSize: 19),
+                                      padding: EdgeInsets.only(left: 0),
+                                      child: Text(
+                                        ///contador
+                                        '\$${numberFormat.format(contador)}.00 MXN',
+                                        style: TextStyle(fontSize: 19),
+                                      ),
                                     ),
-                                  ),
 
-                                  /* Text(
+                              /* Text(
                                       '${numberFormat.format(contadorTotal)} MXN',
                                       style: TextStyle(fontSize: 19)) */
                               SizedBox(
@@ -232,8 +240,6 @@ mainMenu(Size size, double size2, {landScape = false}){
                 : Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-
-                
                       SizedBox(
                           width: size.width / 1.5,
                           child: Text(
@@ -243,7 +249,7 @@ mainMenu(Size size, double size2, {landScape = false}){
                           )),
                       SizedBox(
                         height: size.height / 10,
-                      ) 
+                      )
                     ],
                   ),
             showButton(),
@@ -292,8 +298,6 @@ mainMenu(Size size, double size2, {landScape = false}){
             backgroundColor: Colors.red,
             textColor: Colors.white,
             fontSize: 16.0);
-
-        
       } else {
         print('aqui2:${e.response!.data.toString()}');
         Fluttertoast.showToast(
@@ -304,7 +308,6 @@ mainMenu(Size size, double size2, {landScape = false}){
             backgroundColor: Colors.red,
             textColor: Colors.white,
             fontSize: 16.0);
-        
       }
     }
   }
@@ -322,9 +325,9 @@ mainMenu(Size size, double size2, {landScape = false}){
                   } else {
                     context.loaderOverlay.show();
                     sendingData().then((value) => {
-                      context.loaderOverlay.hide(),
-                      alerta(value!.referenciaP!),
-                    });
+                          context.loaderOverlay.hide(),
+                          alerta(value!.referenciaP!),
+                        });
                   }
                 },
                 gradient: LinearGradient(colors: [
@@ -450,47 +453,50 @@ mainMenu(Size size, double size2, {landScape = false}){
     return (checkedAll) == true
         ? Column(
             children: [
-                  Container(
-                    padding: EdgeInsets.only(left: 10, right: 20),
-                    alignment: Alignment.topLeft,
-                  child:Row(
+              Container(
+                padding: EdgeInsets.only(left: 10, right: 20),
+                alignment: Alignment.topLeft,
+                child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         'Meses a pagar',
-                        style: TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, fontSize: 20),
                       ),
                       SizedBox(
-                        width: size*0.01,
+                        width: size * 0.01,
                       ),
                       Text(
                         '${widget.pagoAnualR!.mesesApagar}',
-                        style: TextStyle(fontWeight: FontWeight.w400, fontSize:19),
+                        style: TextStyle(
+                            fontWeight: FontWeight.w400, fontSize: 19),
                       )
-                    ]
-                  ),
-                   ),
-                   Container(
-                    padding: EdgeInsets.only(left: 10, right: 20),
-                    alignment: Alignment.topLeft,
-                  child:Row(
+                    ]),
+              ),
+              Container(
+                padding: EdgeInsets.only(left: 10, right: 20),
+                alignment: Alignment.topLeft,
+                child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         'Cuota:',
-                        style: TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, fontSize: 20),
                       ),
                       SizedBox(
-                        width: size*0.40,
+                        width: size * 0.40,
                       ),
                       Text(
-                        '\$' + '${numberFormat.format(widget.pagoAnualR!.cuota!)}.00',
-                        style: TextStyle(fontWeight: FontWeight.w400, fontSize:20),
+                        '\$' +
+                            '${numberFormat.format(widget.pagoAnualR!.cuota!)}.00',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w400, fontSize: 20),
                       )
-                    ]
-                  ),
-                   ),
-                   /*  Container(
+                    ]),
+              ),
+              /*  Container(
                     padding: EdgeInsets.only(left: 10, right: 20),
                     alignment: Alignment.topLeft,
                   child:Row(
@@ -510,162 +516,169 @@ mainMenu(Size size, double size2, {landScape = false}){
                     ]
                   ),
                    ), */
-                     Container(
-                    padding: EdgeInsets.only(left: 10, right: 20),
-                    alignment: Alignment.topLeft,
-                  child:Row(
+              Container(
+                padding: EdgeInsets.only(left: 10, right: 20),
+                alignment: Alignment.topLeft,
+                child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         'Descuento:',
-                        style: TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, fontSize: 20),
                       ),
                       SizedBox(
-                        width: size*0.27,
+                        width: size * 0.27,
                       ),
                       Text(
-                        '\$' + '${numberFormat.format(double.parse(widget.pagoAnualR!.descuento))}.00',
-                        style: TextStyle(fontWeight: FontWeight.w400, fontSize:20),
+                        '\$' +
+                            '${numberFormat.format(double.parse(widget.pagoAnualR!.descuento))}.00',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w400, fontSize: 20),
                       )
-                    ]
-                  ),
-                   ),
-
-                     Container(
-                    padding: EdgeInsets.only(left: 10, right: 20),
-                    alignment: Alignment.topLeft,
-                  child:Row(
+                    ]),
+              ),
+              Container(
+                padding: EdgeInsets.only(left: 10, right: 20),
+                alignment: Alignment.topLeft,
+                child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         'Total a pagar:',
-                        style: TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, fontSize: 20),
                       ),
                       SizedBox(
-                        width: size*0.24,
+                        width: size * 0.24,
                       ),
                       Text(
                         '\$${numberFormat.format(widget.pagoAnualR!.totalApagar)}.00',
-                        style: TextStyle(fontWeight: FontWeight.w400, fontSize:20),
+                        style: TextStyle(
+                            fontWeight: FontWeight.w400, fontSize: 20),
                       )
-                    ]
-                  ),
-                   ),
-                  
+                    ]),
+              ),
             ],
           )
         : Flexible(
             flex: 3,
-            child: mesFormat.isNotEmpty ? GridView.builder(
-                padding: EdgeInsets.only(left: 10, right: 4),
-                itemCount: mesFormat.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 1,
-                  childAspectRatio: 4.8,
-                  crossAxisSpacing: 22,
-                  mainAxisSpacing: 15,
-                ),
-                itemBuilder: (_, int data) {
-                  return Container(
-                    decoration: BoxDecoration(
-                        color: pa == true ? Colors.grey[350] : Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                              color: Colors.grey,
-                              blurRadius: 7,
-                              offset: Offset(0, 5))
-                        ]),
-                    child: CheckboxListTile(
-                      value: check.contains(data),
-                      onChanged: (bool? v) {
-                        HapticFeedback.lightImpact();
-                        if (pa == true) {
-                        } else {
-                          if (checkedAll == false) {
-                            if (v!) {
-                              setState(() {
-                                ///contadors que va sumando el adeudo
-                                contador += debt[data];
-
-                                idAdeudos.add(widget.list![data].idAdeudo!);
-
-                                ///funcion que los añade a una lista de adeudos
-                                check.add(data);
-                              });
+            child: mesFormat.isNotEmpty
+                ? GridView.builder(
+                    padding: EdgeInsets.only(left: 10, right: 4),
+                    itemCount: mesFormat.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 1,
+                      childAspectRatio: 4.8,
+                      crossAxisSpacing: 22,
+                      mainAxisSpacing: 15,
+                    ),
+                    itemBuilder: (_, int data) {
+                      return Container(
+                        decoration: BoxDecoration(
+                            color: pa == true ? Colors.grey[350] : Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.grey,
+                                  blurRadius: 7,
+                                  offset: Offset(0, 5))
+                            ]),
+                        child: CheckboxListTile(
+                          value: check.contains(data),
+                          onChanged: (bool? v) {
+                            HapticFeedback.lightImpact();
+                            if (pa == true) {
                             } else {
-                              setState(() {
-                                ///hace lo opuesto a añadir y sumar
-                                contador -= debt[data];
-                                check.remove(data);
-                              });
-                            }
+                              if (checkedAll == false) {
+                                if (v!) {
+                                  setState(() {
+                                    ///contadors que va sumando el adeudo
+                                    contador += debt[data];
 
-                            ///si la lista contiene datos muestra el boton
-                            if (check.contains(data)) {
-                              setState(() {
-                                checked = v;
-                                showButton();
-                              });
-                            } else {
-                              if(check.length == 0){
-                                setState((){
-                                  checked = v;
-                                });
+                                    idAdeudos.add(widget.list![data].idAdeudo!);
+
+                                    ///funcion que los añade a una lista de adeudos
+                                    check.add(data);
+                                  });
+                                } else {
+                                  setState(() {
+                                    ///hace lo opuesto a añadir y sumar
+                                    contador -= debt[data];
+                                    check.remove(data);
+                                  });
+                                }
+
+                                ///si la lista contiene datos muestra el boton
+                                if (check.contains(data)) {
+                                  setState(() {
+                                    checked = v;
+                                    showButton();
+                                  });
+                                } else {
+                                  if (check.length == 0) {
+                                    setState(() {
+                                      checked = v;
+                                    });
+                                  }
+                                }
+                              } else {
+                                checked = false;
                               }
                             }
-                          } else {
-                            checked = false;
-                          }
-                        }
-                      },
-                      controlAffinity: ListTileControlAffinity.platform,
-                      activeColor: Colors.lightGreen[700],
-                      checkColor: Colors.black,
-                      title: Container(
-                        padding: EdgeInsets.only(
-                            top: 10.0, bottom: 20.0, left: 20.0, right: 20.0),
-                        child: Column(
-                          children: <Widget>[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          },
+                          controlAffinity: ListTileControlAffinity.platform,
+                          activeColor: Colors.lightGreen[700],
+                          checkColor: Colors.black,
+                          title: Container(
+                            padding: EdgeInsets.only(
+                                top: 10.0,
+                                bottom: 20.0,
+                                left: 20.0,
+                                right: 20.0),
+                            child: Column(
                               children: <Widget>[
-                                Text('Concepto',
-                                    style: TextStyle(
-                                        fontSize: 17.0,
-                                        fontWeight: FontWeight.bold)),
-                                Text('Monto',
-                                    style: TextStyle(
-                                        fontSize: 17.0,
-                                        fontWeight: FontWeight.bold))
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Text('Concepto',
+                                        style: TextStyle(
+                                            fontSize: 17.0,
+                                            fontWeight: FontWeight.bold)),
+                                    Text('Monto',
+                                        style: TextStyle(
+                                            fontSize: 17.0,
+                                            fontWeight: FontWeight.bold))
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 10.0,
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Text(
+                                        '${conceptos[data]}: ${mesFormat[data]}',
+                                        style: TextStyle(
+                                            color: Colors.grey[800],
+                                            fontSize: 14.0)),
+                                    Text(
+                                        '${numberFormat.format(debt[data])}.00',
+                                        style: TextStyle(
+                                            color: Colors.grey[800],
+                                            fontSize: 14.0,
+                                            fontWeight: FontWeight.w500))
+                                  ],
+                                ),
                               ],
                             ),
-                            SizedBox(
-                              height: 10.0,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                Text('${conceptos[data]}: ${mesFormat[data]}',
-                                    style: TextStyle(
-                                        color: Colors.grey[800],
-                                        fontSize: 14.0)),
-                                Text('${numberFormat.format(debt[data])}.00',
-                                    style: TextStyle(
-                                        color: Colors.grey[800],
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.w500
-                                        
-                                        
-                                        ))
-                              ],
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
-                  );
-                }): Container());
+                      );
+                    })
+                : Container());
   }
 
   sacarConcepto() {
@@ -741,9 +754,15 @@ mainMenu(Size size, double size2, {landScape = false}){
   alerta(String text) {
     Widget okButton = TextButton(
         onPressed: () {
-          Navigator.of(context)..pop()..push(MaterialPageRoute(
-            builder: (_) => RefView(list: widget.refp, refP: widget.list, ref:text)
-          ));
+          Navigator.of(context)
+            ..pop()
+            ..push(MaterialPageRoute(
+                builder: (_) => RefView(
+                      list: widget.refp,
+                      refP: widget.list,
+                      ref: text,
+                      express: true,
+                    )));
           //sendingData();
         },
         child: Text(
@@ -781,14 +800,17 @@ mainMenu(Size size, double size2, {landScape = false}){
       ),
     );
 
-    showDialog(context: context, builder: (_) => alert, barrierDismissible: false);
+    showDialog(
+        context: context, builder: (_) => alert, barrierDismissible: false);
   }
 
   ///alerta  que sale cuando se ha generado una referencia de pago y se intenta otra
   alerta2() {
     Widget okButton = TextButton(
         onPressed: () {
-          Navigator.of(context)..pop()..pop();
+          Navigator.of(context)
+            ..pop()
+            ..pop();
           //sendingData();
         },
         child: Text(
@@ -826,7 +848,8 @@ mainMenu(Size size, double size2, {landScape = false}){
       ),
     );
 
-    showDialog(context: context, builder: (_) => alert, barrierDismissible: false);
+    showDialog(
+        context: context, builder: (_) => alert, barrierDismissible: false);
   }
 
   sacarMesDeAtrazo() async {

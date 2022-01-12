@@ -7,6 +7,7 @@ import 'package:gradient_widgets/gradient_widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:adcom/json/jsonAdeudos.dart';
 import 'package:adcom/json/jsonFinanzas.dart';
+
 // ignore: must_be_immutable
 class RefView extends StatefulWidget {
   late List<DatosCuenta>? list = [];
@@ -14,7 +15,14 @@ class RefView extends StatefulWidget {
   PagoAnualR? pagoAnualR;
   final ref;
   bool express = false;
-  RefView({Key? key, this.list, this.refP, this.ref, this.pagoAnualR, this.express = false}) : super(key: key);
+  RefView(
+      {Key? key,
+      this.list,
+      this.refP,
+      this.ref,
+      this.pagoAnualR,
+      this.express = false})
+      : super(key: key);
   @override
   _RefViewState createState() => _RefViewState();
 }
@@ -30,12 +38,11 @@ class _RefViewState extends State<RefView> {
   @override
   void initState() {
     super.initState();
-    sacarReferencia().then((value)  {
-      setState((){
+    sacarReferencia().then((value) {
+      setState(() {
         terminado = true;
       });
     });
-    
   }
 
   @override
@@ -44,98 +51,113 @@ class _RefViewState extends State<RefView> {
       appBar: AppBar(
         backgroundColor: Colors.lightGreen[700],
         title: Text('Tu Referencia de Pago'),
-        
+        leading: widget.express == true
+            ? BackButton(
+                onPressed: () {
+                  Navigator.of(context)
+                      .pushNamedAndRemoveUntil('/screen3', (route) => false);
+                },
+              )
+            : BackButton(),
       ),
       body: SafeArea(
-        child: terminado == false ? Center(child: CircularProgressIndicator()) :  Container(
-          //margin: EdgeInsets.all(16.0),
-          padding: EdgeInsets.only(top: 10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                'Tipo Ref: $tipoReferencia',
-                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(
-                height: 25,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  InkWell(
-                      onTap: () {
-                        Clipboard.setData(
-                                new ClipboardData(text: widget.ref != null ? widget.ref : mesMasCerca()))
-                            .then((_) {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text(
-                            "La referencia se ha copiado exitosamente!",
-                            style: TextStyle(fontSize: 20),
-                          )));
-                        });
-                      },
-                      child: widget.ref != null ? Text(
-                        '${widget.ref}',
-                        style: TextStyle(
-                            fontSize: 35,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Roboto',
-                            decoration: TextDecoration.underline),
-                      ) : Text(
-                        '${mesMasCerca()}',
-                        style: TextStyle(
-                            fontSize: 35,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Roboto',
-                            decoration: TextDecoration.underline),
-                      )),
-                  InkWell(
-                      onTap: () {
-                        Clipboard.setData(
-                                new ClipboardData(text: mesMasCerca()))
-                            .then((_) {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text(
-                            "La referencia se ha copiado exitosamente!",
-                            style: TextStyle(fontSize: 20),
-                          )));
-                        });
-                      },
-                      child: Icon(Icons.copy))
-                ],
-              ),
-              SizedBox(
-                height: 30,
-              ),
-              Text(
-                'IMPORTANTE!',
-                style: TextStyle(
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.red),
-              ),
-              SizedBox(
-                height: 30,
-              ),
-              Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Text(
-                  'Esta es tu referencia para realizar tu pago correctamente. Cualquier duda, favor de contactar a su administrador. Gracias!',
-                  textAlign: TextAlign.justify,
-                  style: TextStyle(fontSize: 25),
+        child: terminado == false
+            ? Center(child: CircularProgressIndicator())
+            : Container(
+                //margin: EdgeInsets.all(16.0),
+                padding: EdgeInsets.only(top: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Tipo Ref: $tipoReferencia',
+                      style:
+                          TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(
+                      height: 25,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        InkWell(
+                            onTap: () {
+                              Clipboard.setData(new ClipboardData(
+                                      text: widget.ref != null
+                                          ? widget.ref
+                                          : mesMasCerca()))
+                                  .then((_) {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(SnackBar(
+                                        content: Text(
+                                  "La referencia se ha copiado exitosamente!",
+                                  style: TextStyle(fontSize: 20),
+                                )));
+                              });
+                            },
+                            child: widget.ref != null
+                                ? Text(
+                                    '${widget.ref}',
+                                    style: TextStyle(
+                                        fontSize: 35,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'Roboto',
+                                        decoration: TextDecoration.underline),
+                                  )
+                                : Text(
+                                    '${mesMasCerca()}',
+                                    style: TextStyle(
+                                        fontSize: 35,
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'Roboto',
+                                        decoration: TextDecoration.underline),
+                                  )),
+                        InkWell(
+                            onTap: () {
+                              Clipboard.setData(
+                                      new ClipboardData(text: mesMasCerca()))
+                                  .then((_) {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(SnackBar(
+                                        content: Text(
+                                  "La referencia se ha copiado exitosamente!",
+                                  style: TextStyle(fontSize: 20),
+                                )));
+                              });
+                            },
+                            child: Icon(Icons.copy))
+                      ],
+                    ),
+                    SizedBox(
+                      height: 30,
+                    ),
+                    Text(
+                      'IMPORTANTE!',
+                      style: TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red),
+                    ),
+                    SizedBox(
+                      height: 30,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Text(
+                        'Esta es tu referencia para realizar tu pago correctamente. Cualquier duda, favor de contactar a su administrador. Gracias!',
+                        textAlign: TextAlign.justify,
+                        style: TextStyle(fontSize: 25),
+                      ),
+                    ),
+                    payButton()
+                  ],
                 ),
               ),
-              payButton()
-            ],
-          ),
-        ),
       ),
     );
   }
 
   referenciaApagar() {
-   
     for (int i = 0; i < widget.list!.length; i++) {
       //no hay referencia padre
       if (widget.refP!.isEmpty) {
@@ -192,7 +214,7 @@ class _RefViewState extends State<RefView> {
     return ref;
   }
 
-   payButton() {
+  payButton() {
     return Container(
       padding: EdgeInsets.only(left: 10, right: 10, top: 20),
       width: 300,
@@ -263,84 +285,83 @@ class _RefViewState extends State<RefView> {
     showDialog(context: context, builder: (_) => alert);
   }
 
-
-  sacarReferencia()async{
+  sacarReferencia() async {
     cuentas = await getAdeudos().catchError((e) {
       alerta6();
     });
-    for(int i = 0; i < cuentas!.data!.length; i++){
+    for (int i = 0; i < cuentas!.data!.length; i++) {
       if (cuentas!.data![i].idConcepto == "PA        ") {
-          setState(() {
-            hayRefPadre = true;
-          });
+        setState(() {
+          hayRefPadre = true;
+        });
 
-          refPadre.add(new DatosCuenta(
-              pago: cuentas!.data![i].pago,
-              referenciaP: cuentas!.data![i].referencaiP!,
-              idConcepto: cuentas!.data![i].idConcepto!));
-        }  else{
-      if (cuentas!.data![i].idConcepto == "ACCTEL    ") {
-          } else {
-            referencias.add(new DatosCuenta(
-                referencia: cuentas!.data![i].referencia,
-                fechaGenerada: cuentas!.data![i].fechaGeneracion!,
-                fechaLimite: cuentas!.data![i].fechaLimite == null
-                    ? DateTime.now()
-                    : cuentas!.data![i].fechaLimite,
-                fechaPago: cuentas!.data![i].fechaPago,
-                referenciaP: cuentas!.data![i].referencaiP));
-          }
+        refPadre.add(new DatosCuenta(
+            pago: cuentas!.data![i].pago,
+            referenciaP: cuentas!.data![i].referencaiP!,
+            idConcepto: cuentas!.data![i].idConcepto!));
+      } else {
+        if (cuentas!.data![i].idConcepto == "ACCTEL    ") {
+        } else {
+          referencias.add(new DatosCuenta(
+              referencia: cuentas!.data![i].referencia,
+              fechaGenerada: cuentas!.data![i].fechaGeneracion!,
+              fechaLimite: cuentas!.data![i].fechaLimite == null
+                  ? DateTime.now()
+                  : cuentas!.data![i].fechaLimite,
+              fechaPago: cuentas!.data![i].fechaPago,
+              referenciaP: cuentas!.data![i].referencaiP));
+        }
+      }
     }
-  }
 
     mesMasCerca();
   }
 
   mesMasCerca() {
     DateTime fechaActual = DateTime.now();
-    if(hayRefPadre == true){
-      setState((){
+    if (hayRefPadre == true) {
+      setState(() {
         tipoReferencia = "Pago Anual";
       });
       return refPadre.last.referenciaP!;
-    }else{
+    } else {
       for (int i = 0; i < widget.list!.length; i++) {
-      if (widget.list![i].referenciaP == "0" ||
-          widget.list![i].referenciaP == null) {
-        if (widget.list![i].fechaPago != null) {
-          DateTime fechafinal = widget.list![i].fechaLimite!;
-          if (fechafinal.isAfter(fechaActual)) {
-            setState(() {
-              tipoReferencia = "Normal";
-            });
-            return widget.list![i].referencia;
-          } else {
-            setState(() {
-              tipoReferencia = "Normal";
-            });
-            return widget.list![i].referencia;
+        if (widget.list![i].referenciaP == "0" ||
+            widget.list![i].referenciaP == null) {
+          if (widget.list![i].fechaPago != null) {
+            DateTime fechafinal = widget.list![i].fechaLimite!;
+            if (fechafinal.isAfter(fechaActual)) {
+              setState(() {
+                tipoReferencia = "Normal";
+              });
+              return widget.list![i].referencia;
+            } else {
+              setState(() {
+                tipoReferencia = "Normal";
+              });
+              return widget.list![i].referencia;
+            }
+          }
+        } else {
+          if (widget.list![i].fechaPago != null) {
+            DateTime fechaPago = widget.list![i].fechaLimite!;
+            if (fechaPago.isAfter(fechaActual)) {
+              setState(() {
+                tipoReferencia = "Agrupada";
+              });
+              return widget.list![i].referenciaP;
+            } else {
+              setState(() {
+                tipoReferencia = "Agrupada";
+              });
+              return widget.list![i].referenciaP;
+            }
           }
         }
-      } else {
-        if (widget.list![i].fechaPago != null) {
-          DateTime fechaPago = widget.list![i].fechaLimite!;
-          if (fechaPago.isAfter(fechaActual)) {
-            setState(() {
-              tipoReferencia = "Agrupada";
-            });
-            return widget.list![i].referenciaP;
-          } else {
-            setState(() {
-              tipoReferencia = "Agrupada";
-            });
-            return widget.list![i].referenciaP;
-          }
-        } 
       }
     }
-    }
-    
   }
+
   alerta6() {
     Widget okButton = TextButton(
         onPressed: () {
@@ -352,7 +373,9 @@ class _RefViewState extends State<RefView> {
         ));
     Widget backButton = TextButton(
         onPressed: () {
-          Navigator.of(context)..pop()..pop();
+          Navigator.of(context)
+            ..pop()
+            ..pop();
         },
         child: Text(
           'Regresar',
@@ -384,9 +407,9 @@ class _RefViewState extends State<RefView> {
         ),
       ),
     );
-    if(mounted){
-      showDialog(context: context, builder: (_) => alert, barrierDismissible: false);
+    if (mounted) {
+      showDialog(
+          context: context, builder: (_) => alert, barrierDismissible: false);
     }
-    
   }
 }
