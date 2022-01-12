@@ -844,60 +844,60 @@ class _DetallesPagoState extends State<DetallesPago> {
   sacarMesDeAtrazo() async {
     int? mesesAtrazo;
     String? mes;
-
+    int? year;
     for (int i = 0; i < widget.list!.length; i++) {
       if (widget.list![i].pago == 1) {
       } else {
         mesesAtrazo = widget.list![i].fechaGenerada!.month;
-
+        year = widget.list![i].fechaGenerada!.year;
         switch (mesesAtrazo) {
           case 1:
-            mes = "Enero";
+            mes = "Enero $year";
             mesFormat.add(mes);
             break;
           case 2:
-            mes = "Febrero";
+            mes = "Febrero $year";
             mesFormat.add(mes);
             break;
           case 3:
-            mes = "Marzo";
+            mes = "Marzo $year";
             mesFormat.add(mes);
             break;
           case 4:
-            mes = "Abril";
+            mes = "Abril $year";
             mesFormat.add(mes);
             break;
           case 5:
-            mes = "Mayo";
+            mes = "Mayo $year";
             mesFormat.add(mes);
             break;
 
           case 6:
-            mes = "Junio";
+            mes = "Junio $year";
             mesFormat.add(mes);
             break;
           case 7:
-            mes = "Julio";
+            mes = "Julio $year";
             mesFormat.add(mes);
             break;
           case 8:
-            mes = "Agosto";
+            mes = "Agosto $year";
             mesFormat.add(mes);
             break;
           case 9:
-            mes = "Septiembre";
+            mes = "Septiembre $year";
             mesFormat.add(mes);
             break;
           case 10:
-            mes = "Octubre";
+            mes = "Octubre $year";
             mesFormat.add(mes);
             break;
           case 11:
-            mes = "Noviembre";
+            mes = "Noviembre $year";
             mesFormat.add(mes);
             break;
           case 12:
-            mes = "Diciembre";
+            mes = "Diciembre $year";
             mesFormat.add(mes);
             break;
         }
