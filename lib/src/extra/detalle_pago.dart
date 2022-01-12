@@ -484,7 +484,7 @@ mainMenu(Size size, double size2, {landScape = false}){
                         width: size*0.40,
                       ),
                       Text(
-                        '\$' + '${widget.pagoAnualR!.cuota!.toString()}.00',
+                        '\$' + '${numberFormat.format(widget.pagoAnualR!.cuota!)}.00',
                         style: TextStyle(fontWeight: FontWeight.w400, fontSize:20),
                       )
                     ]
@@ -524,7 +524,7 @@ mainMenu(Size size, double size2, {landScape = false}){
                         width: size*0.27,
                       ),
                       Text(
-                        '\$' + '${widget.pagoAnualR!.descuento}.00',
+                        '\$' + '${numberFormat.format(double.parse(widget.pagoAnualR!.descuento))}.00',
                         style: TextStyle(fontWeight: FontWeight.w400, fontSize:20),
                       )
                     ]
@@ -545,7 +545,7 @@ mainMenu(Size size, double size2, {landScape = false}){
                         width: size*0.24,
                       ),
                       Text(
-                        '\$${widget.pagoAnualR!.totalApagar!.toStringAsFixed(2)}',
+                        '\$${numberFormat.format(widget.pagoAnualR!.totalApagar)}.00',
                         style: TextStyle(fontWeight: FontWeight.w400, fontSize:20),
                       )
                     ]
@@ -557,7 +557,7 @@ mainMenu(Size size, double size2, {landScape = false}){
         : Flexible(
             flex: 3,
             child: mesFormat.isNotEmpty ? GridView.builder(
-                padding: EdgeInsets.only(left: 10, right: 10),
+                padding: EdgeInsets.only(left: 10, right: 4),
                 itemCount: mesFormat.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 1,
@@ -653,7 +653,11 @@ mainMenu(Size size, double size2, {landScape = false}){
                                 Text('${numberFormat.format(debt[data])}.00',
                                     style: TextStyle(
                                         color: Colors.grey[800],
-                                        fontSize: 14.0))
+                                        fontSize: 14.0,
+                                        fontWeight: FontWeight.w500
+                                        
+                                        
+                                        ))
                               ],
                             ),
                           ],
@@ -755,7 +759,7 @@ mainMenu(Size size, double size2, {landScape = false}){
           style: TextStyle(color: Colors.lightGreen[700]),
         ));
     AlertDialog alert = AlertDialog(
-      actions: [okButton, backButton],
+      actions: [okButton],
       title: Text(
         '¡Atención!',
         style: TextStyle(
@@ -769,7 +773,7 @@ mainMenu(Size size, double size2, {landScape = false}){
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Su referencia ha sido generada con exito!, Actualice y revise el apartado de referencias en +',
+              'Su referencia ha sido generada con exito!',
               style: TextStyle(fontSize: 18),
             )
           ],

@@ -44,6 +44,7 @@ class Datum {
     this.telGuardia,
     this.idTipoProveedor,
     this.diaAtencion,
+    this.activo,
   });
 
   int? idProveedor;
@@ -55,6 +56,7 @@ class Datum {
   String? telGuardia;
   int? idTipoProveedor;
   String? diaAtencion;
+  dynamic activo;
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
         idProveedor: json["ID_PROVEEDOR"] == null ? null : json["ID_PROVEEDOR"],
@@ -70,6 +72,7 @@ class Datum {
             ? null
             : json["ID_TIPO_PROVEEDOR"],
         diaAtencion: json["DIA_ATENCION"] == null ? null : json["DIA_ATENCION"],
+        activo: json["ACTIVO"] == null ? null : json["ACTIVO"]
       );
 
   Map<String, dynamic> toJson() => {
@@ -82,5 +85,6 @@ class Datum {
         "TEL_GUARDIA": telGuardia == null ? null : telGuardia,
         "ID_TIPO_PROVEEDOR": idTipoProveedor == null ? null : idTipoProveedor,
         "DIA_ATENCION": diaAtencion == null ? null : diaAtencion,
+        "ACTIVO": activo == null ? null : activo
       };
 }

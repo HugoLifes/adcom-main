@@ -118,7 +118,11 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
                           builder: (_) => RefView(
                               list: widget.newList, refP: widget.refP)));
                     },
-                    child: Text('Ver referencia',style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 15)),
+                    child: Text('Ver referencia',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: 15)),
                     style: OutlinedButton.styleFrom(
                         side:
                             BorderSide(width: 1.0, color: Colors.transparent)),
@@ -170,7 +174,9 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
                     HapticFeedback.lightImpact();
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (_) => DetallesPago(
-                            list: widget.newList!, refp: widget.refP, pagoAnualR:widget.pagoAnualR)));
+                            list: widget.newList!,
+                            refp: widget.refP,
+                            pagoAnualR: widget.pagoAnualR)));
                   },
                   child: Text('Detalles',
                       textAlign: TextAlign.center,
@@ -184,6 +190,10 @@ class _VistaTarjetaState extends State<VistaTarjeta> {
         ),
       ),
     );
+  }
+
+  callback() async {
+    setState(() {});
   }
 
   void _showModalSheet() {

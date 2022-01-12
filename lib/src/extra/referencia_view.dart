@@ -5,26 +5,37 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gradient_widgets/gradient_widgets.dart';
 import 'package:provider/provider.dart';
-
+import 'package:adcom/json/jsonAdeudos.dart';
+import 'package:adcom/json/jsonFinanzas.dart';
 // ignore: must_be_immutable
 class RefView extends StatefulWidget {
   late List<DatosCuenta>? list = [];
   late List<DatosCuenta>? refP = [];
   PagoAnualR? pagoAnualR;
   final ref;
-  RefView({Key? key, this.list, this.refP, this.ref, this.pagoAnualR}) : super(key: key);
+  bool express = false;
+  RefView({Key? key, this.list, this.refP, this.ref, this.pagoAnualR, this.express = false}) : super(key: key);
   @override
   _RefViewState createState() => _RefViewState();
 }
 
 class _RefViewState extends State<RefView> {
   String? tipoReferencia;
-   String? ref;
+  String? ref;
+  Accounts? cuentas;
+  List<DatosCuenta> refPadre = [];
+  List<DatosCuenta> referencias = [];
+  bool hayRefPadre = false;
+  bool terminado = false;
   @override
   void initState() {
     super.initState();
-    referenciaApagar();
-    mesMasCerca();
+    sacarReferencia().then((value)  {
+      setState((){
+        terminado = true;
+      });
+    });
+    
   }
 
   @override
@@ -33,18 +44,16 @@ class _RefViewState extends State<RefView> {
       appBar: AppBar(
         backgroundColor: Colors.lightGreen[700],
         title: Text('Tu Referencia de Pago'),
+        
       ),
       body: SafeArea(
-        child: Container(
+        child: terminado == false ? Center(child: CircularProgressIndicator()) :  Container(
           //margin: EdgeInsets.all(16.0),
           padding: EdgeInsets.only(top: 10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              widget.ref != null ? Text(
-                'Tipo Ref: Agrupado',
-                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-              ) : Text(
+              Text(
                 'Tipo Ref: $tipoReferencia',
                 style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
               ),
@@ -254,10 +263,48 @@ class _RefViewState extends State<RefView> {
     showDialog(context: context, builder: (_) => alert);
   }
 
+
+  sacarReferencia()async{
+    cuentas = await getAdeudos().catchError((e) {
+      alerta6();
+    });
+    for(int i = 0; i < cuentas!.data!.length; i++){
+      if (cuentas!.data![i].idConcepto == "PA        ") {
+          setState(() {
+            hayRefPadre = true;
+          });
+
+          refPadre.add(new DatosCuenta(
+              pago: cuentas!.data![i].pago,
+              referenciaP: cuentas!.data![i].referencaiP!,
+              idConcepto: cuentas!.data![i].idConcepto!));
+        }  else{
+      if (cuentas!.data![i].idConcepto == "ACCTEL    ") {
+          } else {
+            referencias.add(new DatosCuenta(
+                referencia: cuentas!.data![i].referencia,
+                fechaGenerada: cuentas!.data![i].fechaGeneracion!,
+                fechaLimite: cuentas!.data![i].fechaLimite == null
+                    ? DateTime.now()
+                    : cuentas!.data![i].fechaLimite,
+                fechaPago: cuentas!.data![i].fechaPago,
+                referenciaP: cuentas!.data![i].referencaiP));
+          }
+    }
+  }
+
+    mesMasCerca();
+  }
+
   mesMasCerca() {
     DateTime fechaActual = DateTime.now();
-
-    for (int i = 0; i < widget.list!.length; i++) {
+    if(hayRefPadre == true){
+      setState((){
+        tipoReferencia = "Pago Anual";
+      });
+      return refPadre.last.referenciaP!;
+    }else{
+      for (int i = 0; i < widget.list!.length; i++) {
       if (widget.list![i].referenciaP == "0" ||
           widget.list![i].referenciaP == null) {
         if (widget.list![i].fechaPago != null) {
@@ -288,26 +335,58 @@ class _RefViewState extends State<RefView> {
             });
             return widget.list![i].referenciaP;
           }
-        } else {
-          if (widget.refP!.last.pago == 1) {
-            ref = 'Pagado';
-          } else {
-            if (widget.refP!.last.referenciaP != '0' ||
-                widget.refP!.last.referenciaP != null) {
-              setState(() {
-                tipoReferencia = "Pago Anual";
-              });
-              return widget.refP!.last.referenciaP;
-            } else {
-              setState(() {
-                tipoReferencia = "Agrupada";
-              });
-              return widget.list![i].referenciaP;
-            }
-          }
-        }
+        } 
       }
     }
+    }
+    
   }
-
+  alerta6() {
+    Widget okButton = TextButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: Text(
+          'Si, continuar',
+          style: TextStyle(color: Colors.red[900]),
+        ));
+    Widget backButton = TextButton(
+        onPressed: () {
+          Navigator.of(context)..pop()..pop();
+        },
+        child: Text(
+          'Regresar',
+          style: TextStyle(color: Colors.orange),
+        ));
+    AlertDialog alert = AlertDialog(
+      actions: [backButton],
+      title: Text(
+        'Atención!',
+        style: TextStyle(
+          fontSize: 25,
+        ),
+      ),
+      content: Container(
+        width: 140,
+        height: 150,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Atencion!',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Text('Ha sucedido un error inesperado, vuelva a intentar')
+          ],
+        ),
+      ),
+    );
+    if(mounted){
+      showDialog(context: context, builder: (_) => alert, barrierDismissible: false);
+    }
+    
+  }
 }

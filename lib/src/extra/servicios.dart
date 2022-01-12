@@ -62,7 +62,8 @@ class _ServicesState extends State<Services> {
 
     DatosProveedor().getDatos(idCom).then((value) {
       for (int i = 0; i < value!.data!.length; i++) {
-        datos.add(new DatosProveedor(
+        if(value.data![i].activo == "1"){
+           datos.add(new DatosProveedor(
           rutaLogo: value.data![i].rutaLogo,
           diasAtencion: value.data![i].diaAtencion,
           horarioInicio: value.data![i].horaInitAten,
@@ -72,11 +73,16 @@ class _ServicesState extends State<Services> {
           formaPago2: value.data![i].formaPago2!,
           formaPago3: value.data![i].formaPago3!,
         ));
+        }else if(value.data![i].activo == "0"){
+         
+        }
       }
 
       setState((){
         cargado = true;
       });
+
+
        precio = List.generate(
           value.data!.length,
           (index) => List.generate(
@@ -96,7 +102,7 @@ class _ServicesState extends State<Services> {
               value.data![index].productos!.length,
               (index2) => value.data![index].productos![index2].descripcion == null ? '0' : value.data![index].productos![index2].descripcion!
                   .trimRight()));
-      seleccionado = List.generate(
+      seleccionado = List.generate( 
           value.data!.length,
           (index) => List.generate(
               value.data![index].productos!.length, (index2) => false));
@@ -160,7 +166,26 @@ class _ServicesState extends State<Services> {
             )
           )
         
-         :ListView.builder(
+         :datos.isEmpty ? Container(
+                    padding: EdgeInsets.only(top: MediaQuery.of(context).size.width / 5),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/images/zzz.png',
+                          width: MediaQuery.of(context).size.width / 1,
+                          height: 200,
+                        ),
+                        Text(
+                          'Lo sentimos, por el momento no se encuentran servicios disponibles',
+                          style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.width / 20,
+                            color: Colors.deepPurple,
+                          ),
+                          textAlign: TextAlign.justify,
+                        )
+                      ],
+                    )) :ListView.builder(
           itemCount: servicios.length,
           itemBuilder: (_, int index) {
             return InkWell(
@@ -314,6 +339,7 @@ class DatosProveedor {
   String? formaPago2;
   String? formaPago3;
   String? compania;
+  dynamic activo;
 
   DatosProveedor({
     this.rutaLogo,
@@ -324,6 +350,7 @@ class DatosProveedor {
     this.formaPago2,
     this.formaPago3,
     this.compania,
+    this.activo
   });
 
   Future<ProvedoresId?> getDatos(int idCom) async {
@@ -335,6 +362,7 @@ class DatosProveedor {
         return http.Response('Timeout', 408);
       });
       var data = returnResponse(response);
+      print(data);
       return seguimientoFromJson(data);
     } on SocketException {
       throw FetchDataException('Error');

@@ -72,7 +72,7 @@ class _PedirServicioState extends State<PedirServicio> {
   bool isChecked2 = false;
   int? selectindex;
   bool tanqueLleno = false;
-
+  
   getDt() async {
     prefs = await SharedPreferences.getInstance();
     if (prefs!.getString('comunidad') == null) {
@@ -117,6 +117,12 @@ class _PedirServicioState extends State<PedirServicio> {
     printUrl();
     fromDate = DateTime.now();
     toDate = DateTime.now().add(Duration(hours: 2));
+        
+  }
+  @override
+  void dispose() {
+    
+    super.dispose();
   }
 
   @override
@@ -399,10 +405,19 @@ class _PedirServicioState extends State<PedirServicio> {
                                         Container(
                                           width: 150,
                                           height: 300,
-                                          child: PhotoView(
-                                              imageProvider: NetworkImage(
-                                                  widget.url![index],
-                                                  scale: 1.5)),
+                                          child: GestureDetector(
+        child: Hero(
+          tag: 'imageHero',
+          child: Image.network(
+             widget.url![index],
+          ),
+        ),
+        onTap: () {
+          Navigator.push(context, MaterialPageRoute(builder: (_) {
+            return DetailScreen(image:  widget.url![index]);
+          }));
+        },
+      ),
                                         ),
                                       ],
                                     )),
@@ -417,7 +432,19 @@ class _PedirServicioState extends State<PedirServicio> {
                                                 ? Colors.red
                                                 : Colors.transparent,
                                             width: 2.0)),
-                                    child: Image.network(widget.url![index])),
+                                    child: GestureDetector(
+        child: Hero(
+          tag: 'imageHero',
+          child: Image.network(
+             widget.url![index],
+          ),
+        ),
+        onTap: () {
+          Navigator.push(context, MaterialPageRoute(builder: (_) {
+            return DetailScreen(image:  widget.url![index]);
+          }));
+        },
+      ),),
                               ),
                       );
                     })));
@@ -474,9 +501,24 @@ class _PedirServicioState extends State<PedirServicio> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceEvenly,
                                       children: [
-                                        PhotoView(
+                                        GestureDetector(
+        child: Hero(
+          tag: 'imageHero',
+          child: Image.network(
+             widget.url![index],
+          ),
+        ),
+        onTap: () {
+          Navigator.push(context, MaterialPageRoute(builder: (_) {
+            return DetailScreen(image:  widget.url![index]);
+          }));
+        },
+      ),
+                                        /* ClipRect(
+                                          child: PhotoView(
                                             imageProvider: NetworkImage(
-                                                widget.url![index])),
+                                                widget.url![index]))
+                                        ), */ 
                                       ],
                                     )),
                               )
@@ -1293,5 +1335,32 @@ class EnviarCorreo {
         }
       }
     }
+  }
+}
+
+class DetailScreen extends StatelessWidget {
+  String ?image;
+
+  DetailScreen({this.image});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        leading: BackButton(),
+      ),
+      body: GestureDetector(
+        child: Center(
+          child: Hero(
+            tag: 'imageHero',
+            child: Image.network(
+              image!,
+            ),
+          ),
+        ),
+        onTap: () {
+          Navigator.pop(context);
+        },
+      ),
+    );
   }
 }

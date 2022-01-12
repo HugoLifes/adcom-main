@@ -66,7 +66,11 @@ class _MultiServiciosState extends State<MultiServicios> {
 
     if (prov!.data!.isNotEmpty) {
       for (int i = 0; i < prov!.data!.length; i++) {
-        serv.add(new Servicios(
+        print(" activo ${prov!.data![i].activo}");
+        if(prov!.data![i].activo == 0){
+          
+        }else{
+          serv.add(new Servicios(
             idTipoProveedor: prov!.data![i].idTipoProveedor,
             idproveedor: prov!.data![i].idProveedor,
             domicilio: prov!.data![i].domicilio,
@@ -76,6 +80,8 @@ class _MultiServiciosState extends State<MultiServicios> {
             telCont2: prov!.data![i].telContacto2,
             telGuard: prov!.data![i].telGuardia,
             compania: prov!.data![i].compaia));
+        }
+        
       }
     }
 

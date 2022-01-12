@@ -175,6 +175,7 @@ class _FinanzasState extends State<Finanzas> {
                       localList.clear();
                       deudas.clear();
                       deudas2.clear();
+                      refPadre.clear();
                       data().catchError((e) {
                         print(e);
                       });
@@ -192,7 +193,7 @@ class _FinanzasState extends State<Finanzas> {
                   Padding(
                     padding: const EdgeInsets.only(top: 12),
                     child: Text(
-                      'Toma el control de tus gastos',
+                      'Toma el control de tus pagos',
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -629,8 +630,8 @@ class _FinanzasState extends State<Finanzas> {
               child: GridView.builder(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: landScape == true ? 2 : 1,
-                    childAspectRatio: landScape == true ? 3.0 :2.8,
-                    crossAxisSpacing: 20,
+                    childAspectRatio: landScape == true ? 3.0 :2.5,
+                    crossAxisSpacing: 23,
                     mainAxisSpacing: 5,
                   ),
                   itemCount: deudas.length,

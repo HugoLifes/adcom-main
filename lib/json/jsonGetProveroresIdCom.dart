@@ -44,6 +44,7 @@ class Datum {
     this.formaPago3,
     this.compania,
     this.productos,
+    this.activo
   });
 
   String? rutaLogo;
@@ -55,6 +56,7 @@ class Datum {
   String? formaPago3;
   String? compania;
   List<Producto>? productos;
+  dynamic activo;
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
         rutaLogo: json["RUTA_LOGO"] == null ? null : json["RUTA_LOGO"],
@@ -71,6 +73,7 @@ class Datum {
             ? null
             : List<Producto>.from(
                 json["PRODUCTOS"].map((x) => Producto.fromJson(x))),
+        activo: json["ACTIVO"] == null ? null : json["ACTIVO"]
       );
 
   Map<String, dynamic> toJson() => {
@@ -85,6 +88,7 @@ class Datum {
         "PRODUCTOS": productos == null
             ? null
             : List<dynamic>.from(productos!.map((x) => x.toJson())),
+        "ACTIVO": activo == null ? null : activo,
       };
 }
 
