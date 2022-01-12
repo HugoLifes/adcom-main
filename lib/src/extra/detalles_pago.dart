@@ -499,7 +499,8 @@ class _DetallesPagoState extends State<DetallesPago> {
                           TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
                     ),
                     Text(
-                      '\$' + '${widget.pagoAnualR!.cuota.toString()}.00',
+                      '\$' +
+                          '${numberFormat.format(widget.pagoAnualR!.cuota)}.00',
                       style:
                           TextStyle(fontWeight: FontWeight.w400, fontSize: 20),
                     ),
@@ -519,7 +520,8 @@ class _DetallesPagoState extends State<DetallesPago> {
                           TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
                     ),
                     Text(
-                      '\$' + '${widget.pagoAnualR!.descuento}.00',
+                      '\$' +
+                          '${numberFormat.format(double.parse(widget.pagoAnualR!.descuento))}.00',
                       style:
                           TextStyle(fontWeight: FontWeight.w400, fontSize: 20),
                     ),
@@ -538,7 +540,7 @@ class _DetallesPagoState extends State<DetallesPago> {
                           TextStyle(fontWeight: FontWeight.w500, fontSize: 20),
                     ),
                     Text(
-                      '\$${widget.pagoAnualR!.totalApagar!.toStringAsFixed(2)}',
+                      '\$${numberFormat.format(widget.pagoAnualR!.totalApagar)}.00',
                       style:
                           TextStyle(fontWeight: FontWeight.w400, fontSize: 20),
                     ),

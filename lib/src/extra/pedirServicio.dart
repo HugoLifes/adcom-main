@@ -401,25 +401,33 @@ class _PedirServicioState extends State<PedirServicio> {
                                         Container(
                                           width: 150,
                                           height: 300,
-                                          child: PhotoView(
-                                              imageProvider: NetworkImage(
-                                                  widget.url![index],
-                                                  scale: 1.5)),
+                                          child: ClipRect(
+                                            child: PhotoView(
+                                                imageProvider: NetworkImage(
+                                                    widget.url![index],
+                                                    scale: 1.5)),
+                                          ),
                                         ),
                                       ],
                                     )),
                               )
                             : ListTile(
                                 title: Container(
-                                    width: 90,
-                                    height: 90,
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                            color: selectindex == index
-                                                ? Colors.red
-                                                : Colors.transparent,
-                                            width: 2.0)),
-                                    child: Image.network(widget.url![index])),
+                                  width: 90,
+                                  height: 90,
+                                  decoration: BoxDecoration(
+                                      border: Border.all(
+                                          color: selectindex == index
+                                              ? Colors.red
+                                              : Colors.transparent,
+                                          width: 2.0)),
+                                  child: ClipRect(
+                                    child: PhotoView(
+                                        imageProvider: NetworkImage(
+                                            widget.url![index],
+                                            scale: 1.5)),
+                                  ),
+                                ),
                               ),
                       );
                     })));
