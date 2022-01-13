@@ -17,6 +17,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
+
 SharedPreferences? prefs;
 
 // ignore: must_be_immutable
@@ -72,7 +73,7 @@ class _PedirServicioState extends State<PedirServicio> {
   bool isChecked2 = false;
   int? selectindex;
   bool tanqueLleno = false;
-  
+
   getDt() async {
     prefs = await SharedPreferences.getInstance();
     if (prefs!.getString('comunidad') == null) {
@@ -117,11 +118,10 @@ class _PedirServicioState extends State<PedirServicio> {
     printUrl();
     fromDate = DateTime.now();
     toDate = DateTime.now().add(Duration(hours: 2));
-        
   }
+
   @override
   void dispose() {
-    
     super.dispose();
   }
 
@@ -344,8 +344,7 @@ class _PedirServicioState extends State<PedirServicio> {
     return _steps;
   }
 
-  
-   Step? tipoDeServicio() {
+  Step? tipoDeServicio() {
     print(' idTipoProvedor ${widget.servicio!.idTipoProveedor}');
     print('here ${widget.servicio!.idproveedor}');
     switch (widget.servicio!.idTipoProveedor) {
@@ -406,45 +405,51 @@ class _PedirServicioState extends State<PedirServicio> {
                                           width: 150,
                                           height: 300,
                                           child: GestureDetector(
-        child: Hero(
-          tag: 'imageHero',
-          child: Image.network(
-             widget.url![index],
-          ),
-        ),
-        onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (_) {
-            return DetailScreen(image:  widget.url![index]);
-          }));
-        },
-      ),
+                                            child: Hero(
+                                              tag: 'imageHero',
+                                              child: Image.network(
+                                                widget.url![index],
+                                              ),
+                                            ),
+                                            onTap: () {
+                                              Navigator.push(context,
+                                                  MaterialPageRoute(
+                                                      builder: (_) {
+                                                return DetailScreen(
+                                                    image: widget.url![index]);
+                                              }));
+                                            },
+                                          ),
                                         ),
                                       ],
                                     )),
                               )
                             : ListTile(
                                 title: Container(
-                                    width: 90,
-                                    height: 90,
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                            color: selectindex == index
-                                                ? Colors.red
-                                                : Colors.transparent,
-                                            width: 2.0)),
-                                    child: GestureDetector(
-        child: Hero(
-          tag: 'imageHero',
-          child: Image.network(
-             widget.url![index],
-          ),
-        ),
-        onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (_) {
-            return DetailScreen(image:  widget.url![index]);
-          }));
-        },
-      ),),
+                                  width: 90,
+                                  height: 90,
+                                  decoration: BoxDecoration(
+                                      border: Border.all(
+                                          color: selectindex == index
+                                              ? Colors.red
+                                              : Colors.transparent,
+                                          width: 2.0)),
+                                  child: GestureDetector(
+                                    child: Hero(
+                                      tag: 'imageHero',
+                                      child: Image.network(
+                                        widget.url![index],
+                                      ),
+                                    ),
+                                    onDoubleTap: () {
+                                      Navigator.push(context,
+                                          MaterialPageRoute(builder: (_) {
+                                        return DetailScreen(
+                                            image: widget.url![index]);
+                                      }));
+                                    },
+                                  ),
+                                ),
                               ),
                       );
                     })));
@@ -502,23 +507,25 @@ class _PedirServicioState extends State<PedirServicio> {
                                           MainAxisAlignment.spaceEvenly,
                                       children: [
                                         GestureDetector(
-        child: Hero(
-          tag: 'imageHero',
-          child: Image.network(
-             widget.url![index],
-          ),
-        ),
-        onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (_) {
-            return DetailScreen(image:  widget.url![index]);
-          }));
-        },
-      ),
+                                          child: Hero(
+                                            tag: 'imageHero',
+                                            child: Image.network(
+                                              widget.url![index],
+                                            ),
+                                          ),
+                                          onDoubleTap: () {
+                                            Navigator.push(context,
+                                                MaterialPageRoute(builder: (_) {
+                                              return DetailScreen(
+                                                  image: widget.url![index]);
+                                            }));
+                                          },
+                                        ),
                                         /* ClipRect(
                                           child: PhotoView(
                                             imageProvider: NetworkImage(
                                                 widget.url![index]))
-                                        ), */ 
+                                        ), */
                                       ],
                                     )),
                               )
@@ -532,7 +539,21 @@ class _PedirServicioState extends State<PedirServicio> {
                                                 ? Colors.red
                                                 : Colors.transparent,
                                             width: 2.0)),
-                                    child: Image.network(widget.url![index])),
+                                    child: GestureDetector(
+                                      child: Hero(
+                                        tag: 'imageHero',
+                                        child: Image.network(
+                                          widget.url![index],
+                                        ),
+                                      ),
+                                      onDoubleTap: () {
+                                        Navigator.push(context,
+                                            MaterialPageRoute(builder: (_) {
+                                          return DetailScreen(
+                                              image: widget.url![index]);
+                                        }));
+                                      },
+                                    )),
                               ),
                       );
                     })));
@@ -540,7 +561,7 @@ class _PedirServicioState extends State<PedirServicio> {
   }
 
   /// step que muestra los tipos de pago
-   Step? caracteristicasTipoPago() {
+  Step? caracteristicasTipoPago() {
     switch (widget.servicio!.idTipoProveedor) {
       case 1:
         return Step(
@@ -701,7 +722,6 @@ class _PedirServicioState extends State<PedirServicio> {
       default:
     }
   }
-
 
   /// step que muestra los campos de pago
   Column camposTipoPago() {
@@ -1001,7 +1021,8 @@ class _PedirServicioState extends State<PedirServicio> {
       ),
     );
 
-    showDialog(context: context, builder: (_) => alert, barrierDismissible: false);
+    showDialog(
+        context: context, builder: (_) => alert, barrierDismissible: false);
   }
 
   alerta2() {
@@ -1051,13 +1072,16 @@ class _PedirServicioState extends State<PedirServicio> {
       ),
     );
 
-    showDialog(context: context, builder: (_) => alert, barrierDismissible: false);
+    showDialog(
+        context: context, builder: (_) => alert, barrierDismissible: false);
   }
 
   alerta3() {
     Widget okButton = TextButton(
         onPressed: () {
-          Navigator.of(context)..pop()..pop();
+          Navigator.of(context)
+            ..pop()
+            ..pop();
         },
         child: Text(
           'Si, continuar',
@@ -1097,9 +1121,9 @@ class _PedirServicioState extends State<PedirServicio> {
         ),
       ),
     );
-    
 
-    showDialog(context: context, builder: (_) => alert, barrierDismissible: false);
+    showDialog(
+        context: context, builder: (_) => alert, barrierDismissible: false);
   }
 
   alerta4(String mensaje) {
@@ -1149,7 +1173,8 @@ class _PedirServicioState extends State<PedirServicio> {
       ),
     );
 
-    showDialog(context: context, builder: (_) => alert, barrierDismissible: false);
+    showDialog(
+        context: context, builder: (_) => alert, barrierDismissible: false);
   }
 
   alerta5() {
@@ -1198,10 +1223,10 @@ class _PedirServicioState extends State<PedirServicio> {
         ),
       ),
     );
-    
-    showDialog(context: context, builder: (_) => alert, barrierDismissible: false);
+
+    showDialog(
+        context: context, builder: (_) => alert, barrierDismissible: false);
   }
-  
 }
 
 class Checkeo {
@@ -1339,17 +1364,20 @@ class EnviarCorreo {
 }
 
 class DetailScreen extends StatelessWidget {
-  String ?image;
+  final String? image;
 
   DetailScreen({this.image});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
         leading: BackButton(),
       ),
       body: GestureDetector(
-        child: Center(
+        child: Container(
+          alignment: Alignment.center,
+          decoration: BoxDecoration(color: Colors.black),
           child: Hero(
             tag: 'imageHero',
             child: Image.network(
