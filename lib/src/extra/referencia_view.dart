@@ -55,7 +55,7 @@ class _RefViewState extends State<RefView> {
             ? BackButton(
                 onPressed: () {
                   Navigator.of(context)
-                      .pushNamedAndRemoveUntil('/screen3', (route) => false);
+                      .pushNamedAndRemoveUntil('/screen3', (route) => true);
                 },
               )
             : BackButton(),

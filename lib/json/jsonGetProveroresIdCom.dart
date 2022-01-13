@@ -104,13 +104,13 @@ class Producto {
   dynamic presLogoRuta;
 
   factory Producto.fromJson(Map<String, dynamic> json) => Producto(
-        unidad: json["UNIDAD"] == null ? null : json["UNIDAD"],
+        unidad: json["COSTO"] == null ? null : json["COSTO"],
         descripcion: json["DESCRIPCION"] == null ? null : json["DESCRIPCION"],
         presLogoRuta: json["PRES_LOGO_RUTA"],
       );
 
   Map<String, dynamic> toJson() => {
-        "UNIDAD": unidad == null ? null : unidad,
+        "COSTO": unidad == null ? null : unidad,
         "DESCRIPCION": descripcion == null ? null : descripcion,
         "PRES_LOGO_RUTA": presLogoRuta,
       };

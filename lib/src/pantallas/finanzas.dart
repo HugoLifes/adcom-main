@@ -9,7 +9,7 @@ import 'package:adcom/src/methods/exeptions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:adcom/src/extra/opciones_edoCuenta.dart';
 import 'package:adcom/src/extra/servicios.dart';
-
+import 'package:adcom/src/pantallas/mainMenu.dart';
 import 'package:adcom/src/extra/vista_tarjeta.dart';
 
 import 'package:flutter/material.dart';
@@ -131,7 +131,9 @@ class _FinanzasState extends State<Finanzas> {
                     fontWeight: FontWeight.w700),
               ),
               elevation: 7,
-              leading: BackButton(),
+              leading: BackButton(onPressed: (){
+                Navigator.popAndPushNamed(context, MainMenu.routeName);
+              }),
               backgroundColor: Colors.lightGreen[700],
             ),
       resizeToAvoidBottomInset: false,

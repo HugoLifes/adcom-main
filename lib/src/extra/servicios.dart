@@ -62,7 +62,7 @@ class _ServicesState extends State<Services> {
 
     DatosProveedor().getDatos(idCom).then((value) {
       for (int i = 0; i < value!.data!.length; i++) {
-        if(value.data![i].activo == "1"){
+      
            datos.add(new DatosProveedor(
           rutaLogo: value.data![i].rutaLogo,
           diasAtencion: value.data![i].diaAtencion,
@@ -73,9 +73,7 @@ class _ServicesState extends State<Services> {
           formaPago2: value.data![i].formaPago2!,
           formaPago3: value.data![i].formaPago3!,
         ));
-        }else if(value.data![i].activo == "0"){
-         
-        }
+        
       }
 
       setState((){
