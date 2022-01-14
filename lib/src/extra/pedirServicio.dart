@@ -411,7 +411,7 @@ class _PedirServicioState extends State<PedirServicio> {
                                                 widget.url![index],
                                               ),
                                             ),
-                                            onTap: () {
+                                            onDoubleTap: () {
                                               Navigator.push(context,
                                                   MaterialPageRoute(
                                                       builder: (_) {
@@ -565,21 +565,17 @@ class _PedirServicioState extends State<PedirServicio> {
     switch (widget.servicio!.idTipoProveedor) {
       case 1:
         return Step(
-            title: Text('Tipo de pago'),
-            content: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            title: Text('Forma de pago'),
+            content: Column(
+              //mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                tanqueLleno != true
-                    ? Form(
-                        key: _formKey3,
-                        child: buildCantidad(),
-                      )
-                    : Row(
+                 Row(
+                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         ///tipoDePago = "Efectivo";
                         children: [
-                          Row(
+                          Column(
                             children: [
-                              Text('Efectivo'),
+                              Text('Efectivo', style: TextStyle(fontSize:19)),
                               Checkbox(
                                 checkColor: Colors.white,
                                 tristate: true,
@@ -604,9 +600,10 @@ class _PedirServicioState extends State<PedirServicio> {
                               ),
                             ],
                           ),
-                          Row(
+                          
+                         Column(
                             children: [
-                              Text('Tarjeta  '),
+                              Text('Tarjeta', style: TextStyle(fontSize:19)),
                               Checkbox(
                                 checkColor: Colors.white,
                                 value: isChecked2,
@@ -633,14 +630,14 @@ class _PedirServicioState extends State<PedirServicio> {
                           ),
                         ],
                       ),
-                tanqueLleno != true ? camposTipoPago() : Container(),
+                
               ],
             ),
             state: StepState.disabled,
             isActive: _currentStep >= 2);
       case 2:
         return Step(
-            title: Text('Tipo de pago'),
+            title: Text('Forma de pago'),
             content: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -705,7 +702,7 @@ class _PedirServicioState extends State<PedirServicio> {
             isActive: _currentStep >= 2);
       case 3:
         return Step(
-            title: Text('Tipo de pago'),
+            title: Text('Forma de pago'),
             state: StepState.disabled,
             isActive: _currentStep >= 2,
             content: Row(
@@ -713,7 +710,7 @@ class _PedirServicioState extends State<PedirServicio> {
             ));
       case 4:
         return Step(
-            title: Text('Tipo de pago'),
+            title: Text('Forma de pago'),
             state: StepState.disabled,
             isActive: _currentStep >= 2,
             content: Row(
@@ -1370,14 +1367,11 @@ class DetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        leading: BackButton(),
-      ),
+      
       body: GestureDetector(
         child: Container(
           alignment: Alignment.center,
-          decoration: BoxDecoration(color: Colors.black),
+          
           child: Hero(
             tag: 'imageHero',
             child: Image.network(

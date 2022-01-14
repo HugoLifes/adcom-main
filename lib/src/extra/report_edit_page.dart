@@ -551,7 +551,7 @@ class _ReportEditPageState extends State<ReportEditPage> {
   /// funcion que constuye la imagen o la cantidad de imagenes
 
   buildResponseImage() {
-    return Container(
+    return evidencias.isEmpty ? Container() : Container(
       height: 400,
       margin: EdgeInsets.only(left: 15, right: 15),
       width: MediaQuery.of(context).size.width,
@@ -588,7 +588,7 @@ class _ReportEditPageState extends State<ReportEditPage> {
   }
 
   buildPhotoView() {
-    return Container(
+    return widget.report.uri!.isEmpty ? Container() : Container(
       height: 400,
       margin: EdgeInsets.only(left: 15, right: 15),
       width: MediaQuery.of(context).size.width,
