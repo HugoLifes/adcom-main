@@ -194,7 +194,10 @@ class _PedirServicioState extends State<PedirServicio> {
                 if ((isChecked || isChecked2) == false) {
                   alerta4('Seleccione un metodo de pago');
                 } else {
-                  if (tanqueLleno != true) {
+                  setState(() {
+                    this._currentStep = this._currentStep + 1;
+                  });
+                  /* if (tanqueLleno != true) {
                     if (_formKey3.currentState!.validate()) {
                       setState(() {
                         this._currentStep = this._currentStep + 1;
@@ -204,11 +207,9 @@ class _PedirServicioState extends State<PedirServicio> {
                       alerta4('Complete los campos');
                     }
                   } else {
-                    setState(() {
-                      this._currentStep = this._currentStep + 1;
-                    });
+                    
                     FocusScope.of(context).unfocus();
-                  }
+                  } */
                 }
               } else {
                 /// chequea si hay imagenes seleccionadas
@@ -569,68 +570,67 @@ class _PedirServicioState extends State<PedirServicio> {
             content: Column(
               //mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                 Row(
-                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        ///tipoDePago = "Efectivo";
-                        children: [
-                          Column(
-                            children: [
-                              Text('Efectivo', style: TextStyle(fontSize:19)),
-                              Checkbox(
-                                checkColor: Colors.white,
-                                tristate: true,
-                                value: isChecked,
-                                onChanged: (bool? value) {
-                                  if (value == true) {
-                                    setState(() {
-                                      isChecked = value!;
-                                      tipoDePago = "Efectivo";
-                                    });
-                                  }
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
 
-                                  if (isChecked2 == true) {
-                                    setState(() {
-                                      isChecked2 = false;
-                                      isChecked = value!;
-                                      tipoDePago = "Efectivo";
-                                    });
-                                  }
-                                  print('$tipoDePago');
-                                },
-                              ),
-                            ],
-                          ),
-                          
-                         Column(
-                            children: [
-                              Text('Tarjeta', style: TextStyle(fontSize:19)),
-                              Checkbox(
-                                checkColor: Colors.white,
-                                value: isChecked2,
-                                tristate: true,
-                                onChanged: (bool? value) {
-                                  if (value == true) {
-                                    setState(() {
-                                      isChecked2 = value!;
-                                      tipoDePago = "Tarjeta";
-                                    });
-                                  }
+                  ///tipoDePago = "Efectivo";
+                  children: [
+                    Column(
+                      children: [
+                        Text('Efectivo', style: TextStyle(fontSize: 19)),
+                        Checkbox(
+                          checkColor: Colors.white,
+                          tristate: true,
+                          value: isChecked,
+                          onChanged: (bool? value) {
+                            if (value == true) {
+                              setState(() {
+                                isChecked = value!;
+                                tipoDePago = "Efectivo";
+                              });
+                            }
 
-                                  if (isChecked == true) {
-                                    setState(() {
-                                      isChecked = false;
-                                      isChecked2 = value!;
-                                      tipoDePago = "Tarjeta";
-                                    });
-                                    print('$tipoDePago');
-                                  }
-                                },
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                
+                            if (isChecked2 == true) {
+                              setState(() {
+                                isChecked2 = false;
+                                isChecked = value!;
+                                tipoDePago = "Efectivo";
+                              });
+                            }
+                            print('$tipoDePago');
+                          },
+                        ),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Text('Tarjeta', style: TextStyle(fontSize: 19)),
+                        Checkbox(
+                          checkColor: Colors.white,
+                          value: isChecked2,
+                          tristate: true,
+                          onChanged: (bool? value) {
+                            if (value == true) {
+                              setState(() {
+                                isChecked2 = value!;
+                                tipoDePago = "Tarjeta";
+                              });
+                            }
+
+                            if (isChecked == true) {
+                              setState(() {
+                                isChecked = false;
+                                isChecked2 = value!;
+                                tipoDePago = "Tarjeta";
+                              });
+                              print('$tipoDePago');
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ],
             ),
             state: StepState.disabled,
@@ -1076,9 +1076,7 @@ class _PedirServicioState extends State<PedirServicio> {
   alerta3() {
     Widget okButton = TextButton(
         onPressed: () {
-          Navigator.of(context)
-            ..pop()
-            ..pop();
+          Navigator.of(context)..pop()..pop();
         },
         child: Text(
           'Si, continuar',
@@ -1367,11 +1365,9 @@ class DetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
       body: GestureDetector(
         child: Container(
           alignment: Alignment.center,
-          
           child: Hero(
             tag: 'imageHero',
             child: Image.network(
