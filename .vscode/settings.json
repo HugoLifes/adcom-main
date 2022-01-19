@@ -1,3 +1,4 @@
 {
-    "dart.flutterSdkPath": "/Users/macbook/Downloads/flutter"
+    "dart.flutterSdkPath": "/Users/macbook/Downloads/flutter",
+    "atlascode.jira.enabled": false
 }
