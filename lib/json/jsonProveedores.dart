@@ -38,17 +38,17 @@ class Proveedores {
 }
 
 class Datum {
-  Datum({
-    this.idProveedor,
-    this.compaia,
-    this.domicilio,
-    this.contacto,
-    this.telContacto1,
-    this.telContacto2,
-    this.telGuardia,
-    this.idTipoProveedor,
-    this.diaAtencion,
-  });
+  Datum(
+      {this.idProveedor,
+      this.compaia,
+      this.domicilio,
+      this.contacto,
+      this.telContacto1,
+      this.telContacto2,
+      this.telGuardia,
+      this.idTipoProveedor,
+      this.diaAtencion,
+      this.activo});
 
   int? idProveedor;
   String? compaia;
@@ -59,22 +59,22 @@ class Datum {
   String? telGuardia;
   int? idTipoProveedor;
   String? diaAtencion;
+  dynamic activo;
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
-        idProveedor: json["ID_PROVEEDOR"] == null ? null : json["ID_PROVEEDOR"],
-        compaia: json["COMPAÑIA"] == null ? null : json["COMPAÑIA"],
-        domicilio: json["DOMICILIO"] == null ? null : json["DOMICILIO"],
-        contacto: json["CONTACTO"] == null ? null : json["CONTACTO"],
-        telContacto1:
-            json["TEL_CONTACTO1"] == null ? null : json["TEL_CONTACTO1"],
-        telContacto2:
-            json["TEL_CONTACTO2"] == null ? null : json["TEL_CONTACTO2"],
-        telGuardia: json["TEL_GUARDIA"] == null ? null : json["TEL_GUARDIA"],
-        idTipoProveedor: json["ID_TIPO_PROVEEDOR"] == null
-            ? null
-            : json["ID_TIPO_PROVEEDOR"],
-        diaAtencion: json["DIA_ATENCION"] == null ? null : json["DIA_ATENCION"],
-      );
+      idProveedor: json["ID_PROVEEDOR"] == null ? null : json["ID_PROVEEDOR"],
+      compaia: json["COMPAÑIA"] == null ? null : json["COMPAÑIA"],
+      domicilio: json["DOMICILIO"] == null ? null : json["DOMICILIO"],
+      contacto: json["CONTACTO"] == null ? null : json["CONTACTO"],
+      telContacto1:
+          json["TEL_CONTACTO1"] == null ? null : json["TEL_CONTACTO1"],
+      telContacto2:
+          json["TEL_CONTACTO2"] == null ? null : json["TEL_CONTACTO2"],
+      telGuardia: json["TEL_GUARDIA"] == null ? null : json["TEL_GUARDIA"],
+      idTipoProveedor:
+          json["ID_TIPO_PROVEEDOR"] == null ? null : json["ID_TIPO_PROVEEDOR"],
+      diaAtencion: json["DIA_ATENCION"] == null ? null : json["DIA_ATENCION"],
+      activo: json["ACTIVO"] == null ? null : json["ACTIVO"]);
 
   Map<String, dynamic> toJson() => {
         "ID_PROVEEDOR": idProveedor == null ? null : idProveedor,
@@ -86,5 +86,6 @@ class Datum {
         "TEL_GUARDIA": telGuardia == null ? null : telGuardia,
         "ID_TIPO_PROVEEDOR": idTipoProveedor == null ? null : idTipoProveedor,
         "DIA_ATENCION": diaAtencion == null ? null : diaAtencion,
+        "ACTIVO": activo == null ? null : activo
       };
 }

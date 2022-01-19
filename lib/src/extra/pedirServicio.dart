@@ -191,7 +191,13 @@ class _PedirServicioState extends State<PedirServicio> {
                 if ((isChecked || isChecked2) == false) {
                   alerta4('Seleccione un metodo de pago');
                 } else {
-                  if (tanqueLleno != true) {
+                  setState(() {
+                    this._currentStep = this._currentStep + 1;
+                  });
+                  /*  if (tanqueLleno != true) {
+                    setState(() {
+                        this._currentStep = this._currentStep + 1;
+                      });
                     if (_formKey3.currentState!.validate()) {
                       setState(() {
                         this._currentStep = this._currentStep + 1;
@@ -205,7 +211,7 @@ class _PedirServicioState extends State<PedirServicio> {
                       this._currentStep = this._currentStep + 1;
                     });
                     FocusScope.of(context).unfocus();
-                  }
+                  } */
                 }
               } else {
                 /// chequea si hay imagenes seleccionadas
@@ -399,15 +405,24 @@ class _PedirServicioState extends State<PedirServicio> {
                                           MainAxisAlignment.spaceEvenly,
                                       children: [
                                         Container(
-                                          width: 150,
-                                          height: 300,
-                                          child: ClipRect(
-                                            child: PhotoView(
-                                                imageProvider: NetworkImage(
+                                            width: 150,
+                                            height: 300,
+                                            child: GestureDetector(
+                                                child: Hero(
+                                                  tag: 'imageHero',
+                                                  child: Image.network(
                                                     widget.url![index],
-                                                    scale: 1.5)),
-                                          ),
-                                        ),
+                                                  ),
+                                                ),
+                                                onDoubleTap: () {
+                                                  Navigator.push(context,
+                                                      MaterialPageRoute(
+                                                          builder: (_) {
+                                                    return DetailScreen(
+                                                        image:
+                                                            widget.url![index]);
+                                                  }));
+                                                })),
                                       ],
                                     )),
                               )
@@ -421,12 +436,23 @@ class _PedirServicioState extends State<PedirServicio> {
                                               ? Colors.red
                                               : Colors.transparent,
                                           width: 2.0)),
-                                  child: ClipRect(
-                                    child: PhotoView(
-                                        imageProvider: NetworkImage(
-                                            widget.url![index],
-                                            scale: 1.5)),
-                                  ),
+                                  child: Container(
+                                      width: 150,
+                                      height: 300,
+                                      child: GestureDetector(
+                                          child: Hero(
+                                            tag: 'imageHero',
+                                            child: Image.network(
+                                              widget.url![index],
+                                            ),
+                                          ),
+                                          onDoubleTap: () {
+                                            Navigator.push(context,
+                                                MaterialPageRoute(builder: (_) {
+                                              return DetailScreen(
+                                                  image: widget.url![index]);
+                                            }));
+                                          })),
                                 ),
                               ),
                       );
@@ -484,9 +510,25 @@ class _PedirServicioState extends State<PedirServicio> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceEvenly,
                                       children: [
-                                        PhotoView(
-                                            imageProvider: NetworkImage(
-                                                widget.url![index])),
+                                        Container(
+                                            width: 150,
+                                            height: 300,
+                                            child: GestureDetector(
+                                                child: Hero(
+                                                  tag: 'imageHero',
+                                                  child: Image.network(
+                                                    widget.url![index],
+                                                  ),
+                                                ),
+                                                onDoubleTap: () {
+                                                  Navigator.push(context,
+                                                      MaterialPageRoute(
+                                                          builder: (_) {
+                                                    return DetailScreen(
+                                                        image:
+                                                            widget.url![index]);
+                                                  }));
+                                                })),
                                       ],
                                     )),
                               )
@@ -500,7 +542,20 @@ class _PedirServicioState extends State<PedirServicio> {
                                                 ? Colors.red
                                                 : Colors.transparent,
                                             width: 2.0)),
-                                    child: Image.network(widget.url![index])),
+                                    child: GestureDetector(
+                                        child: Hero(
+                                          tag: 'imageHero',
+                                          child: Image.network(
+                                            widget.url![index],
+                                          ),
+                                        ),
+                                        onDoubleTap: () {
+                                          Navigator.push(context,
+                                              MaterialPageRoute(builder: (_) {
+                                            return DetailScreen(
+                                                image: widget.url![index]);
+                                          }));
+                                        })),
                               ),
                       );
                     })));
@@ -1310,5 +1365,32 @@ class EnviarCorreo {
         }
       }
     }
+  }
+}
+
+class DetailScreen extends StatelessWidget {
+  String? image;
+
+  DetailScreen({this.image});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        leading: BackButton(),
+      ),
+      body: GestureDetector(
+        child: Center(
+          child: Hero(
+            tag: 'imageHero',
+            child: Image.network(
+              image!,
+            ),
+          ),
+        ),
+        onTap: () {
+          Navigator.pop(context);
+        },
+      ),
+    );
   }
 }

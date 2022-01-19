@@ -78,7 +78,7 @@ class _VistaPagosState extends State<VistaPagos> {
                         TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500)),
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 10),
+                padding: const EdgeInsets.only(left: 12),
                 child: widget.deudas!.totalAdeudo == null
                     ? Container()
                     : Text('\$${formatMoney(widget.deudas!.totalAdeudo!)} MXN',
@@ -173,23 +173,39 @@ class _VistaPagosState extends State<VistaPagos> {
                           fontSize: 14.0,
                           fontWeight: FontWeight.bold)),
                 ),
-                Row(
-                  children: [
-                    Text(
-                      '${widget.deudas!.mes!}',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Text(
-                      '${widget.deudas!.fechaGeneracion!}',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                    ),
-                  ],
-                ),
+                widget.deudas!.fechaGeneracion!.length >= 8
+                    ? Row(children: [
+                        Text(
+                          '${widget.deudas!.mes!}',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Text(
+                          '${widget.deudas!.fechaGeneracion}',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 15),
+                        )
+                      ])
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                            Text(
+                              '${widget.deudas!.mes!}',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 15),
+                            ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Text(
+                              '${widget.deudas!.fechaGeneracion}',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 15),
+                            )
+                          ]),
                 SizedBox(
                   width: 19,
                 ),

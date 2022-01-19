@@ -63,16 +63,63 @@ class _ServicesState extends State<Services> {
 
     DatosProveedor().getDatos(idCom).then((value) {
       for (int i = 0; i < value!.data!.length; i++) {
-        datos.add(new DatosProveedor(
-          rutaLogo: value.data![i].rutaLogo,
-          diasAtencion: value.data![i].diaAtencion,
-          horarioInicio: value.data![i].horaInitAten,
-          horarioFin: value.data![i].horaFinAten,
-          compania: value.data![i].compania,
-          formaPago1: value.data![i].formaPago1!,
-          formaPago2: value.data![i].formaPago2!,
-          formaPago3: value.data![i].formaPago3!,
-        ));
+        if (value.data![i].activo == "0") {
+        } else {
+          if (value.data![i].activo == "1") {
+            datos.add(new DatosProveedor(
+              rutaLogo: value.data![i].rutaLogo,
+              diasAtencion: value.data![i].diaAtencion,
+              horarioInicio: value.data![i].horaInitAten,
+              horarioFin: value.data![i].horaFinAten,
+              compania: value.data![i].compania,
+              formaPago1: value.data![i].formaPago1!,
+              formaPago2: value.data![i].formaPago2!,
+              formaPago3: value.data![i].formaPago3!,
+            ));
+
+            for (int j = 0; j < value.data![i].productos!.length; j++) {
+              print('here omg');
+              setState(() {
+                unidad.add(
+                  value.data![i].productos![j].presLogoRuta!,
+                );
+              });
+            }
+            /* unidad = List.generate(
+                  value.data!.length,
+                  (index) => List.generate(
+                      value.data![index].productos!.length,
+                      (index2) => value.data![index].productos![index2]
+                                  .presLogoRuta! ==
+                              null
+                          ? '0'
+                          : value.data![index].productos![index2].presLogoRuta!
+                              .trimRight())); */
+            precio = List.generate(
+                value.data!.length,
+                (index) => List.generate(
+                    value.data![index].productos!.length,
+                    (index2) =>
+                        value.data![index].productos![index2].costo == null
+                            ? '0'
+                            : value.data![index].productos![index2].costo!
+                                .trimRight()));
+            name = List.generate(
+                value.data!.length,
+                (index) => List.generate(
+                    value.data![index].productos!.length,
+                    (index2) =>
+                        value.data![index].productos![index2].descripcion ==
+                                null
+                            ? '0'
+                            : value.data![index].productos![index2].descripcion!
+                                .trimRight()));
+            seleccionado = List.generate(
+                value.data!.length,
+                (index) => List.generate(
+                    value.data![index].productos!.length, (index2) => false));
+          }
+        }
       }
       setState(() {
         cargado = true;
@@ -80,25 +127,28 @@ class _ServicesState extends State<Services> {
 
       /// aqui se obtienen caracteristicas del producto
       /// en este caso el campo unidad del service
-      precio = List.generate(
+      /* precio = List.generate(
           value.data!.length,
           (index) => List.generate(
               value.data![index].productos!.length,
               (index2) => value.data![index].productos![index2].costo == null
                   ? '0'
-                  : value.data![index].productos![index2].costo!.trimRight()));
+                  : value.data![index].productos![index2].costo!.trimRight())); */
 
-      /// aqui se obtienen caracteristicas del producto
+      /*   /// aqui se obtienen caracteristicas del producto
       /// en este caso el campo de las imagenes del producto
       unidad = List.generate(
           value.data!.length,
-          (index) => List.generate(
-              value.data![index].productos!.length,
-              (index2) =>
-                  value.data![index].productos![index2].presLogoRuta! == null
-                      ? '0'
-                      : value.data![index].productos![index2].presLogoRuta!
-                          .trimRight()));
+          (index) => value.data![index].activo == "0"
+              ? null
+              : List.generate(
+                  value.data![index].productos!.length,
+                  (index2) =>
+                      value.data![index].productos![index2].presLogoRuta! ==
+                              null
+                          ? '0'
+                          : value.data![index].productos![index2].presLogoRuta!
+                              .trimRight()));
       name = List.generate(
           value.data!.length,
           (index) => List.generate(
@@ -111,7 +161,7 @@ class _ServicesState extends State<Services> {
       seleccionado = List.generate(
           value.data!.length,
           (index) => List.generate(
-              value.data![index].productos!.length, (index2) => false));
+              value.data![index].productos!.length, (index2) => false)); */
     }).catchError((e) {
       setState(() {
         if (mounted) {
@@ -177,79 +227,101 @@ class _ServicesState extends State<Services> {
                       ],
                     ),
                   )
-            : ListView.builder(
-                itemCount: servicios.length,
-                itemBuilder: (_, int index) {
-                  return InkWell(
-                    onTap: () {
-                      if (userType == 2) {
-                        Fluttertoast.showToast(
-                            msg: 'Tipo de usuario no permitido',
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.BOTTOM,
-                            timeInSecForIosWeb: 2,
-                            backgroundColor: Colors.red,
-                            textColor: Colors.white,
-                            fontSize: 16.0);
-                      } else {
-                        if (error == true) {
-                          Fluttertoast.showToast(
-                              msg: 'Respuesta del servidor larga: 408',
-                              toastLength: Toast.LENGTH_SHORT,
-                              gravity: ToastGravity.BOTTOM,
-                              timeInSecForIosWeb: 2,
-                              backgroundColor: Colors.red,
-                              textColor: Colors.white,
-                              fontSize: 16.0);
-                        } else {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (_) => MultiServicios(
-                                    service: servicios[index].tipoDeServ,
-                                    datosP: datos,
-                                    unidad: unidad,
-                                    precios: precio,
-                                    name: name,
-                                    seleccionado: seleccionado,
-                                  )));
-                        }
-                      }
-                    },
-                    child: Container(
-                        padding: EdgeInsets.only(left: 10, top: 16),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Container(
+            : datos.isEmpty
+                ? Container(
+                    padding: EdgeInsets.only(
+                        top: MediaQuery.of(context).size.width / 5),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/images/zzz.png',
+                          width: MediaQuery.of(context).size.width / 1,
+                          height: 200,
+                        ),
+                        Text(
+                          'Lo sentimos, por el momento no se encuentran servicios disponibles',
+                          style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.width / 20,
+                            color: Colors.deepPurple,
+                          ),
+                          textAlign: TextAlign.justify,
+                        )
+                      ],
+                    ))
+                : ListView.builder(
+                    itemCount: servicios.length,
+                    itemBuilder: (_, int index) {
+                      return InkWell(
+                        onTap: () {
+                          if (userType == 2) {
+                            Fluttertoast.showToast(
+                                msg: 'Tipo de usuario no permitido',
+                                toastLength: Toast.LENGTH_SHORT,
+                                gravity: ToastGravity.BOTTOM,
+                                timeInSecForIosWeb: 2,
+                                backgroundColor: Colors.red,
+                                textColor: Colors.white,
+                                fontSize: 16.0);
+                          } else {
+                            if (error == true) {
+                              Fluttertoast.showToast(
+                                  msg: 'Respuesta del servidor larga: 408',
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.BOTTOM,
+                                  timeInSecForIosWeb: 2,
+                                  backgroundColor: Colors.red,
+                                  textColor: Colors.white,
+                                  fontSize: 16.0);
+                            } else {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (_) => MultiServicios(
+                                        service: servicios[index].tipoDeServ,
+                                        datosP: datos,
+                                        unidad: unidad,
+                                        precios: precio,
+                                        name: name,
+                                        seleccionado: seleccionado,
+                                      )));
+                            }
+                          }
+                        },
+                        child: Container(
+                            padding: EdgeInsets.only(left: 10, top: 16),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Container(
 
-                                ///Image.asset('assets/images/k19.png', width: 110)
-                                child: servicios[index].image),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 15),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                    child: Text(
-                                      'Servicios para el hogar',
-                                      style: TextStyle(fontSize: 18),
-                                    ),
+                                    ///Image.asset('assets/images/k19.png', width: 110)
+                                    child: servicios[index].image),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 15),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        child: Text(
+                                          'Servicios para el hogar',
+                                          style: TextStyle(fontSize: 18),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text(
+                                        servicios[index].horario!,
+                                        style: TextStyle(fontSize: 16),
+                                      )
+                                    ],
                                   ),
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Text(
-                                    servicios[index].horario!,
-                                    style: TextStyle(fontSize: 16),
-                                  )
-                                ],
-                              ),
-                            )
-                          ],
-                        )),
-                  );
-                },
-              ),
+                                )
+                              ],
+                            )),
+                      );
+                    },
+                  ),
       ),
     );
   }
@@ -331,17 +403,18 @@ class DatosProveedor {
   String? formaPago2;
   String? formaPago3;
   String? compania;
+  dynamic activo;
 
-  DatosProveedor({
-    this.rutaLogo,
-    this.diasAtencion,
-    this.horarioInicio,
-    this.horarioFin,
-    this.formaPago1,
-    this.formaPago2,
-    this.formaPago3,
-    this.compania,
-  });
+  DatosProveedor(
+      {this.rutaLogo,
+      this.diasAtencion,
+      this.horarioInicio,
+      this.horarioFin,
+      this.formaPago1,
+      this.formaPago2,
+      this.formaPago3,
+      this.compania,
+      this.activo});
 
   Future<Seguimiento?> getDatos(int idCom) async {
     try {

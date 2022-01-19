@@ -548,77 +548,83 @@ class _ReportEditPageState extends State<ReportEditPage> {
   }
 
   buildPhotoView() {
-    return Container(
-      height: 400,
-      margin: EdgeInsets.only(left: 15, right: 15),
-      width: MediaQuery.of(context).size.width,
-      child: PhotoViewGallery.builder(
-        itemCount: widget.report.uri!.length,
-        builder: (context, index) {
-          return PhotoViewGalleryPageOptions(
-            imageProvider: NetworkImage(widget.report.uri![index]),
-            minScale: PhotoViewComputedScale.contained * 0.9,
-            maxScale: PhotoViewComputedScale.covered * 2,
-          );
-        },
-        gaplessPlayback: true,
-        scrollDirection: Axis.horizontal,
-        scrollPhysics: BouncingScrollPhysics(),
-        backgroundDecoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(20)),
-          color: Theme.of(context).canvasColor,
-        ),
-        loadingBuilder: (context, event) => Center(
-          child: Container(
-            width: 30.0,
-            height: 30.0,
-            child: CircularProgressIndicator(
-              backgroundColor: Colors.orange,
-              value: event == null
-                  ? 0
-                  : event.cumulativeBytesLoaded / event.expectedTotalBytes!,
+    return widget.report.uri!.isEmpty
+        ? Container()
+        : Container(
+            height: 400,
+            margin: EdgeInsets.only(left: 15, right: 15),
+            width: MediaQuery.of(context).size.width,
+            child: PhotoViewGallery.builder(
+              itemCount: widget.report.uri!.length,
+              builder: (context, index) {
+                return PhotoViewGalleryPageOptions(
+                  imageProvider: NetworkImage(widget.report.uri![index]),
+                  minScale: PhotoViewComputedScale.contained * 0.9,
+                  maxScale: PhotoViewComputedScale.covered * 2,
+                );
+              },
+              gaplessPlayback: true,
+              scrollDirection: Axis.horizontal,
+              scrollPhysics: BouncingScrollPhysics(),
+              backgroundDecoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(20)),
+                color: Theme.of(context).canvasColor,
+              ),
+              loadingBuilder: (context, event) => Center(
+                child: Container(
+                  width: 30.0,
+                  height: 30.0,
+                  child: CircularProgressIndicator(
+                    backgroundColor: Colors.orange,
+                    value: event == null
+                        ? 0
+                        : event.cumulativeBytesLoaded /
+                            event.expectedTotalBytes!,
+                  ),
+                ),
+              ),
             ),
-          ),
-        ),
-      ),
-    );
+          );
   }
 
   buildResponseImage() {
-    return Container(
-      height: 400,
-      margin: EdgeInsets.only(left: 15, right: 15),
-      width: MediaQuery.of(context).size.width,
-      child: PhotoViewGallery.builder(
-        itemCount: evidencias.length,
-        builder: (context, index) {
-          return PhotoViewGalleryPageOptions(
-            imageProvider: NetworkImage(evidencias[index]),
-            minScale: PhotoViewComputedScale.contained * 0.9,
-            maxScale: PhotoViewComputedScale.covered * 2,
-          );
-        },
-        gaplessPlayback: true,
-        scrollDirection: Axis.horizontal,
-        scrollPhysics: BouncingScrollPhysics(),
-        backgroundDecoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(20)),
-          color: Theme.of(context).canvasColor,
-        ),
-        loadingBuilder: (context, event) => Center(
-          child: Container(
-            width: 30.0,
-            height: 30.0,
-            child: CircularProgressIndicator(
-              backgroundColor: Colors.orange,
-              value: event == null
-                  ? 0
-                  : event.cumulativeBytesLoaded / event.expectedTotalBytes!,
+    return evidencias.isEmpty
+        ? Container()
+        : Container(
+            height: 400,
+            margin: EdgeInsets.only(left: 15, right: 15),
+            width: MediaQuery.of(context).size.width,
+            child: PhotoViewGallery.builder(
+              itemCount: evidencias.length,
+              builder: (context, index) {
+                return PhotoViewGalleryPageOptions(
+                  imageProvider: NetworkImage(evidencias[index]),
+                  minScale: PhotoViewComputedScale.contained * 0.9,
+                  maxScale: PhotoViewComputedScale.covered * 2,
+                );
+              },
+              gaplessPlayback: true,
+              scrollDirection: Axis.horizontal,
+              scrollPhysics: BouncingScrollPhysics(),
+              backgroundDecoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(20)),
+                color: Theme.of(context).canvasColor,
+              ),
+              loadingBuilder: (context, event) => Center(
+                child: Container(
+                  width: 30.0,
+                  height: 30.0,
+                  child: CircularProgressIndicator(
+                    backgroundColor: Colors.orange,
+                    value: event == null
+                        ? 0
+                        : event.cumulativeBytesLoaded /
+                            event.expectedTotalBytes!,
+                  ),
+                ),
+              ),
             ),
-          ),
-        ),
-      ),
-    );
+          );
   }
 
   /// funcion que constuye la imagen o la cantidad de imagenes

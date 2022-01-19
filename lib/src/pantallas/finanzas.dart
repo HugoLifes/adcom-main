@@ -7,6 +7,7 @@ import 'package:adcom/src/extra/historico.dart';
 import 'package:adcom/src/extra/vistaPagos.dart';
 import 'package:adcom/src/methods/checkInternet.dart';
 import 'package:adcom/src/methods/exeptions.dart';
+import 'package:adcom/src/pantallas/mainMenu.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:adcom/src/extra/opciones_edoCuenta.dart';
 import 'package:adcom/src/extra/servicios.dart';
@@ -134,7 +135,9 @@ class _FinanzasState extends State<Finanzas> {
                     fontWeight: FontWeight.w700),
               ),
               elevation: 7,
-              leading: BackButton(),
+              leading: BackButton(onPressed: () {
+                Navigator.popAndPushNamed(context, MainMenu.routeName);
+              }),
               backgroundColor: Colors.lightGreen[700],
             ),
       resizeToAvoidBottomInset: false,
@@ -198,7 +201,7 @@ class _FinanzasState extends State<Finanzas> {
                   Padding(
                     padding: const EdgeInsets.only(top: 12),
                     child: Text(
-                      'Toma el control de tus gastos',
+                      'Toma el control de tus pagos',
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -649,8 +652,8 @@ class _FinanzasState extends State<Finanzas> {
               child: GridView.builder(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: landScape == true ? 2 : 1,
-                    childAspectRatio: landScape == true ? 3.0 : 2.8,
-                    crossAxisSpacing: 20,
+                    childAspectRatio: landScape == true ? 3.0 : 2.5,
+                    crossAxisSpacing: 23,
                     mainAxisSpacing: 5,
                   ),
                   itemCount: deudas.length,

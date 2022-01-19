@@ -356,6 +356,7 @@ class Servicios {
   String? telGuard;
   int? idTipoProveedor;
   String? diaAtencion;
+  dynamic activo;
 
   Servicios(
       {this.idproveedor,
@@ -366,5 +367,6 @@ class Servicios {
       this.idTipoProveedor,
       this.telCont1,
       this.telCont2,
+      this.activo,
       this.telGuard});
 }

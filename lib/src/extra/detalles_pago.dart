@@ -752,6 +752,7 @@ class _DetallesPagoState extends State<DetallesPago> {
                       list: widget.refp,
                       refP: widget.list,
                       ref: mensaje,
+                      express: true,
                     )));
 
           //sendingData();
@@ -769,7 +770,7 @@ class _DetallesPagoState extends State<DetallesPago> {
           style: TextStyle(color: Colors.lightGreen[700]),
         ));
     AlertDialog alert = AlertDialog(
-      actions: [okButton, backButton],
+      actions: [okButton],
       title: Text(
         '¡Atención!',
         style: TextStyle(
