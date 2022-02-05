@@ -39,7 +39,7 @@ SharedPreferences? prefs;
 Future<Proveedores?> getProv() async {
   try {
     Uri url = Uri.parse(
-        "http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-proveedores");
+        "http://www.adcom.com.mx:8081/backend/web/index.php?r=adcom/get-proveedores");
 
     final response = await http.get(url);
     var data = returnResponse(response);

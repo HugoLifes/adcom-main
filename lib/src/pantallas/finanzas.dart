@@ -37,7 +37,7 @@ Future<Accounts?> getAdeudos() async {
     var id = prefs!.getInt('userId');
     print(id);
     final Uri url = Uri.parse(
-        'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-adeudos');
+        'http://www.adcom.com.mx:8081/backend/web/index.php?r=adcom/get-adeudos');
     final response = await http.post(url, body: {
       "params": json.encode({"usuarioId": id.toString()})
     }).timeout(Duration(seconds: 5), onTimeout: () {
@@ -918,7 +918,7 @@ class Deudas {
       var id = prefs!.getInt('userId');
       print('aqui es el getDeuda $id');
       final Uri url = Uri.parse(
-          'http://187.189.53.8:8081/backend/web/index.php?r=adcom/deudas');
+          'http://www.adcom.com.mx:8081/backend/web/index.php?r=adcom/deudas');
       final response = await http.post(url, body: {
         "params": json.encode({"idResidente": id.toString(), "pagoBandera": i})
       }).timeout(Duration(seconds: 1), onTimeout: () {

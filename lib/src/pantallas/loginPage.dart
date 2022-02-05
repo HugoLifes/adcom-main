@@ -392,7 +392,7 @@ Future<Posting?> loginAcces(String user, String pass) async {
   var data;
   try {
     final Uri uri = Uri.parse(
-        'http://187.189.53.8:8081/backend/web/index.php?r=adcom/login');
+        'http://www.adcom.com.mx:8081/backend/web/index.php?r=adcom/login');
     final response = await http.post(uri, body: {
       "params": jsonEncode({'username': user, 'password': pass}),
     }).timeout(Duration(seconds: 7), onTimeout: () {

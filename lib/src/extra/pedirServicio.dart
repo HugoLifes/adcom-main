@@ -1230,7 +1230,7 @@ class Checkeo {
     print(id);
 
     Uri url = Uri.parse(
-        "http://187.189.53.8:8080/AdcomBackend/backend/web/index.php?r=adcom/validar-fecha-porveedor");
+        "http://www.adcom.com.mx:8080/AdcomBackend/backend/web/index.php?r=adcom/validar-fecha-porveedor");
     final response = await http.post(url, body: {
       'params': json.encode({"fecha": "'${tiempo}'", "idProveedor": id})
     });
@@ -1302,7 +1302,7 @@ class EnviarCorreo {
     print(tipoPago);
     print(coments);
     Uri url = Uri.parse(
-        "http://187.189.53.8:8080/AdcomBackend/backend/web/index.php?r=adcom/envio-correo-servicio");
+        "http://www.adcom.com.mx:8080/AdcomBackend/backend/web/index.php?r=adcom/envio-correo-servicio");
 
     final response = await http.post(url, body: {
       "params": json.encode({

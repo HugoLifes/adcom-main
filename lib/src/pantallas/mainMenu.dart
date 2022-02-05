@@ -381,7 +381,7 @@ class _MainMenuState extends State<MainMenu> {
 class SendIdNotification {
   Future sendId(String nuserId, int userIdApp) async {
     Uri uri = Uri.parse(
-        'http://187.189.53.8:8081/backend/web/index.php?r=adcom/token');
+        'http://www.adcom.com.mx:8081/backend/web/index.php?r=adcom/token');
     print(nuserId);
     print(userIdApp);
     var response = await http.post(uri, body: {

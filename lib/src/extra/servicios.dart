@@ -354,7 +354,7 @@ class DatosProveedor {
   Future<ProvedoresId?> getDatos(int idCom) async {
     try {
       Uri uri = Uri.parse(
-          'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-datos-provedores-by-com');
+          'http://www.adcom.com.mx:8081/backend/web/index.php?r=adcom/get-datos-provedores-by-com');
 
       var response = await http.post(uri, body: {'idCom': idCom.toString()}).timeout(Duration(seconds: 6), onTimeout:(){
         return http.Response('Timeout', 408);

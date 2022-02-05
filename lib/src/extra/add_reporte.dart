@@ -731,7 +731,7 @@ class _AddReporteState extends State<AddReporte> {
       List<String> newpath) async {
     // string to uri
     var uri = Uri.parse(
-        "http://187.189.53.8:8081/backend/web/index.php?r=adcom/reportes");
+        "http://www.adcom.com.mx:8081/backend/web/index.php?r=adcom/reportes");
     print("image upload URL - $uri");
 // create multipart request
     var request = new http.MultipartRequest("POST", uri);
@@ -948,7 +948,7 @@ class _AddReporteState extends State<AddReporte> {
     print(idCom);
     print(idUser);
     final Uri url = Uri.parse(
-        'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-tipo-aviso');
+        'http://www.adcom.com.mx:8081/backend/web/index.php?r=adcom/get-tipo-aviso');
     final response = await http.post(url, body: {"idCom": idCom.toString()});
 
     if (response.statusCode == 200) {

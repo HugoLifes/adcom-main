@@ -31,7 +31,7 @@ Future<GetReportes?> getReportes() async {
     var id = prefs!.getInt('userId');
     print(id);
     Uri url = Uri.parse(
-        'http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-reportes');
+        'http://www.adcom.com.mx:8081/backend/web/index.php?r=adcom/get-reportes');
 
     final response = await http.post(url, body: {"idResidente": id.toString()});
 

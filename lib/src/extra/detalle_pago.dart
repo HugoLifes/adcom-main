@@ -275,7 +275,7 @@ class _DetallesPagoState extends State<DetallesPago> {
       });
 
       Response response = await dio.post(
-          'http://187.189.53.8:8080/AdcomBackend/backend/web/index.php?r=adcom/generar-referencia-maestra',
+          'http://www.adcom.com.mx:8080/AdcomBackend/backend/web/index.php?r=adcom/generar-referencia-maestra',
           data: formdata2, onSendProgress: (received, total) {
         if (total != 1) {
           print((received / total * 100).toStringAsFixed(0) + '%');
