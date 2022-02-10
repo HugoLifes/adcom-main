@@ -38,15 +38,17 @@ class MultiServicios extends StatefulWidget {
 }
 
 SharedPreferences? prefs;
-Future<Proveedores?> getProv() async {
+Future<Proveedores?> getProv(int idCom) async {
   try {
     Uri url = Uri.parse(
         "http://187.189.53.8:8081/backend/web/index.php?r=adcom/get-proveedores");
 
-    final response =
-        await http.get(url).timeout(Duration(seconds: 8), onTimeout: () {
+    final response = await http.post(url, body: {
+      "params": json.encode({"idComu": idCom.toString()})
+    }).timeout(Duration(seconds: 8), onTimeout: () {
       return http.Response('Request Timeout', 408);
     });
+
     var data = returnResponse(response);
     print(data);
     return proveedoresFromJson(data);
@@ -62,11 +64,15 @@ class _MultiServiciosState extends State<MultiServicios> {
   bool loading = true;
   String? fi;
   String? ff;
+  int? idCom;
 
   Future data() async {
     prefs = await SharedPreferences.getInstance();
 
-    prov = await getProv().catchError((e) {
+    setState(() {
+      idCom = prefs!.getInt('idCom');
+    });
+    prov = await getProv(idCom!).catchError((e) {
       alerta5();
     });
 

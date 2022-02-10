@@ -63,63 +63,16 @@ class _ServicesState extends State<Services> {
 
     DatosProveedor().getDatos(idCom).then((value) {
       for (int i = 0; i < value!.data!.length; i++) {
-        if (value.data![i].activo == "0") {
-        } else {
-          if (value.data![i].activo == "1") {
-            datos.add(new DatosProveedor(
-              rutaLogo: value.data![i].rutaLogo,
-              diasAtencion: value.data![i].diaAtencion,
-              horarioInicio: value.data![i].horaInitAten,
-              horarioFin: value.data![i].horaFinAten,
-              compania: value.data![i].compania,
-              formaPago1: value.data![i].formaPago1!,
-              formaPago2: value.data![i].formaPago2!,
-              formaPago3: value.data![i].formaPago3!,
-            ));
-
-            for (int j = 0; j < value.data![i].productos!.length; j++) {
-              print('here omg');
-              setState(() {
-                unidad.add(
-                  value.data![i].productos![j].presLogoRuta!,
-                );
-              });
-            }
-            /* unidad = List.generate(
-                  value.data!.length,
-                  (index) => List.generate(
-                      value.data![index].productos!.length,
-                      (index2) => value.data![index].productos![index2]
-                                  .presLogoRuta! ==
-                              null
-                          ? '0'
-                          : value.data![index].productos![index2].presLogoRuta!
-                              .trimRight())); */
-            precio = List.generate(
-                value.data!.length,
-                (index) => List.generate(
-                    value.data![index].productos!.length,
-                    (index2) =>
-                        value.data![index].productos![index2].costo == null
-                            ? '0'
-                            : value.data![index].productos![index2].costo!
-                                .trimRight()));
-            name = List.generate(
-                value.data!.length,
-                (index) => List.generate(
-                    value.data![index].productos!.length,
-                    (index2) =>
-                        value.data![index].productos![index2].descripcion ==
-                                null
-                            ? '0'
-                            : value.data![index].productos![index2].descripcion!
-                                .trimRight()));
-            seleccionado = List.generate(
-                value.data!.length,
-                (index) => List.generate(
-                    value.data![index].productos!.length, (index2) => false));
-          }
-        }
+        datos.add(new DatosProveedor(
+          rutaLogo: value.data![i].rutaLogo,
+          diasAtencion: value.data![i].diaAtencion,
+          horarioInicio: value.data![i].horaInitAten,
+          horarioFin: value.data![i].horaFinAten,
+          compania: value.data![i].compania,
+          formaPago1: value.data![i].formaPago1!,
+          formaPago2: value.data![i].formaPago2!,
+          formaPago3: value.data![i].formaPago3!,
+        ));
       }
       setState(() {
         cargado = true;
@@ -127,15 +80,15 @@ class _ServicesState extends State<Services> {
 
       /// aqui se obtienen caracteristicas del producto
       /// en este caso el campo unidad del service
-      /* precio = List.generate(
+      precio = List.generate(
           value.data!.length,
           (index) => List.generate(
               value.data![index].productos!.length,
               (index2) => value.data![index].productos![index2].costo == null
                   ? '0'
-                  : value.data![index].productos![index2].costo!.trimRight())); */
+                  : value.data![index].productos![index2].costo!.trimRight()));
 
-      /*   /// aqui se obtienen caracteristicas del producto
+      /// aqui se obtienen caracteristicas del producto
       /// en este caso el campo de las imagenes del producto
       unidad = List.generate(
           value.data!.length,
@@ -161,7 +114,7 @@ class _ServicesState extends State<Services> {
       seleccionado = List.generate(
           value.data!.length,
           (index) => List.generate(
-              value.data![index].productos!.length, (index2) => false)); */
+              value.data![index].productos!.length, (index2) => false));
     }).catchError((e) {
       setState(() {
         if (mounted) {
