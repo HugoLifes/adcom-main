@@ -32,7 +32,7 @@ Future<Welcome?> getData() async {
     print(id.toString());
 
     Uri uri = Uri.parse(
-        'http://www.adcom.com.mx:8081/backend/web/index.php?r=adcom/get-directorio');
+        'http://www.adcom.mx:8081/backend/web/index.php?r=adcom/get-directorio');
     final response = await http.post(uri, body: {
       "params": json.encode({"usuarioId": id})
     }).timeout(Duration(seconds: 8), onTimeout: () {

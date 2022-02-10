@@ -481,7 +481,7 @@ class _ResponseSeguimientoState extends State<ResponseSeguimiento> {
     var userId = prefs!.getInt('userId');
     // string to uri
     var uri = Uri.parse(
-        "http://www.adcom.com.mx:8081/backend/web/index.php?r=adcom/registrar-seguimiento");
+        "http://www.adcom.mx:8081/backend/web/index.php?r=adcom/registrar-seguimiento");
     print("image upload URL - $uri");
 // create multipart request
     var request = new http.MultipartRequest("POST", uri);

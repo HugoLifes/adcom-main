@@ -501,7 +501,7 @@ class AvisosCall {
   Future<Comunities?> getComunidades() async {
     try {
       Uri url = Uri.parse(
-          "http://www.adcom.com.mx:8081/backend/web/index.php?r=adcom/get-comunities");
+          "http://www.adcom.mx:8081/backend/web/index.php?r=adcom/get-comunities");
 
       final response =
           await http.get(url).timeout(Duration(seconds: 7), onTimeout: () {
@@ -536,7 +536,7 @@ class AvisosUsuario {
   Future<GetAvisos?> getAvisos(int id) async {
     try {
       Uri url = Uri.parse(
-          "http://www.adcom.com.mx:8081/backend/web/index.php?r=adcom/get-avisos-by-residente");
+          "http://www.adcom.mx:8081/backend/web/index.php?r=adcom/get-avisos-by-residente");
       var response = await http
           .post(url, body: {'idCom': id.toString()}).timeout(
               Duration(seconds: 7), onTimeout: () {

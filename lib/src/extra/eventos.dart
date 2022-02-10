@@ -385,7 +385,7 @@ Future<ReservaData?> getReserva({id}) async {
     prefs = await SharedPreferences.getInstance();
 
     Uri uri = Uri.parse(
-        'http://www.adcom.com.mx:8081/backend/web/index.php?r=adcom/get-amenidad-reserva');
+        'http://www.adcom.mx:8081/backend/web/index.php?r=adcom/get-amenidad-reserva');
 
     final response = await http.post(uri, body: {"idAmenidad": "${id}"});
 
